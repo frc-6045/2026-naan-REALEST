@@ -15,13 +15,15 @@ import frc.robot.Constants.PositionConstants;
 public class Bindings {
     public static void InitBindings(
         CommandXboxController m_driverController,
-        CommandXboxController m_operatorController,
-        CommandXboxController m_testController 
+        CommandXboxController m_operatorController
+       
+
         //Put subsystems here
 
     ){
         
         /*Driver Bindings */
+        //m_driverController.leftBumper()
         /*Operator Bindings */
         
       
