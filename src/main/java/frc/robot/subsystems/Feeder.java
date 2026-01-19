@@ -16,7 +16,7 @@ import frc.robot.Constants.MotorConstants;
 public class Feeder extends SubsystemBase {
     
     private final SparkFlex m_FeederMotor;
-    SparkFlexConfig config = new SparkFlexConfig;
+    SparkFlexConfig config = new SparkFlexConfig();
 
     public Shooter() {
         m_FeederMotor = new SparkFlex(67, MotorType.kBrushless);
