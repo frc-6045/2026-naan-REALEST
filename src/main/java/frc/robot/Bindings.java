@@ -23,6 +23,7 @@ public class Bindings {
     ){
         
         /*Driver Bindings */
+        m_driverController.leftBumper()
         /*Operator Bindings */
         
       
