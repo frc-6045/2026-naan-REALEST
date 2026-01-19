@@ -3,7 +3,8 @@
   "robotLength": 0.737,
   "holonomicMode": true,
   "pathFolders": [
-    "auto9paths",
+    "New Folder",
+    "auto10paths",
     "auto1paths",
     "auto2paths",
     "auto3paths",
@@ -11,9 +12,12 @@
     "auto5paths",
     "auto6paths",
     "auto7paths",
-    "auto8paths"
+    "auto8paths",
+    "auto9paths"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "Auto Outlines"
+  ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
