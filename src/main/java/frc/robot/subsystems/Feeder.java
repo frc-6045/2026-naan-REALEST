@@ -14,44 +14,41 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 
 public class Feeder extends SubsystemBase {
-    
-    private final SparkFlex m_FeederMotor;
-    SparkFlexConfig config = new SparkFlexConfig();
+  private final SparkFlex m_FeederMotor;
+  SparkFlexConfig config = new SparkFlexConfig();
 
-    public Shooter() {
-        m_FeederMotor = new SparkFlex(67, MotorType.kBrushless);
+  public Feeder() {
+    m_FeederMotor = new SparkFlex(67, MotorType.kBrushless);
 
-        updateMotorSettings(m_FeederMotor);
-        m_FeederMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    }
+    updateMotorSettings(m_FeederMotor);
+    m_FeederMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+  }
 
-    public void updateMotorSettings(SparkFlex motor){
-        config
-            .idleMode(IdleMode.kBrake)
-
+   public void updateMotorSettings(SparkFlex motor) {
+    config
+        .idleMode(IdleMode.kBrake)
+        //.smartCurrentLimit(MotorConstants.kSpindexerCurrentLimit)
         ;
-        config.closedLoop
-            .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
-    }
-    public void setSpeed(double speed) {
-        
-        m_FeederMotor.set(speed);
-        SmartDashboard.putNumber("Feeder speed", speed);
-      }
-    
-      public void stopClimbMotor() {
-        m_FeederMotor.stopMotor();
-        SmartDashboard.putNumber("Feeder speed", 0);
-      }
-    
-      @Override
-      public void periodic() {
-    
-      }
-    
-      @Override
-      public void simulationPeriodic() {}
-    }
-    
+    config.closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
+  }
 
+  public void setSpeed(double speed) {
+    //speed = MathUtil.clamp(-MotorConstants.kSpindexerMotorMaximumSpeed,MotorConstants.kSpindexerMotorMaximumSpeed);
+    m_FeederMotor.set(speed);
+    SmartDashboard.putNumber("Shooter speed", speed);
+  }
 
+  public void stopClimbMotor() {
+    m_FeederMotor.stopMotor();
+    SmartDashboard.putNumber("Shooter speed", 0);
+  }
+
+  @Override
+  public void periodic() {
+
+  }
+
+  @Override
+  public void simulationPeriodic() {}
+}
