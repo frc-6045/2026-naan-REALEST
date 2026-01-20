@@ -18,7 +18,7 @@ public class Intake extends SubsystemBase {
   SparkFlexConfig config = new SparkFlexConfig();
 
   public Intake() {
-    m_IntakeMotor = new SparkFlex(67, MotorType.kBrushless);
+    m_IntakeMotor = new SparkFlex(MotorConstants.kIntakeMotorCanID, MotorType.kBrushless);
 
     updateMotorSettings(m_IntakeMotor);
     m_IntakeMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

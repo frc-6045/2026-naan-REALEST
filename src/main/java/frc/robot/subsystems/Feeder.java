@@ -18,7 +18,7 @@ public class Feeder extends SubsystemBase {
   SparkFlexConfig config = new SparkFlexConfig();
 
   public Feeder() {
-    m_FeederMotor = new SparkFlex(67, MotorType.kBrushless);
+    m_FeederMotor = new SparkFlex(MotorConstants.kFeederMotorCanID, MotorType.kBrushless);
 
     updateMotorSettings(m_FeederMotor);
     m_FeederMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

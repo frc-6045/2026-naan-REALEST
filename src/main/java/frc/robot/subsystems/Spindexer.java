@@ -18,7 +18,7 @@ public class Spindexer extends SubsystemBase {
   SparkFlexConfig config = new SparkFlexConfig();
 
   public Spindexer() {
-    m_SpindexerMotor = new SparkFlex(67, MotorType.kBrushless);
+    m_SpindexerMotor = new SparkFlex(MotorConstants.kSpindexerMotorCanID, MotorType.kBrushless);
 
     updateMotorSettings(m_SpindexerMotor);
     m_SpindexerMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

@@ -14,14 +14,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 
 public class Shooter extends SubsystemBase {
-  private final SparkFlex m_ShooterMotor;
+  private final SparkFlex m_ShooterMotor1;
+  private final SparkFlex m_ShooterMotor2;
   SparkFlexConfig config = new SparkFlexConfig();
 
   public Shooter() {
-    m_ShooterMotor = new SparkFlex(67, MotorType.kBrushless);
+    m_ShooterMotor1 = new SparkFlex(MotorConstants.kShooterMotor1CanID, MotorType.kBrushless);
+    m_ShooterMotor2 = new SparkFlex(MotorConstants.kShooterMotor2CanID, MotorType.kBrushless);
 
-    updateMotorSettings(m_ShooterMotor);
-    m_ShooterMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    updateMotorSettings(m_ShooterMotor1);
+    m_ShooterMotor1.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
    public void updateMotorSettings(SparkFlex motor) {
@@ -35,12 +37,12 @@ public class Shooter extends SubsystemBase {
 
   public void setSpeed(double speed) {
     //speed = MathUtil.clamp(-MotorConstants.kSpindexerMotorMaximumSpeed,MotorConstants.kSpindexerMotorMaximumSpeed);
-    m_ShooterMotor.set(speed);
+    m_ShooterMotor1.set(speed);
     SmartDashboard.putNumber("Shooter speed", speed);
   }
 
   public void stopClimbMotor() {
-    m_ShooterMotor.stopMotor();
+    m_ShooterMotor1.stopMotor();
     SmartDashboard.putNumber("Shooter speed", 0);
   }
 

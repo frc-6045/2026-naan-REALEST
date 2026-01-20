@@ -14,14 +14,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 
 public class Climber extends SubsystemBase {
-  private final SparkFlex m_ClimbMotor;
+  private final SparkFlex m_ClimbMotor1;
+  private final SparkFlex m_ClimbMotor2;
   SparkFlexConfig config = new SparkFlexConfig();
 
   public Climber() {
-    m_ClimbMotor = new SparkFlex(67, MotorType.kBrushless);
+    m_ClimbMotor1 = new SparkFlex(MotorConstants.kClimberMotor1CanID, MotorType.kBrushless);
+    m_ClimbMotor2 = new SparkFlex(MotorConstants.kClimberMotor2CanID, MotorType.kBrushless);
 
-    updateMotorSettings(m_ClimbMotor);
-    m_ClimbMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    updateMotorSettings(m_ClimbMotor1);
+    m_ClimbMotor1.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
    public void updateMotorSettings(SparkFlex motor) {
@@ -35,12 +37,12 @@ public class Climber extends SubsystemBase {
 
   public void setSpeed(double speed) {
     //speed = MathUtil.clamp(-MotorConstants.kSpindexerMotorMaximumSpeed,MotorConstants.kSpindexerMotorMaximumSpeed);
-    m_ClimbMotor.set(speed);
+    m_ClimbMotor1.set(speed);
     SmartDashboard.putNumber("Shooter speed", speed);
   }
 
   public void stopClimbMotor() {
-    m_ClimbMotor.stopMotor();
+    m_ClimbMotor1.stopMotor();
     SmartDashboard.putNumber("Shooter speed", 0);
   }
 
