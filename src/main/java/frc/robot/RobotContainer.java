@@ -5,6 +5,11 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.Feeder;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Spindexer;
 import frc.robot.Autos;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -17,16 +22,25 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+  private Autos m_Autos;
+  private final Intake m_Intake = new Intake();
+  private final Spindexer m_Spindexer = new Spindexer();
+  private final Climber m_Climber = new Climber();
+  private final Shooter m_Shooter = new Shooter();
+  private final Feeder m_Feeder = new Feeder();
+
   
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  private final CommandXboxController m_operatorController =
+      new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // Configure the trigger bindings
-    configureBindings();
+    m_Autos = new Autos(m_Intake, m_Spindexer, m_Climber, m_Shooter, m_Feeder);
+    Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_Spindexer, m_Climber, m_Shooter, m_Feeder);
   }
 
   /**
@@ -44,6 +58,10 @@ public class RobotContainer {
     // cancelling on release.
 
   }
+
+  public Command getAutonomousCommand() {
+    return m_Autos.getAutonomousCommand();
+  } 
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
