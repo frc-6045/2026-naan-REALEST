@@ -5,12 +5,14 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Spindexer;
+import frc.robot.subsystems.Swerve;
 
 public class Autos {
 
@@ -21,31 +23,23 @@ public class Autos {
    * NamedCommands.registerCommand("autoCommandName", new exampleCommand(parameters));
    * exampleCommand must be closed-loop
    * PID stuff (untimed commmands) should use .asProxy();
-   * 
+   *
    * ADD AUTO TO AUTO CHOOSER
    * autoChooser.addOption("exampleAutoName", AutoBuilder.buildAuto("NameOfAutoInPathplanner"));
    */
-  public Autos(Intake intake, Spindexer spindexer, Climber climb, Shooter shooter, Feeder feeder) {
+  public Autos(Intake intake, Spindexer spindexer, Climber climb, Shooter shooter, Feeder feeder, Swerve swerve) {
+    // PathPlanner AutoBuilder is configured in Swerve subsystem
 
-    
     autoChooser = new SendableChooser<Command>();
+    autoChooser.setDefaultOption("None", null);
+
+    // Add autos to chooser
+    // autoChooser.addOption("ExampleAuto", AutoBuilder.buildAuto("ExampleAuto"));
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
   }
 }
-
-
-    //// probably not needed 
-    // private final Intake m_Intake;
-    // private final Spindexer m_Spindexer;
-    // private final Climber m_Climber;
-    // private final Shooter m_Shooter;
-    // private final Feeder m_Feeder;
-    //// probably not needed 
-    // m_Intake=intake;
-    // m_Spindexer=spindexer;
-    // m_Climber=climb;
-    // m_Shooter=shooter;
-    // m_Feeder=feeder;
