@@ -4,9 +4,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.DrivebaseConstants;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -15,8 +17,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-
   private final RobotContainer m_robotContainer;
+  private final Timer m_disabledTimer = new Timer();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -46,14 +48,28 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    // Enable brake mode when disabled to hold position
+    m_robotContainer.setMotorBrake(true);
+    m_disabledTimer.reset();
+    m_disabledTimer.start();
+  }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    // After the wheel lock time has elapsed, release brakes to allow pushing the robot
+    if (m_disabledTimer.hasElapsed(DrivebaseConstants.kWheelLockTime)) {
+      m_robotContainer.setMotorBrake(false);
+      m_disabledTimer.stop();
+    }
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    // Enable brake mode for autonomous
+    m_robotContainer.setMotorBrake(true);
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -68,6 +84,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    // Enable brake mode for teleop
+    m_robotContainer.setMotorBrake(true);
+
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove

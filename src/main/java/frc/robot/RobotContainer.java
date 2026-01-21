@@ -50,5 +50,14 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return m_Autos.getAutonomousCommand();
-  } 
+  }
+
+  /**
+   * Sets the motor brake mode for the swerve drive.
+   *
+   * @param brake true for brake mode, false for coast mode
+   */
+  public void setMotorBrake(boolean brake) {
+    m_Swerve.setMotorBrake(brake);
+  }
 }

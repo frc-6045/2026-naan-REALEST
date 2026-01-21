@@ -22,6 +22,11 @@ public final class Constants {
 
   }
 
+  public static class DrivebaseConstants {
+    // Time in seconds to hold motor brakes when disabled before releasing (allows pushing robot)
+    public static final double kWheelLockTime = 10.0;
+  }
+
   public static class MotorConstants {
     // Can IDs
 
