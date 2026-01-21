@@ -5,23 +5,40 @@
 package frc.robot.subsystems;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.function.DoubleSupplier;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
+
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SwerveConstants;
 import swervelib.SwerveDrive;
+import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveParser;
+import swervelib.telemetry.SwerveDriveTelemetry;
+import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 public class Swerve extends SubsystemBase {
     private final SwerveDrive m_swerveDrive;
 
     public Swerve() {
+        // Set telemetry verbosity before creating swerve drive
+        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+
         try {
             m_swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), "swerve"))
                     .createSwerveDrive(SwerveConstants.kMaxSpeedMetersPerSecond);
@@ -30,47 +47,139 @@ public class Swerve extends SubsystemBase {
         }
 
         // Configure the SwerveDrive
-        m_swerveDrive.setHeadingCorrection(true);
+        m_swerveDrive.setHeadingCorrection(false);
         m_swerveDrive.setCosineCompensator(false);
+        m_swerveDrive.setAngularVelocityCompensation(true, true, 0.1);
+        m_swerveDrive.setModuleEncoderAutoSynchronize(false, 1);
+
+        // Setup PathPlanner
+        setupPathPlanner();
     }
 
     /**
-     * Drive the robot with field-oriented control.
-     *
-     * @param translationX X velocity in meters per second (forward positive)
-     * @param translationY Y velocity in meters per second (left positive)
-     * @param rotation     Angular velocity in radians per second (counter-clockwise positive)
+     * Setup PathPlanner AutoBuilder for autonomous path following.
      */
-    public void driveFieldOriented(double translationX, double translationY, double rotation) {
-        m_swerveDrive.driveFieldOriented(
-                new ChassisSpeeds(translationX, translationY, rotation));
-    }
+    public void setupPathPlanner() {
+        try {
+            RobotConfig config = RobotConfig.fromGUISettings();
 
-    /**
-     * Drive the robot with robot-oriented control.
-     *
-     * @param speeds ChassisSpeeds object representing the desired velocities
-     */
-    public void drive(ChassisSpeeds speeds) {
-        m_swerveDrive.drive(speeds);
+            AutoBuilder.configure(
+                this::getPose,
+                this::resetOdometry,
+                this::getRobotVelocity,
+                (speedsRobotRelative, moduleFeedForwards) -> {
+                    m_swerveDrive.drive(
+                        speedsRobotRelative,
+                        m_swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
+                        moduleFeedForwards.linearForces()
+                    );
+                },
+                new PPHolonomicDriveController(
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID
+                    new PIDConstants(5.0, 0.0, 0.0)  // Rotation PID
+                ),
+                config,
+                () -> {
+                    // Flip path for red alliance
+                    var alliance = DriverStation.getAlliance();
+                    return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+                },
+                this
+            );
+        } catch (Exception e) {
+            DriverStation.reportError("Failed to load PathPlanner config: " + e.getMessage(), e.getStackTrace());
+        }
+
+        // Warmup pathfinding command
+        PathfindingCommand.warmupCommand().schedule();
     }
 
     /**
      * Creates a command for field-oriented driving using joystick inputs.
+     * Uses input scaling for better control at low speeds.
      *
-     * @param xSupplier   Supplier for forward velocity (-1 to 1)
-     * @param ySupplier   Supplier for left velocity (-1 to 1)
-     * @param rotSupplier Supplier for rotation velocity (-1 to 1)
+     * @param translationX Supplier for forward velocity (-1 to 1)
+     * @param translationY Supplier for left velocity (-1 to 1)
+     * @param angularRotationX Supplier for rotation velocity (-1 to 1)
      * @return A command that drives the robot
      */
-    public Command driveCommand(DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier rotSupplier) {
+    public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX) {
         return run(() -> {
-            double xVelocity = xSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
-            double yVelocity = ySupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
-            double rotVelocity = rotSupplier.getAsDouble() * SwerveConstants.kMaxAngularSpeedRadiansPerSecond;
-
-            driveFieldOriented(xVelocity, yVelocity, rotVelocity);
+            m_swerveDrive.drive(
+                SwerveMath.scaleTranslation(new Translation2d(
+                    translationX.getAsDouble() * m_swerveDrive.getMaximumChassisVelocity(),
+                    translationY.getAsDouble() * m_swerveDrive.getMaximumChassisVelocity()), 0.8),
+                Math.pow(angularRotationX.getAsDouble(), 3) * m_swerveDrive.getMaximumChassisAngularVelocity(),
+                true,
+                false
+            );
         });
+    }
+
+    /**
+     * Command to drive to a pose using PathPlanner pathfinding.
+     *
+     * @param pose Target pose to drive to
+     * @return Command that pathfinds to the pose
+     */
+    public Command driveToPose(Pose2d pose) {
+        PathConstraints constraints = new PathConstraints(
+            m_swerveDrive.getMaximumChassisVelocity(), 4.0,
+            m_swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720)
+        );
+        return AutoBuilder.pathfindToPose(
+            pose,
+            constraints,
+            edu.wpi.first.units.Units.MetersPerSecond.of(0)
+        );
+    }
+
+    /**
+     * Command to center all swerve modules to 0 degrees.
+     *
+     * @return Command that centers all modules
+     */
+    public Command centerModulesCommand() {
+        return run(() -> Arrays.asList(m_swerveDrive.getModules())
+            .forEach(it -> it.setAngle(0.0)));
+    }
+
+    /**
+     * Drive the robot using Translation2d and rotation.
+     *
+     * @param translation Translation2d representing x and y velocities
+     * @param rotation Angular velocity in radians per second
+     * @param fieldRelative Whether to drive field-relative
+     */
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
+        m_swerveDrive.drive(translation, rotation, fieldRelative, false);
+    }
+
+    /**
+     * Drive the robot with field-oriented ChassisSpeeds.
+     *
+     * @param velocity ChassisSpeeds object representing the desired field-relative velocities
+     */
+    public void driveFieldOriented(ChassisSpeeds velocity) {
+        m_swerveDrive.driveFieldOriented(velocity);
+    }
+
+    /**
+     * Drive the robot with robot-oriented ChassisSpeeds.
+     *
+     * @param velocity ChassisSpeeds object representing the desired robot-relative velocities
+     */
+    public void drive(ChassisSpeeds velocity) {
+        m_swerveDrive.drive(velocity);
+    }
+
+    /**
+     * Set the chassis speeds directly.
+     *
+     * @param chassisSpeeds Desired chassis speeds
+     */
+    public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+        m_swerveDrive.setChassisSpeeds(chassisSpeeds);
     }
 
     /**
@@ -110,6 +219,24 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
+     * Gets the current heading of the robot.
+     *
+     * @return The heading as a Rotation2d
+     */
+    public Rotation2d getHeading() {
+        return getPose().getRotation();
+    }
+
+    /**
+     * Gets the pitch of the robot (tilt forward/backward).
+     *
+     * @return The pitch as a Rotation2d
+     */
+    public Rotation2d getPitch() {
+        return m_swerveDrive.getPitch();
+    }
+
+    /**
      * Zeroes the gyro heading.
      */
     public void zeroGyro() {
@@ -117,10 +244,51 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
+     * Checks if the robot is on the red alliance.
+     *
+     * @return true if red alliance, false otherwise
+     */
+    private boolean isRedAlliance() {
+        var alliance = DriverStation.getAlliance();
+        return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+    }
+
+    /**
+     * Zeros the gyro and resets odometry to face the correct direction based on alliance.
+     * Red alliance faces 180 degrees, blue alliance faces 0 degrees.
+     */
+    public void zeroGyroWithAlliance() {
+        if (isRedAlliance()) {
+            zeroGyro();
+            resetOdometry(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(180)));
+        } else {
+            zeroGyro();
+        }
+    }
+
+    /**
      * Locks the swerve modules in an X pattern to prevent movement.
      */
     public void lock() {
         m_swerveDrive.lockPose();
+    }
+
+    /**
+     * Sets the motor idle mode (brake or coast).
+     *
+     * @param brake true for brake mode, false for coast mode
+     */
+    public void setMotorBrake(boolean brake) {
+        m_swerveDrive.setMotorIdleMode(brake);
+    }
+
+    /**
+     * Gets the swerve drive kinematics.
+     *
+     * @return The SwerveDriveKinematics object
+     */
+    public SwerveDriveKinematics getKinematics() {
+        return m_swerveDrive.kinematics;
     }
 
     /**
@@ -134,15 +302,6 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // Push telemetry to SmartDashboard
-        Pose2d pose = getPose();
-        SmartDashboard.putNumber("Swerve/Pose X", pose.getX());
-        SmartDashboard.putNumber("Swerve/Pose Y", pose.getY());
-        SmartDashboard.putNumber("Swerve/Pose Rotation", pose.getRotation().getDegrees());
-
-        ChassisSpeeds velocity = getRobotVelocity();
-        SmartDashboard.putNumber("Swerve/Velocity X", velocity.vxMetersPerSecond);
-        SmartDashboard.putNumber("Swerve/Velocity Y", velocity.vyMetersPerSecond);
-        SmartDashboard.putNumber("Swerve/Angular Velocity", Math.toDegrees(velocity.omegaRadiansPerSecond));
+        // Telemetry is handled by YAGSL's SwerveDriveTelemetry when verbosity is HIGH
     }
 }
