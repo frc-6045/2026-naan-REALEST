@@ -41,7 +41,16 @@ public final class Constants {
   }
 
   public static class PositionConstants {
-    
+
+  }
+
+  public static class SwerveConstants {
+    // Maximum speed in meters per second
+    public static final double kMaxSpeedMetersPerSecond = 4.5;
+    // Maximum angular speed in radians per second
+    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI * 2;
+    // Joystick deadband for driving
+    public static final double kDeadband = 0.1;
   }
 
 }

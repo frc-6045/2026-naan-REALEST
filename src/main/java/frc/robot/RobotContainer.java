@@ -5,11 +5,14 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Spindexer;
+import frc.robot.subsystems.Swerve;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -21,6 +24,7 @@ public class RobotContainer {
   private final Climber m_Climber = new Climber();
   private final Shooter m_Shooter = new Shooter();
   private final Feeder m_Feeder = new Feeder();
+  private final Swerve m_Swerve = new Swerve();
 
 
   private final CommandXboxController m_driverController =
@@ -30,8 +34,17 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    m_Autos = new Autos(m_Intake, m_Spindexer, m_Climber, m_Shooter, m_Feeder);
-    Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_Spindexer, m_Climber, m_Shooter, m_Feeder);
+    m_Autos = new Autos(m_Intake, m_Spindexer, m_Climber, m_Shooter, m_Feeder, m_Swerve);
+    Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_Spindexer, m_Climber, m_Shooter, m_Feeder, m_Swerve);
+
+    // Set default swerve drive command
+    m_Swerve.setDefaultCommand(
+        m_Swerve.driveCommand(
+            () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), SwerveConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), SwerveConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(m_driverController.getRightX(), SwerveConstants.kDeadband)
+        )
+    );
   }
 
 
