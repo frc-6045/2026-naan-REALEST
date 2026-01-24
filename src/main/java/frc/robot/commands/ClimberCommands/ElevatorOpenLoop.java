@@ -1,18 +1,17 @@
 package frc.robot.commands.ClimberCommands;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Climber;
+import frc.robot.Constants.MotorConstants;
+import frc.robot.subsystems.Elevator;
 
 public class ElevatorOpenLoop extends Command {
-  private final Climber m_Climber;
-  private final DoubleSupplier m_SpeedSupplier;
+  private final Elevator m_Elevator;
+  private final double m_Speed;
 
-  public ElevatorOpenLoop(Climber climber, DoubleSupplier speedSupplier) {
-    m_Climber = climber;
-    m_SpeedSupplier = speedSupplier;
-    addRequirements(climber);
+  public ElevatorOpenLoop(Elevator elevator, boolean goUp) {
+    m_Elevator = elevator;
+    m_Speed = goUp ? MotorConstants.kElevatorSpeed : -MotorConstants.kElevatorSpeed;
+    addRequirements(elevator);
   }
 
   @Override
@@ -20,12 +19,12 @@ public class ElevatorOpenLoop extends Command {
 
   @Override
   public void execute() {
-    m_Climber.setElevatorSpeed(m_SpeedSupplier.getAsDouble());
+    m_Elevator.setSpeed(m_Speed);
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_Climber.stopElevator();
+    m_Elevator.stop();
   }
 
   @Override

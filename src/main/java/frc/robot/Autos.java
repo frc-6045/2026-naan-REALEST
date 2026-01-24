@@ -7,9 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LowHook;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Spindexer;
 import frc.robot.subsystems.Swerve;
@@ -27,7 +28,7 @@ public class Autos {
    * ADD AUTO TO AUTO CHOOSER
    * autoChooser.addOption("exampleAutoName", AutoBuilder.buildAuto("NameOfAutoInPathplanner"));
    */
-  public Autos(Intake intake, Spindexer spindexer, Climber climb, Shooter shooter, Feeder feeder, Swerve swerve) {
+  public Autos(Intake intake, Spindexer spindexer, Elevator elevator, LowHook lowHook, Shooter shooter, Feeder feeder, Swerve swerve) {
     // PathPlanner AutoBuilder is configured in Swerve subsystem
 
     autoChooser = new SendableChooser<Command>();

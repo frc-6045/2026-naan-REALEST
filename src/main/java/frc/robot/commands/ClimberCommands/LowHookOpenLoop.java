@@ -1,18 +1,17 @@
 package frc.robot.commands.ClimberCommands;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Climber;
+import frc.robot.Constants.MotorConstants;
+import frc.robot.subsystems.LowHook;
 
 public class LowHookOpenLoop extends Command {
-  private final Climber m_Climber;
-  private final DoubleSupplier m_SpeedSupplier;
+  private final LowHook m_LowHook;
+  private final double m_Speed;
 
-  public LowHookOpenLoop(Climber climber, DoubleSupplier speedSupplier) {
-    m_Climber = climber;
-    m_SpeedSupplier = speedSupplier;
-    addRequirements(climber);
+  public LowHookOpenLoop(LowHook lowHook, boolean goUp) {
+    m_LowHook = lowHook;
+    m_Speed = goUp ? MotorConstants.kLowHookSpeed : -MotorConstants.kLowHookSpeed;
+    addRequirements(lowHook);
   }
 
   @Override
@@ -20,12 +19,12 @@ public class LowHookOpenLoop extends Command {
 
   @Override
   public void execute() {
-    m_Climber.setLowHookSpeed(m_SpeedSupplier.getAsDouble());
+    m_LowHook.setSpeed(m_Speed);
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_Climber.stopLowHook();
+    m_LowHook.stop();
   }
 
   @Override
