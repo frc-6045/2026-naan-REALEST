@@ -1,5 +1,5 @@
 package frc.robot.commands.IntakeCommands;
 
-public class StopIntake {
+public class ToggleIntake {
     
 }
