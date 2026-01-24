@@ -83,6 +83,9 @@ public final class Constants {
 
     // Feeder Speed for shooting
     public static final double kFeederShootSpeed = 0.5; // Speed to feed ball into shooter
+
+    // Spindexer Speed for indexing game pieces
+    public static final double kSpindexerIndexSpeed = 0.4; // Speed to index balls from intake to feeder
   }
 
   public static class PositionConstants {
