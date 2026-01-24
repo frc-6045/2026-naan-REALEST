@@ -2,7 +2,9 @@ package frc.robot.commands.SpindexerCommands;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ControllerConstants;
 import frc.robot.subsystems.Spindexer;
 
 public class SpindexerOpenLoop extends Command {
@@ -20,7 +22,8 @@ public class SpindexerOpenLoop extends Command {
 
   @Override
   public void execute() {
-    m_Spindexer.setSpeed(m_SpeedSupplier.getAsDouble());
+    double speed = MathUtil.applyDeadband(m_SpeedSupplier.getAsDouble(), ControllerConstants.DEADBAND);
+    m_Spindexer.setSpeed(speed);
   }
 
   @Override
