@@ -48,9 +48,14 @@ public class Intake extends SubsystemBase {
     return m_IntakeMotor.getOutputCurrent();
   }
 
+  public boolean isRunning() {
+    return Math.abs(m_IntakeMotor.get()) > 0.01; // Small threshold to account for floating point errors
+  }
+
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Intake Current (A)", getCurrent());
+    SmartDashboard.putBoolean("Intake Running", isRunning());
   }
 
   @Override
