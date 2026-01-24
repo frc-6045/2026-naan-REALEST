@@ -58,8 +58,9 @@ public class Climber extends SubsystemBase {
   public void stopClimbMotor() {
     m_ClimbMotor2.stopMotor();
     SmartDashboard.putNumber("Shooter speed", 0);
-  } *\
-   
+  } 
+  */
+  
   @Override
   public void periodic() {
 
