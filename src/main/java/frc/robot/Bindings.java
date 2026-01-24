@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Climber;
@@ -12,12 +13,19 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Spindexer;
 import frc.robot.subsystems.Swerve;
+import frc.robot.Constants.ControllerConstants;
+import swervelib.SwerveInputStream;
 
 public class Bindings {
     public static void configureBindings(
         CommandXboxController m_driverController,
         CommandXboxController m_operatorController,
-       Intake intake, Spindexer spindexer, Climber climb, Shooter shooter, Feeder feeder, Swerve swerve
+       Intake intake, 
+       Spindexer spindexer, 
+       Climber climb, 
+       Shooter shooter, 
+       Feeder feeder, 
+       Swerve swerve
     ){
 
         /*Driver Bindings */
@@ -31,8 +39,23 @@ public class Bindings {
         // Center all modules to 0 degrees - back button
         m_driverController.back().whileTrue(swerve.centerModulesCommand());
 
+        //configures drivetrain
+   
+
         /*Operator Bindings */
 
 
+    }
+    public static void configureDrivetrain(Swerve swerve, CommandXboxController m_driverController) {
+        SwerveInputStream driveAngularVelocity = SwerveInputStream.of(swerve.getSwerveDrive(),
+                                                                        () -> m_driverController.getLeftY() * -1,
+                                                                        () -> m_driverController.getLeftX() * -1)
+                                                                    .withControllerRotationAxis(()->{return -m_driverController.getRightX();})
+                                                                    .deadband(ControllerConstants.DEADBAND)
+                                                                    .scaleTranslation(0.8)
+                                                                    .allianceRelativeControl(true);
+
+        Command driveFieldOrientedAnglularVelocity = swerve.driveFieldOriented(driveAngularVelocity);
+        swerve.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
 }
