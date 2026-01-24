@@ -21,7 +21,7 @@ public class Spindexer extends SubsystemBase {
     m_SpindexerMotor = new SparkFlex(MotorConstants.kSpindexerMotorCanID, MotorType.kBrushless);
 
     updateMotorSettings(m_SpindexerMotor);
-    m_SpindexerMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_SpindexerMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 
    public void updateMotorSettings(SparkFlex motor) {
@@ -34,12 +34,12 @@ public class Spindexer extends SubsystemBase {
   }
 
   public void setSpeed(double speed) {
-    //speed = MathUtil.clamp(-MotorConstants.kSpindexerMotorMaximumSpeed,MotorConstants.kSpindexerMotorMaximumSpeed);
+    speed = MathUtil.clamp(speed, -MotorConstants.kSpindexerMotorMaximumSpeed, MotorConstants.kSpindexerMotorMaximumSpeed);
     m_SpindexerMotor.set(speed);
     SmartDashboard.putNumber("Spindexer speed", speed);
   }
 
-  public void stopClimbMotor() {
+  public void stopSpindexerMotor() {
     m_SpindexerMotor.stopMotor();
     SmartDashboard.putNumber("Spindexer speed", 0);
   }

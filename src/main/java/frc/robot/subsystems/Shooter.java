@@ -23,7 +23,7 @@ public class Shooter extends SubsystemBase {
     m_ShooterMotor2 = new SparkFlex(MotorConstants.kShooterMotor2CanID, MotorType.kBrushless);
 
     updateMotorSettings(m_ShooterMotor1);
-    m_ShooterMotor1.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_ShooterMotor1.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 
    public void updateMotorSettings(SparkFlex motor) {
@@ -36,12 +36,12 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setSpeed(double speed) {
-    //speed = MathUtil.clamp(-MotorConstants.kSpindexerMotorMaximumSpeed,MotorConstants.kSpindexerMotorMaximumSpeed);
+    speed = MathUtil.clamp(speed, -MotorConstants.kShooterMotorMaximumSpeed, MotorConstants.kShooterMotorMaximumSpeed);
     m_ShooterMotor1.set(speed);
     SmartDashboard.putNumber("Shooter speed", speed);
   }
 
-  public void stopClimbMotor() {
+  public void stopShooterMotor() {
     m_ShooterMotor1.stopMotor();
     SmartDashboard.putNumber("Shooter speed", 0);
   }

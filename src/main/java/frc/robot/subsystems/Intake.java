@@ -21,7 +21,7 @@ public class Intake extends SubsystemBase {
     m_IntakeMotor = new SparkFlex(MotorConstants.kIntakeMotorCanID, MotorType.kBrushless);
 
     updateMotorSettings(m_IntakeMotor);
-    m_IntakeMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_IntakeMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 
    public void updateMotorSettings(SparkFlex motor) {
@@ -34,14 +34,14 @@ public class Intake extends SubsystemBase {
   }
 
   public void setSpeed(double speed) {
-    //speed = MathUtil.clamp(-MotorConstants.kSpindexerMotorMaximumSpeed,MotorConstants.kSpindexerMotorMaximumSpeed);
+    speed = MathUtil.clamp(speed, -MotorConstants.kIntakeMotorMaximumSpeed, MotorConstants.kIntakeMotorMaximumSpeed);
     m_IntakeMotor.set(speed);
-    SmartDashboard.putNumber("Shooter speed", speed);
+    SmartDashboard.putNumber("Intake speed", speed);
   }
 
-  public void stopClimbMotor() {
+  public void stopIntakeMotor() {
     m_IntakeMotor.stopMotor();
-    SmartDashboard.putNumber("Shooter speed", 0);
+    SmartDashboard.putNumber("Intake speed", 0);
   }
 
   @Override

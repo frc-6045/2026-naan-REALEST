@@ -131,7 +131,7 @@ Based on analysis of previous robot code repositories ([2025-PITA-leastyeast-REA
 1. **Motor Configuration Method**: Use dedicated `updateMotorSettings()` method in each subsystem to centralize motor configuration
 2. **Fluent Configuration**: Chain configuration methods: `config.idleMode(IdleMode.kBrake).smartCurrentLimit(...)`
 3. **Persistent Configuration**: Always use `PersistMode.kPersistParameters` to reduce initialization overhead across robot boots
-4. **Reset Mode**: Use `ResetMode.kResetSafeParameters` when applying configurations
+4. **Reset Mode**: Use `ResetMode.kNoResetSafeParameters` when applying configurations (deprecated but still required in REVLib 2026.0.1)
 5. **Telemetry in periodic()**: Push diagnostic data to SmartDashboard consistently in `periodic()` methods for real-time monitoring
 6. **Speed Clamping**: Apply `MathUtil.clamp()` in setSpeed methods with constants defining min/max values
 7. **Sensor Calibration**: Store calibration constants and conversion formulas in Constants class, reference them in subsystem methods
@@ -169,6 +169,6 @@ Based on analysis of previous robot code repositories ([2025-PITA-leastyeast-REA
 - Main robot class: `frc.robot.Main`
 - The robot uses Xbox controllers (driver and operator, sometimes test)
 - Motor controllers use CAN ID assignments (e.g., Intake motor is ID 67)
-- All motor configurations should use `ResetMode.kResetSafeParameters` and `PersistMode.kPersistParameters` when applying configs
+- All motor configurations should use `ResetMode.kNoResetSafeParameters` and `PersistMode.kPersistParameters` when applying configs (deprecated but still required in REVLib 2026.0.1)
 - Simulation support is enabled with GUI by default
 - Team documentation site: https://frc-6045.github.io/

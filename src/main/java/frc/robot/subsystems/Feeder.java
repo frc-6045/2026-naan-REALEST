@@ -21,7 +21,7 @@ public class Feeder extends SubsystemBase {
     m_FeederMotor = new SparkFlex(MotorConstants.kFeederMotorCanID, MotorType.kBrushless);
 
     updateMotorSettings(m_FeederMotor);
-    m_FeederMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_FeederMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 
    public void updateMotorSettings(SparkFlex motor) {
@@ -34,14 +34,14 @@ public class Feeder extends SubsystemBase {
   }
 
   public void setSpeed(double speed) {
-    //speed = MathUtil.clamp(-MotorConstants.kSpindexerMotorMaximumSpeed,MotorConstants.kSpindexerMotorMaximumSpeed);
+    speed = MathUtil.clamp(speed, -MotorConstants.kFeederMotorMaximumSpeed, MotorConstants.kFeederMotorMaximumSpeed);
     m_FeederMotor.set(speed);
-    SmartDashboard.putNumber("Shooter speed", speed);
+    SmartDashboard.putNumber("Feeder speed", speed);
   }
 
-  public void stopClimbMotor() {
+  public void stopFeederMotor() {
     m_FeederMotor.stopMotor();
-    SmartDashboard.putNumber("Shooter speed", 0);
+    SmartDashboard.putNumber("Feeder speed", 0);
   }
 
   @Override

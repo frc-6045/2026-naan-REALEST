@@ -43,6 +43,13 @@ public final class Constants {
     public static final int kHoodMotorCanID = 16;
 
     public static final int kSpindexerMotorCanID = 17;
+
+    // Motor Speed Limits (percentage, -1.0 to 1.0)
+    public static final double kClimberMotorMaximumSpeed = .67;
+    public static final double kFeederMotorMaximumSpeed = .67;
+    public static final double kIntakeMotorMaximumSpeed = .67;
+    public static final double kShooterMotorMaximumSpeed = .67;
+    public static final double kSpindexerMotorMaximumSpeed = .67;
   }
 
   public static class PositionConstants {
