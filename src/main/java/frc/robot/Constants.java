@@ -68,6 +68,21 @@ public final class Constants {
     public static final double kIntakeStowSpeed = -0.3; // Speed for stowing intake (negative)
     public static final double kIntakeDeploySpeed = 0.3; // Speed for deploying intake (positive)
     public static final double kIntakeRollerSpeed = 0.5; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
+
+    // Shooter PID Constants (for velocity control in RPM)
+    // TODO: Tune these values empirically on the robot
+    public static final double kShooterP = 0.0001; // Proportional gain
+    public static final double kShooterI = 0.0; // Integral gain
+    public static final double kShooterD = 0.0; // Derivative gain
+    public static final double kShooterFF = 0.00018; // Feed-forward gain (velocity feed-forward)
+
+    // Shooter Target Speed (RPM)
+    // TODO: Tune this value based on desired shot distance and trajectory
+    public static final double kShooterTargetRPM = 4000.0; // Target shooter wheel speed in RPM
+    public static final double kShooterRPMTolerance = 100.0; // Acceptable RPM tolerance before feeding
+
+    // Feeder Speed for shooting
+    public static final double kFeederShootSpeed = 0.5; // Speed to feed ball into shooter
   }
 
   public static class PositionConstants {

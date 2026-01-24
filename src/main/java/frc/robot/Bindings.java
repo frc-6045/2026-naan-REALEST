@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.StowIntake;
+import frc.robot.commands.ShootFeedCommands.SpinUpShooter;
+import frc.robot.commands.ShootFeedCommands.FeedToShooter;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
@@ -40,6 +42,12 @@ public class Bindings {
 
         // Stow intake - left bumper
         m_operatorController.leftBumper().onTrue(new StowIntake(intake));
+
+        // Spin up shooter - right bumper (hold to maintain speed)
+        m_operatorController.rightBumper().whileTrue(new SpinUpShooter(shooter));
+
+        // Feed to shooter - right trigger (only feeds when shooter is at speed)
+        m_operatorController.rightTrigger().whileTrue(new FeedToShooter(feeder, shooter));
 
     }
 }
