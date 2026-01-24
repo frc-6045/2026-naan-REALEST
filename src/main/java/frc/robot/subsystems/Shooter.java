@@ -29,8 +29,7 @@ public class Shooter extends SubsystemBase {
    public void updateMotorSettings(SparkFlex motor) {
     config
         .idleMode(IdleMode.kBrake)
-        //.smartCurrentLimit(MotorConstants.kSpindexerCurrentLimit)
-        ;
+        .smartCurrentLimit(MotorConstants.kShooterCurrentLimit);
     config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
   }

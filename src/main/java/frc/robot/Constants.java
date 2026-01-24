@@ -50,6 +50,13 @@ public final class Constants {
     public static final double kIntakeMotorMaximumSpeed = .67;
     public static final double kShooterMotorMaximumSpeed = .67;
     public static final double kSpindexerMotorMaximumSpeed = .67;
+
+    // Motor Current Limits (Amps)
+    public static final int kClimberCurrentLimit = 40;
+    public static final int kFeederCurrentLimit = 35;
+    public static final int kIntakeCurrentLimit = 30;
+    public static final int kShooterCurrentLimit = 60;
+    public static final int kSpindexerCurrentLimit = 30;
   }
 
   public static class PositionConstants {

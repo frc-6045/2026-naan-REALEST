@@ -27,8 +27,7 @@ public class Spindexer extends SubsystemBase {
    public void updateMotorSettings(SparkFlex motor) {
     config
         .idleMode(IdleMode.kBrake)
-        //.smartCurrentLimit(MotorConstants.kSpindexerCurrentLimit)
-        ;
+        .smartCurrentLimit(MotorConstants.kSpindexerCurrentLimit);
     config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
   }
