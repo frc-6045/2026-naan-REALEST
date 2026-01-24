@@ -57,6 +57,11 @@ public final class Constants {
     public static final int kIntakeCurrentLimit = 30;
     public static final int kShooterCurrentLimit = 60;
     public static final int kSpindexerCurrentLimit = 30;
+
+    // Current Spike Detection Thresholds (Amps)
+    public static final double kIntakeCurrentSpikeThreshold = 20.0; // Current threshold to detect stow/deploy complete
+    public static final double kIntakeStowSpeed = -0.3; // Speed for stowing intake (negative)
+    public static final double kIntakeDeploySpeed = 0.3; // Speed for deploying intake (positive)
   }
 
   public static class PositionConstants {
