@@ -63,6 +63,10 @@ public final class Constants {
     // Hood encoder offset (rotations, adjust based on physical zero position)
     // TODO: Calibrate this value with the hood at its zero/home position
     public static final double kHoodEncoderOffset = 0.0;
+    // Current Spike Detection Thresholds (Amps)
+    public static final double kIntakeCurrentSpikeThreshold = 20.0; // Current threshold to detect stow/deploy complete
+    public static final double kIntakeStowSpeed = -0.3; // Speed for stowing intake (negative)
+    public static final double kIntakeDeploySpeed = 0.3; // Speed for deploying intake (positive)
   }
 
   public static class PositionConstants {

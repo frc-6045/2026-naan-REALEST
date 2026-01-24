@@ -44,9 +44,13 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("Intake speed", 0);
   }
 
+  public double getCurrent() {
+    return m_IntakeMotor.getOutputCurrent();
+  }
+
   @Override
   public void periodic() {
-
+    SmartDashboard.putNumber("Intake Current (A)", getCurrent());
   }
 
   @Override

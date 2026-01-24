@@ -6,6 +6,8 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.IntakeCommands.DeployIntake;
+import frc.robot.commands.IntakeCommands.StowIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
@@ -33,6 +35,11 @@ public class Bindings {
 
         /*Operator Bindings */
 
+        // Deploy intake - left trigger
+        m_operatorController.leftTrigger().onTrue(new DeployIntake(intake));
+
+        // Stow intake - left bumper
+        m_operatorController.leftBumper().onTrue(new StowIntake(intake));
 
     }
 }
