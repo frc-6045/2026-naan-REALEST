@@ -19,7 +19,7 @@ public final class Constants {
   }
   
   public static class ControllerConstants {
-
+    public static final double DEADBAND = 0.1;
   }
 
   public static class DrivebaseConstants {
