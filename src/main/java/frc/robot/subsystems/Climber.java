@@ -24,6 +24,9 @@ public class Climber extends SubsystemBase {
 
     updateMotorSettings(m_ClimbMotor1);
     m_ClimbMotor1.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    updateMotorSettings(m_ClimbMotor2);
+    m_ClimbMotor2.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
    public void updateMotorSettings(SparkFlex motor) {
@@ -46,6 +49,17 @@ public class Climber extends SubsystemBase {
     SmartDashboard.putNumber("Shooter speed", 0);
   }
 
+  /* public void setSpeed(double speed) {
+    //speed = MathUtil.clamp(-MotorConstants.kSpindexerMotorMaximumSpeed,MotorConstants.kSpindexerMotorMaximumSpeed);
+    m_ClimbMotor2.set(speed);
+    SmartDashboard.putNumber("Shooter speed", speed);
+  }
+
+  public void stopClimbMotor() {
+    m_ClimbMotor2.stopMotor();
+    SmartDashboard.putNumber("Shooter speed", 0);
+  } *\
+   
   @Override
   public void periodic() {
 
