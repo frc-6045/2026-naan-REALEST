@@ -14,22 +14,30 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 
 public class Climber extends SubsystemBase {
-  private final SparkFlex m_ClimbMotor1;
-  private final SparkFlex m_ClimbMotor2;
+  // Elevator motors (hook on elevator)
+  private final SparkFlex m_ElevatorMotor1;
+  private final SparkFlex m_ElevatorMotor2;
+  // Low hook motor (hook on bottom)
+  private final SparkFlex m_LowHookMotor;
   SparkFlexConfig config = new SparkFlexConfig();
 
+  @SuppressWarnings("deprecation")
   public Climber() {
-    m_ClimbMotor1 = new SparkFlex(MotorConstants.kClimberMotor1CanID, MotorType.kBrushless);
-    m_ClimbMotor2 = new SparkFlex(MotorConstants.kClimberMotor2CanID, MotorType.kBrushless);
+    m_ElevatorMotor1 = new SparkFlex(MotorConstants.kClimberMotor1CanID, MotorType.kBrushless);
+    m_ElevatorMotor2 = new SparkFlex(MotorConstants.kClimberMotor2CanID, MotorType.kBrushless);
+    m_LowHookMotor = new SparkFlex(MotorConstants.kLowHookMotorCanID, MotorType.kBrushless);
 
-    updateMotorSettings(m_ClimbMotor1);
-    m_ClimbMotor1.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    updateMotorSettings(m_ElevatorMotor1);
+    m_ElevatorMotor1.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
-    updateMotorSettings(m_ClimbMotor2);
-    m_ClimbMotor2.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    updateMotorSettings(m_ElevatorMotor2);
+    m_ElevatorMotor2.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+
+    updateMotorSettings(m_LowHookMotor);
+    m_LowHookMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 
-   public void updateMotorSettings(SparkFlex motor) {
+  public void updateMotorSettings(SparkFlex motor) {
     config
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(MotorConstants.kClimberCurrentLimit);
@@ -37,28 +45,31 @@ public class Climber extends SubsystemBase {
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
   }
 
-  public void setSpeed(double speed) {
+  // Elevator control methods
+  public void setElevatorSpeed(double speed) {
     speed = MathUtil.clamp(speed, -MotorConstants.kClimberMotorMaximumSpeed, MotorConstants.kClimberMotorMaximumSpeed);
-    m_ClimbMotor1.set(speed);
-    SmartDashboard.putNumber("Climber speed", speed);
+    m_ElevatorMotor1.set(speed);
+    m_ElevatorMotor2.set(-speed);
+    SmartDashboard.putNumber("Elevator speed", speed);
   }
 
-  public void stopClimbMotor() {
-    m_ClimbMotor1.stopMotor();
-    SmartDashboard.putNumber("Climber speed", 0);
+  public void stopElevator() {
+    m_ElevatorMotor1.stopMotor();
+    m_ElevatorMotor2.stopMotor();
+    SmartDashboard.putNumber("Elevator speed", 0);
   }
 
-  /* public void setSpeed(double speed) {
-    //speed = MathUtil.clamp(-MotorConstants.kSpindexerMotorMaximumSpeed,MotorConstants.kSpindexerMotorMaximumSpeed);
-    m_ClimbMotor2.set(speed);
-    SmartDashboard.putNumber("Shooter speed", speed);
+  // Low hook control methods
+  public void setLowHookSpeed(double speed) {
+    speed = MathUtil.clamp(speed, -MotorConstants.kClimberMotorMaximumSpeed, MotorConstants.kClimberMotorMaximumSpeed);
+    m_LowHookMotor.set(speed);
+    SmartDashboard.putNumber("Low Hook speed", speed);
   }
 
-  public void stopClimbMotor() {
-    m_ClimbMotor2.stopMotor();
-    SmartDashboard.putNumber("Shooter speed", 0);
-  } 
-  */
+  public void stopLowHook() {
+    m_LowHookMotor.stopMotor();
+    SmartDashboard.putNumber("Low Hook speed", 0);
+  }
   
   @Override
   public void periodic() {

@@ -49,6 +49,7 @@ public final class Constants {
     public static final double kFeederMotorMaximumSpeed = .67;
     public static final double kIntakeMotorMaximumSpeed = .67;
     public static final double kShooterMotorMaximumSpeed = .67;
+    public static final double kHoodMotorMaximumSpeed = .5;
     public static final double kSpindexerMotorMaximumSpeed = .67;
 
     // Motor Current Limits (Amps)
@@ -56,7 +57,12 @@ public final class Constants {
     public static final int kFeederCurrentLimit = 35;
     public static final int kIntakeCurrentLimit = 30;
     public static final int kShooterCurrentLimit = 60;
+    public static final int kHoodCurrentLimit = 30;
     public static final int kSpindexerCurrentLimit = 30;
+
+    // Hood encoder offset (rotations, adjust based on physical zero position)
+    // TODO: Calibrate this value with the hood at its zero/home position
+    public static final double kHoodEncoderOffset = 0.0;
   }
 
   public static class PositionConstants {

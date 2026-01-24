@@ -17,6 +17,7 @@ public class Intake extends SubsystemBase {
   private final SparkFlex m_IntakeMotor;
   SparkFlexConfig config = new SparkFlexConfig();
 
+  @SuppressWarnings("deprecation")
   public Intake() {
     m_IntakeMotor = new SparkFlex(MotorConstants.kIntakeMotorCanID, MotorType.kBrushless);
 
