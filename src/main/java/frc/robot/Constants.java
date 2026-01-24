@@ -67,7 +67,7 @@ public final class Constants {
     public static final double kIntakeCurrentSpikeThreshold = 20.0; // Current threshold to detect stow/deploy complete
     public static final double kIntakeStowSpeed = -0.3; // Speed for stowing intake (negative)
     public static final double kIntakeDeploySpeed = 0.3; // Speed for deploying intake (positive)
-    public static final double kIntakeRollerSpeed = 0.5; // Speed for intake rollers to pull in game pieces
+    public static final double kIntakeRollerSpeed = 0.5; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
   }
 
   public static class PositionConstants {
