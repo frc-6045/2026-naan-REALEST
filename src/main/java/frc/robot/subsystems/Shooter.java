@@ -27,6 +27,12 @@ public class Shooter extends SubsystemBase {
   SparkFlexConfig config = new SparkFlexConfig();
   SparkFlexConfig hoodConfig = new SparkFlexConfig();
 
+  // Track last PID values to detect changes
+  private double m_lastP = MotorConstants.kShooterP;
+  private double m_lastI = MotorConstants.kShooterI;
+  private double m_lastD = MotorConstants.kShooterD;
+  private double m_lastFF = MotorConstants.kShooterFF;
+
   @SuppressWarnings("deprecation")
   public Shooter() {
     m_ShooterMotor1 = new SparkFlex(MotorConstants.kShooterMotor1CanID, MotorType.kBrushless);
@@ -128,11 +134,32 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Shooter Motor 1 Velocity", m_ShooterMotor1.getEncoder().getVelocity());
     SmartDashboard.putNumber("Shooter Motor 2 Velocity", m_ShooterMotor2.getEncoder().getVelocity());
 
-    // Tunable PID values (read from SmartDashboard if changed)
-    SmartDashboard.putNumber("Shooter P", MotorConstants.kShooterP);
-    SmartDashboard.putNumber("Shooter I", MotorConstants.kShooterI);
-    SmartDashboard.putNumber("Shooter D", MotorConstants.kShooterD);
-    SmartDashboard.putNumber("Shooter FF", MotorConstants.kShooterFF);
+    // Live PID tuning - check if values changed on SmartDashboard
+    double tunedP = SmartDashboard.getNumber("Shooter P", MotorConstants.kShooterP);
+    double tunedI = SmartDashboard.getNumber("Shooter I", MotorConstants.kShooterI);
+    double tunedD = SmartDashboard.getNumber("Shooter D", MotorConstants.kShooterD);
+    double tunedFF = SmartDashboard.getNumber("Shooter FF", MotorConstants.kShooterFF);
+
+    // If any PID value changed, update motor controllers
+    if (tunedP != m_lastP || tunedI != m_lastI || tunedD != m_lastD || tunedFF != m_lastFF) {
+      config.closedLoop
+          .p(tunedP)
+          .i(tunedI)
+          .d(tunedD)
+          .velocityFF(tunedFF);
+
+      m_ShooterMotor1.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+      m_ShooterMotor2.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+
+      m_lastP = tunedP;
+      m_lastI = tunedI;
+      m_lastD = tunedD;
+      m_lastFF = tunedFF;
+
+      SmartDashboard.putString("PID Status", "Updated!");
+    } else {
+      SmartDashboard.putString("PID Status", "OK");
+    }
   }
 
   @Override

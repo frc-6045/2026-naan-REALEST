@@ -38,17 +38,13 @@ public class FeedToShooter extends Command {
     m_shooter = shooter;
     m_targetRPM = targetRPM;
     m_checkSpeed = checkSpeed;
-    addRequirements(feeder);
+    addRequirements(feeder, shooter);
   }
 
   @Override
   public void initialize() {
-    // Check if shooter is ready before feeding
-    if (m_checkSpeed && !m_shooter.isAtTargetSpeed(m_targetRPM)) {
-      SmartDashboard.putBoolean("Shooter Ready", false);
-    } else {
-      SmartDashboard.putBoolean("Shooter Ready", true);
-    }
+    // Initialize dashboard indicators
+    SmartDashboard.putBoolean("Feeding", false);
   }
 
   @Override
@@ -57,10 +53,12 @@ public class FeedToShooter extends Command {
     if (!m_checkSpeed || m_shooter.isAtTargetSpeed(m_targetRPM)) {
       m_feeder.setSpeed(MotorConstants.kFeederShootSpeed);
       SmartDashboard.putBoolean("Feeding", true);
+      SmartDashboard.putBoolean("Shooter Ready", true);
     } else {
       // Shooter not ready yet, wait
       m_feeder.stopFeederMotor();
       SmartDashboard.putBoolean("Feeding", false);
+      SmartDashboard.putBoolean("Shooter Ready", false);
     }
   }
 
