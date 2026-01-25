@@ -86,6 +86,19 @@ public final class Constants {
 
     // Spindexer Speed for indexing game pieces
     public static final double kSpindexerIndexSpeed = 0.4; // Speed to index balls from intake to feeder
+
+    // Climber Speeds and Thresholds
+    public static final double kElevatorUpSpeed = 0.6; // Speed for elevator going up
+    public static final double kElevatorDownSpeed = -0.6; // Speed for elevator going down (pulling robot up)
+    public static final double kLowHookOutSpeed = 0.5; // Speed for low hooks folding out
+    public static final double kLowHookInSpeed = -0.5; // Speed for low hooks folding in
+    public static final double kClimberCurrentSpikeThreshold = 30.0; // Current threshold to detect hard stop (Amps)
+
+    // Climber Timing (seconds) - TODO: Tune these values on robot
+    public static final double kElevatorUpTime = 1.5; // Time to extend elevator fully
+    public static final double kElevatorDownTime = 1.5; // Time to retract elevator fully
+    public static final double kLowHookOutTime = 0.5; // Time to fold low hooks out
+    public static final double kLowHookInTime = 0.5; // Time to fold low hooks in
   }
 
   public static class PositionConstants {
