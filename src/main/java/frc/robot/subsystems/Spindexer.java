@@ -43,9 +43,13 @@ public class Spindexer extends SubsystemBase {
     SmartDashboard.putNumber("Spindexer speed", 0);
   }
 
+  public double getCurrent() {
+    return m_SpindexerMotor.getOutputCurrent();
+  }
+
   @Override
   public void periodic() {
-
+    SmartDashboard.putNumber("Spindexer Current (A)", getCurrent());
   }
 
   @Override

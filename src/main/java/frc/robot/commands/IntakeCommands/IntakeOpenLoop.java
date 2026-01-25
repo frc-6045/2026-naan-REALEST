@@ -22,7 +22,7 @@ public class IntakeOpenLoop extends Command {
 
   @Override
   public void execute() {
-    double speed = MathUtil.applyDeadband(m_SpeedSupplier.getAsDouble(), ControllerConstants.DEADBAND);
+    double speed = MathUtil.applyDeadband(m_SpeedSupplier.getAsDouble(), ControllerConstants.kDeadband);
     m_Intake.setSpeed(speed);
   }
 

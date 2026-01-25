@@ -22,7 +22,7 @@ public class LowHookOpenLoop extends Command {
 
   @Override
   public void execute() {
-    double speed = MathUtil.applyDeadband(m_SpeedSupplier.getAsDouble(), ControllerConstants.DEADBAND);
+    double speed = MathUtil.applyDeadband(m_SpeedSupplier.getAsDouble(), ControllerConstants.kDeadband);
     m_Climber.setLowHookSpeed(speed);
   }
 
