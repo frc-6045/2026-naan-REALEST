@@ -19,7 +19,7 @@ public final class Constants {
   }
   
   public static class ControllerConstants {
-    public static final double DEADBAND = 0.1;
+    public static final double kDeadband = 0.1;
   }
 
   public static class DrivebaseConstants {
@@ -68,6 +68,7 @@ public final class Constants {
     public static final double kIntakeStowSpeed = -0.3; // Speed for stowing intake (negative)
     public static final double kIntakeDeploySpeed = 0.3; // Speed for deploying intake (positive)
     public static final double kIntakeRollerSpeed = 0.5; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
+    public static final double kIntakeDeployStowTimeout = 2.0; // Safety timeout for deploy/stow operations (seconds)
 
     // Shooter PID Constants (for velocity control in RPM)
     // TODO: Tune these values empirically on the robot
