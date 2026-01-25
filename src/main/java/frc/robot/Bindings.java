@@ -6,10 +6,21 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.MotorConstants;
+import frc.robot.commands.ClimberCommands.ClimbL1;
+import frc.robot.commands.ClimberCommands.ClimbL3;
+import frc.robot.commands.ClimberCommands.ElevatorOpenLoop;
+import frc.robot.commands.ClimberCommands.LowHookOpenLoop;
+import frc.robot.commands.ClimberCommands.StopClimber;
 import frc.robot.commands.IntakeCommands.DeployIntake;
+import frc.robot.commands.IntakeCommands.IntakeOpenLoop;
 import frc.robot.commands.IntakeCommands.StowIntake;
-import frc.robot.commands.ShootFeedCommands.SpinUpShooter;
+import frc.robot.commands.IntakeCommands.ToggleIntake;
 import frc.robot.commands.ShootFeedCommands.FeedToShooter;
+import frc.robot.commands.ShootFeedCommands.SpinUpShooter;
+import frc.robot.commands.SpindexerCommands.RunSpindexer;
+import frc.robot.commands.SpindexerCommands.SpindexerOpenLoop;
+import frc.robot.commands.SpindexerCommands.StopSpindexer;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
@@ -21,33 +32,116 @@ public class Bindings {
     public static void configureBindings(
         CommandXboxController m_driverController,
         CommandXboxController m_operatorController,
-       Intake intake, Spindexer spindexer, Climber climb, Shooter shooter, Feeder feeder, Swerve swerve
+        Intake intake, Spindexer spindexer, Climber climber, Shooter shooter, Feeder feeder, Swerve swerve
     ){
 
-        /*Driver Bindings */
+        /*============================*/
+        /*      Driver Bindings       */
+        /*============================*/
 
-        // Zero gyro with alliance awareness - start button
+        // Start: Reset Gyro
         m_driverController.start().onTrue(Commands.runOnce(() -> swerve.zeroGyroWithAlliance()));
 
-        // Lock wheels in X pattern - x button
-        m_driverController.x().whileTrue(Commands.run(() -> swerve.lock(), swerve));
+        // LT: Deploy intake and run intake rollers + spindexer
+        m_driverController.leftTrigger().onTrue(
+            new DeployIntake(intake).andThen(
+                Commands.parallel(
+                    Commands.run(() -> intake.setSpeed(MotorConstants.kIntakeRollerSpeed), intake),
+                    new RunSpindexer(spindexer, MotorConstants.kSpindexerIndexSpeed)
+                )
+            )
+        );
 
-        // Center all modules to 0 degrees - back button
-        m_driverController.back().whileTrue(swerve.centerModulesCommand());
+        // LB: Stow intake and stop rollers
+        m_driverController.leftBumper().onTrue(
+            Commands.parallel(
+                new StowIntake(intake),
+                new StopSpindexer(spindexer)
+            )
+        );
 
-        /*Operator Bindings */
+        // RB: Rev shooter (prep) - spin up shooter wheels
+        m_driverController.rightBumper().whileTrue(new SpinUpShooter(shooter));
 
-        // Deploy intake - left trigger
-        m_operatorController.leftTrigger().onTrue(new DeployIntake(intake));
+        // RT: Release fuel (confirm) - feed to shooter (only when at speed)
+        m_driverController.rightTrigger().whileTrue(new FeedToShooter(feeder, shooter));
 
-        // Stow intake - left bumper
-        m_operatorController.leftBumper().onTrue(new StowIntake(intake));
+        // X: Hood close position
+        m_driverController.x().whileTrue(
+            Commands.run(() -> shooter.setHoodSpeed(-MotorConstants.kHoodMotorMaximumSpeed), shooter)
+                .finallyDo(() -> shooter.stopHoodMotor())
+        );
 
-        // Spin up shooter - right bumper (hold to maintain speed)
-        m_operatorController.rightBumper().whileTrue(new SpinUpShooter(shooter));
+        // B: Hood far position
+        m_driverController.b().whileTrue(
+            Commands.run(() -> shooter.setHoodSpeed(MotorConstants.kHoodMotorMaximumSpeed), shooter)
+                .finallyDo(() -> shooter.stopHoodMotor())
+        );
 
-        // Feed to shooter - right trigger (only feeds when shooter is at speed)
-        m_operatorController.rightTrigger().whileTrue(new FeedToShooter(feeder, shooter));
+        // Y: Align Climber (placeholder - can be updated with vision alignment)
+        // m_driverController.y().whileTrue(...);
+
+        // A: Toggle intake on/off
+        m_driverController.a().onTrue(new ToggleIntake(intake));
+
+        // Back: Lock wheels in X pattern
+        m_driverController.back().whileTrue(Commands.run(() -> swerve.lock(), swerve));
+
+        /*============================*/
+        /*     Operator Bindings      */
+        /*============================*/
+
+        // Start: Climb L1 sequence (simple climb)
+        m_operatorController.start().onTrue(new ClimbL1(climber));
+
+        // Back: Climb L3 sequence (full climb)
+        m_operatorController.back().onTrue(new ClimbL3(climber));
+
+        // Y: Emergency stop climber
+        m_operatorController.y().onTrue(new StopClimber(climber));
+
+        // Reverse Intake - A button (hold)
+        m_operatorController.a().whileTrue(
+            Commands.run(() -> intake.setSpeed(-MotorConstants.kIntakeRollerSpeed), intake)
+                .finallyDo(() -> intake.stopIntakeMotor())
+        );
+
+        // Reverse Spindexer - B button (hold)
+        m_operatorController.b().whileTrue(
+            Commands.run(() -> spindexer.setSpeed(-MotorConstants.kSpindexerIndexSpeed), spindexer)
+                .finallyDo(() -> spindexer.stopSpindexerMotor())
+        );
+
+        // X: Run spindexer forward (hold)
+        m_operatorController.x().whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerIndexSpeed));
+
+        // Manual Hood Control - Right stick Y (hold right bumper + use stick)
+        m_operatorController.rightBumper().whileTrue(
+            Commands.run(() -> shooter.setHoodSpeed(-m_operatorController.getRightY() * MotorConstants.kHoodMotorMaximumSpeed), shooter)
+                .finallyDo(() -> shooter.stopHoodMotor())
+        );
+
+        // Manual Intake Control - Left trigger (analog)
+        m_operatorController.leftTrigger().whileTrue(
+            new IntakeOpenLoop(intake, () -> m_operatorController.getLeftTriggerAxis())
+        );
+
+        // Manual Spindexer Control - Right trigger (analog)
+        m_operatorController.rightTrigger().whileTrue(
+            new SpindexerOpenLoop(spindexer, () -> m_operatorController.getRightTriggerAxis())
+        );
+
+        // Manual Elevator Control - Left stick Y
+        m_operatorController.axisGreaterThan(1, 0.2).or(m_operatorController.axisLessThan(1, -0.2)).whileTrue(
+            new ElevatorOpenLoop(climber, () -> -m_operatorController.getLeftY())
+        );
+
+        // Manual Low Hook Control - Right stick Y (when right bumper not held)
+        m_operatorController.axisGreaterThan(5, 0.2).or(m_operatorController.axisLessThan(5, -0.2))
+            .and(m_operatorController.rightBumper().negate())
+            .whileTrue(
+                new LowHookOpenLoop(climber, () -> -m_operatorController.getRightY())
+        );
 
     }
 }
