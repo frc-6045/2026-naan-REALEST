@@ -111,8 +111,7 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 4.5;
     // Maximum angular speed in radians per second
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI * 2;
-    // Joystick deadband for driving
-    public static final double kDeadband = 0.1;
+    // Joystick deadband for driving - use ControllerConstants.kDeadband instead
   }
 
 }

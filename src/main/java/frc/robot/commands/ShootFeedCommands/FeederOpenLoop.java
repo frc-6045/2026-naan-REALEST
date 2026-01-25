@@ -2,7 +2,9 @@ package frc.robot.commands.ShootFeedCommands;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ControllerConstants;
 import frc.robot.subsystems.Feeder;
 
 /**
@@ -10,8 +12,8 @@ import frc.robot.subsystems.Feeder;
  * Allows manual control of feeder speed via joystick or other input.
  */
 public class FeederOpenLoop extends Command {
-  private final Feeder m_feeder;
-  private final DoubleSupplier m_speedSupplier;
+  private final Feeder m_Feeder;
+  private final DoubleSupplier m_SpeedSupplier;
 
   /**
    * Creates a new FeederOpenLoop command.
@@ -19,8 +21,8 @@ public class FeederOpenLoop extends Command {
    * @param speedSupplier Supplier for the desired speed (-1.0 to 1.0)
    */
   public FeederOpenLoop(Feeder feeder, DoubleSupplier speedSupplier) {
-    m_feeder = feeder;
-    m_speedSupplier = speedSupplier;
+    m_Feeder = feeder;
+    m_SpeedSupplier = speedSupplier;
     addRequirements(feeder);
   }
 
@@ -29,12 +31,13 @@ public class FeederOpenLoop extends Command {
 
   @Override
   public void execute() {
-    m_feeder.setSpeed(m_speedSupplier.getAsDouble());
+    double speed = MathUtil.applyDeadband(m_SpeedSupplier.getAsDouble(), ControllerConstants.kDeadband);
+    m_Feeder.setSpeed(speed);
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_feeder.stopFeederMotor();
+    m_Feeder.stopFeederMotor();
   }
 
   @Override

@@ -2,7 +2,9 @@ package frc.robot.commands.ShootFeedCommands;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ControllerConstants;
 import frc.robot.subsystems.Shooter;
 
 /**
@@ -11,8 +13,8 @@ import frc.robot.subsystems.Shooter;
  * Note: For competition, use SpinUpShooter with PID control instead.
  */
 public class ShooterOpenLoop extends Command {
-  private final Shooter m_shooter;
-  private final DoubleSupplier m_speedSupplier;
+  private final Shooter m_Shooter;
+  private final DoubleSupplier m_SpeedSupplier;
 
   /**
    * Creates a new ShooterOpenLoop command.
@@ -20,8 +22,8 @@ public class ShooterOpenLoop extends Command {
    * @param speedSupplier Supplier for the desired speed (-1.0 to 1.0)
    */
   public ShooterOpenLoop(Shooter shooter, DoubleSupplier speedSupplier) {
-    m_shooter = shooter;
-    m_speedSupplier = speedSupplier;
+    m_Shooter = shooter;
+    m_SpeedSupplier = speedSupplier;
     addRequirements(shooter);
   }
 
@@ -30,12 +32,13 @@ public class ShooterOpenLoop extends Command {
 
   @Override
   public void execute() {
-    m_shooter.setSpeed(m_speedSupplier.getAsDouble());
+    double speed = MathUtil.applyDeadband(m_SpeedSupplier.getAsDouble(), ControllerConstants.kDeadband);
+    m_Shooter.setSpeed(speed);
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_shooter.stopShooterMotor();
+    m_Shooter.stopShooterMotor();
   }
 
   @Override

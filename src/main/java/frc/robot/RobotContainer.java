@@ -4,8 +4,8 @@
 
 package frc.robot;
 
+import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
@@ -40,9 +40,9 @@ public class RobotContainer {
     // Set default swerve drive command
     m_Swerve.setDefaultCommand(
         m_Swerve.driveCommand(
-            () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), SwerveConstants.kDeadband),
-            () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), SwerveConstants.kDeadband),
-            () -> -MathUtil.applyDeadband(m_driverController.getRightX(), SwerveConstants.kDeadband)
+            () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(m_driverController.getRightX(), ControllerConstants.kDeadband)
         )
     );
   }
