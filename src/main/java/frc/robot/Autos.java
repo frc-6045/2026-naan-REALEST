@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,7 +36,8 @@ public class Autos {
     autoChooser.setDefaultOption("None", null);
 
     // Add autos to chooser
-    // autoChooser.addOption("ExampleAuto", AutoBuilder.buildAuto("ExampleAuto"));
+    autoChooser.addOption("normal auto", AutoBuilder.buildAuto("auto7(RyanAuto1)"));
+    autoChooser.addOption("quarter-field auto", AutoBuilder.buildAuto("auto9(RyanAuto2)"));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
