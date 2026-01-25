@@ -2,7 +2,9 @@ package frc.robot.commands.ClimberCommands;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ControllerConstants;
 import frc.robot.subsystems.Climber;
 
 public class LowHookOpenLoop extends Command {
@@ -20,7 +22,8 @@ public class LowHookOpenLoop extends Command {
 
   @Override
   public void execute() {
-    m_Climber.setLowHookSpeed(m_SpeedSupplier.getAsDouble());
+    double speed = MathUtil.applyDeadband(m_SpeedSupplier.getAsDouble(), ControllerConstants.DEADBAND);
+    m_Climber.setLowHookSpeed(speed);
   }
 
   @Override
