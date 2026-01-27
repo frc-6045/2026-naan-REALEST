@@ -38,6 +38,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public void setSpeed(double speed) {
+    // TODO: Add dampening and hard stops
     speed = MathUtil.clamp(speed, -MotorConstants.kClimberMotorMaximumSpeed, MotorConstants.kClimberMotorMaximumSpeed);
     m_ElevatorMotor1.set(speed);
     m_ElevatorMotor2.set(-speed);

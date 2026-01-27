@@ -83,7 +83,14 @@ public final class Constants {
   }
 
   public static class PositionConstants {
+    // Low hook positions (degrees)
+    // TODO: Tune these values based on actual mechanism
+    public static final double kLowHookStowedAngle = 0.0; // Stowed/up position
+    public static final double kLowHookFlickedAngle = 45.0; // Flicked/down position
+    public static final double kLowHookAngleTolerance = 3.0; // Degrees tolerance for position checks
 
+    // Low hook flick speed
+    public static final double kLowHookFlickSpeed = 0.6;
   }
 
   public static class SwerveConstants {
