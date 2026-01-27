@@ -49,6 +49,7 @@ public class Climber extends SubsystemBase {
   public void setElevatorSpeed(double speed) {
     speed = MathUtil.clamp(speed, -MotorConstants.kClimberMotorMaximumSpeed, MotorConstants.kClimberMotorMaximumSpeed);
     m_ElevatorMotor1.set(speed);
+    // Motor2 is inverted because the elevator motors are mounted facing opposite directions
     m_ElevatorMotor2.set(-speed);
     SmartDashboard.putNumber("Elevator speed", speed);
   }
@@ -73,7 +74,9 @@ public class Climber extends SubsystemBase {
   
   @Override
   public void periodic() {
-
+    SmartDashboard.putNumber("Elevator Motor 1 Current (A)", m_ElevatorMotor1.getOutputCurrent());
+    SmartDashboard.putNumber("Elevator Motor 2 Current (A)", m_ElevatorMotor2.getOutputCurrent());
+    SmartDashboard.putNumber("Low Hook Current (A)", m_LowHookMotor.getOutputCurrent());
   }
 
   @Override

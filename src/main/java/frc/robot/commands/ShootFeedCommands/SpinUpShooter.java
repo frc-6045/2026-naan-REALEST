@@ -39,8 +39,8 @@ public class SpinUpShooter extends Command {
 
   @Override
   public void execute() {
-    // Continuously maintain the target velocity (PID handles this automatically)
-    // The PID controller on the SparkFlex will maintain the setpoint
+    // Continuously re-apply the velocity setpoint to protect against motor controller resets
+    m_shooter.setShooterVelocity(m_targetRPM);
   }
 
   @Override

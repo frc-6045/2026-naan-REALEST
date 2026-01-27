@@ -38,7 +38,7 @@ public class FeedToShooter extends Command {
     m_shooter = shooter;
     m_targetRPM = targetRPM;
     m_checkSpeed = checkSpeed;
-    addRequirements(feeder, shooter);
+    addRequirements(feeder);
   }
 
   @Override

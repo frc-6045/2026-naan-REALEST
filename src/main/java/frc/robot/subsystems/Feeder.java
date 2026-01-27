@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
@@ -33,7 +34,16 @@ public class Feeder extends SubsystemBase {
   }
 
   public void setSpeed(double speed) {
+    double requestedSpeed = speed;
     speed = MathUtil.clamp(speed, -MotorConstants.kFeederMotorMaximumSpeed, MotorConstants.kFeederMotorMaximumSpeed);
+
+    if (Math.abs(requestedSpeed) > Math.abs(speed)) {
+      String warning = String.format("Feeder speed clamped: requested %.2f, limited to %.2f",
+                                     requestedSpeed, speed);
+      DriverStation.reportWarning(warning, false);
+      SmartDashboard.putString("Feeder Warning", warning);
+    }
+
     m_FeederMotor.set(speed);
     SmartDashboard.putNumber("Feeder speed", speed);
   }
