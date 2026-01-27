@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
@@ -33,7 +34,16 @@ public class Spindexer extends SubsystemBase {
   }
 
   public void setSpeed(double speed) {
+    double requestedSpeed = speed;
     speed = MathUtil.clamp(speed, -MotorConstants.kSpindexerMotorMaximumSpeed, MotorConstants.kSpindexerMotorMaximumSpeed);
+
+    if (Math.abs(requestedSpeed) > Math.abs(speed)) {
+      String warning = String.format("Spindexer speed clamped: requested %.2f, limited to %.2f",
+                                     requestedSpeed, speed);
+      DriverStation.reportWarning(warning, false);
+      SmartDashboard.putString("Spindexer Warning", warning);
+    }
+
     m_SpindexerMotor.set(speed);
     SmartDashboard.putNumber("Spindexer speed", speed);
   }

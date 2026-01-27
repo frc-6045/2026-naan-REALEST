@@ -13,6 +13,7 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
@@ -79,7 +80,16 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setSpeed(double speed) {
+    double requestedSpeed = speed;
     speed = MathUtil.clamp(speed, -MotorConstants.kShooterMotorMaximumSpeed, MotorConstants.kShooterMotorMaximumSpeed);
+
+    if (Math.abs(requestedSpeed) > Math.abs(speed)) {
+      String warning = String.format("Shooter speed clamped: requested %.2f, limited to %.2f",
+                                     requestedSpeed, speed);
+      DriverStation.reportWarning(warning, false);
+      SmartDashboard.putString("Shooter Warning", warning);
+    }
+
     m_ShooterMotor1.set(speed);
     m_ShooterMotor2.set(speed);
     SmartDashboard.putNumber("Shooter speed", speed);
@@ -112,7 +122,16 @@ public class Shooter extends SubsystemBase {
 
   // Hood control methods
   public void setHoodSpeed(double speed) {
+    double requestedSpeed = speed;
     speed = MathUtil.clamp(speed, -MotorConstants.kHoodMotorMaximumSpeed, MotorConstants.kHoodMotorMaximumSpeed);
+
+    if (Math.abs(requestedSpeed) > Math.abs(speed)) {
+      String warning = String.format("Hood speed clamped: requested %.2f, limited to %.2f",
+                                     requestedSpeed, speed);
+      DriverStation.reportWarning(warning, false);
+      SmartDashboard.putString("Hood Warning", warning);
+    }
+
     m_HoodMotor.set(speed);
     SmartDashboard.putNumber("Hood speed", speed);
   }
