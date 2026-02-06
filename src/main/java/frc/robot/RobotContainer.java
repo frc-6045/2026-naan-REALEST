@@ -13,6 +13,8 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Spindexer;
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -26,6 +28,7 @@ public class RobotContainer {
   private final Feeder m_Feeder = new Feeder();
   private final Swerve m_Swerve = new Swerve();
 
+  private final PowerDistribution m_pdh = new PowerDistribution(1, ModuleType.kRev);
 
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
@@ -34,6 +37,7 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    m_pdh.setSwitchableChannel(true);
     m_Autos = new Autos(m_Intake, m_Spindexer, m_Climber, m_Shooter, m_Feeder, m_Swerve);
     Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_Spindexer, m_Climber, m_Shooter, m_Feeder, m_Swerve);
 
