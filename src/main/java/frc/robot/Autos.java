@@ -18,7 +18,6 @@ import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.StowIntake;
 import frc.robot.commands.ShootFeedCommands.SpinUpShooter;
 import frc.robot.commands.SpindexerCommands.StopSpindexer;
-import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -38,7 +37,7 @@ public class Autos {
    * ADD AUTO TO AUTO CHOOSER
    * autoChooser.addOption("exampleAutoName", AutoBuilder.buildAuto("NameOfAutoInPathplanner"));
    */
-  public Autos(Intake intake, Spindexer spindexer, Climber climb, Shooter shooter, Feeder feeder, Swerve swerve) {
+  public Autos(Intake intake, Spindexer spindexer, Shooter shooter, Feeder feeder, Swerve swerve) {
     // PathPlanner AutoBuilder is configured in Swerve subsystem
 
     // --- Register NamedCommands for PathPlanner ---

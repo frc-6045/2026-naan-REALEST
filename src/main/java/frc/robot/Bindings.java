@@ -7,11 +7,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.MotorConstants;
-import frc.robot.commands.ClimberCommands.ClimbL1;
-import frc.robot.commands.ClimberCommands.ClimbL3;
-import frc.robot.commands.ClimberCommands.ElevatorOpenLoop;
-import frc.robot.commands.ClimberCommands.LowHookOpenLoop;
-import frc.robot.commands.ClimberCommands.StopClimber;
 import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.IntakeOpenLoop;
 import frc.robot.commands.IntakeCommands.StowIntake;
@@ -21,7 +16,6 @@ import frc.robot.commands.ShootFeedCommands.SpinUpShooter;
 import frc.robot.commands.SpindexerCommands.RunSpindexer;
 import frc.robot.commands.SpindexerCommands.SpindexerOpenLoop;
 import frc.robot.commands.SpindexerCommands.StopSpindexer;
-import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -32,7 +26,7 @@ public class Bindings {
     public static void configureBindings(
         CommandXboxController m_driverController,
         CommandXboxController m_operatorController,
-        Intake intake, Spindexer spindexer, Climber climber, Shooter shooter, Feeder feeder, Swerve swerve
+        Intake intake, Spindexer spindexer, Shooter shooter, Feeder feeder, Swerve swerve
     ){
 
         /*============================*/
@@ -91,15 +85,6 @@ public class Bindings {
         /*     Operator Bindings      */
         /*============================*/
 
-        // Start: Climb L1 sequence (simple climb)
-        m_operatorController.start().onTrue(new ClimbL1(climber));
-
-        // Back: Climb L3 sequence (full climb)
-        m_operatorController.back().onTrue(new ClimbL3(climber));
-
-        // Y: Emergency stop climber
-        m_operatorController.y().onTrue(new StopClimber(climber));
-
         // Reverse Intake - A button (hold)
         m_operatorController.a().whileTrue(
             Commands.run(() -> intake.setSpeed(-MotorConstants.kIntakeRollerSpeed), intake)
@@ -129,18 +114,6 @@ public class Bindings {
         // Manual Spindexer Control - Right trigger (analog)
         m_operatorController.rightTrigger().whileTrue(
             new SpindexerOpenLoop(spindexer, () -> m_operatorController.getRightTriggerAxis())
-        );
-
-        // Manual Elevator Control - Left stick Y
-        m_operatorController.axisGreaterThan(1, 0.2).or(m_operatorController.axisLessThan(1, -0.2)).whileTrue(
-            new ElevatorOpenLoop(climber, () -> -m_operatorController.getLeftY())
-        );
-
-        // Manual Low Hook Control - Right stick Y (when right bumper not held)
-        m_operatorController.axisGreaterThan(5, 0.2).or(m_operatorController.axisLessThan(5, -0.2))
-            .and(m_operatorController.rightBumper().negate())
-            .whileTrue(
-                new LowHookOpenLoop(climber, () -> -m_operatorController.getRightY())
         );
 
     }
