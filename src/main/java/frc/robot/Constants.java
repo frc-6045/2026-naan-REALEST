@@ -37,6 +37,7 @@ public final class Constants {
     public static final int kFeederMotorCanID = 12;
 
     public static final int kIntakeMotorCanID = 13;
+    public static final int kIntakeDeployMotorCanID = 18;
 
     public static final int kShooterMotor1CanID = 14;
     public static final int kShooterMotor2CanID = 15;

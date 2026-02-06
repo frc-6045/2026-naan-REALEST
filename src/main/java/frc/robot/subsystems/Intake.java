@@ -16,14 +16,18 @@ import frc.robot.Constants.MotorConstants;
 
 public class Intake extends SubsystemBase {
   private final SparkFlex m_IntakeMotor;
+  private final SparkFlex m_IntakeDeployMotor;
   SparkFlexConfig config = new SparkFlexConfig();
 
   @SuppressWarnings("deprecation")
   public Intake() {
     m_IntakeMotor = new SparkFlex(MotorConstants.kIntakeMotorCanID, MotorType.kBrushless);
+    m_IntakeDeployMotor = new SparkFlex(MotorConstants.kIntakeDeployMotorCanID, MotorType.kBrushless);
 
     updateMotorSettings(m_IntakeMotor);
+    updateMotorSettings(m_IntakeDeployMotor);
     m_IntakeMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    m_IntakeDeployMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 
    public void updateMotorSettings(SparkFlex motor) {
@@ -55,6 +59,21 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("Intake speed", 0);
   }
 
+  public void setDeploySpeed(double speed) {
+    speed = MathUtil.clamp(speed, -1.0, 1.0);
+    m_IntakeDeployMotor.set(speed);
+    SmartDashboard.putNumber("Intake Deploy speed", speed);
+  }
+
+  public void stopDeployMotor() {
+    m_IntakeDeployMotor.stopMotor();
+    SmartDashboard.putNumber("Intake Deploy speed", 0);
+  }
+
+  public double getDeployCurrent() {
+    return m_IntakeDeployMotor.getOutputCurrent();
+  }
+
   public double getCurrent() {
     return m_IntakeMotor.getOutputCurrent();
   }
@@ -72,6 +91,7 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Intake Current (A)", getCurrent());
+    SmartDashboard.putNumber("Intake Deploy Current (A)", getDeployCurrent());
     SmartDashboard.putBoolean("Intake Running", isRunning());
     SmartDashboard.putBoolean("Intake Roller Running", isRollerRunning());
   }
