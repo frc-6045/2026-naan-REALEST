@@ -6,7 +6,6 @@ package frc.robot;
 
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -23,7 +22,6 @@ public class RobotContainer {
   private Autos m_Autos;
   private final Intake m_Intake = new Intake();
   private final Spindexer m_Spindexer = new Spindexer();
-  private final Climber m_Climber = new Climber();
   private final Shooter m_Shooter = new Shooter();
   private final Feeder m_Feeder = new Feeder();
   private final Swerve m_Swerve = new Swerve();
@@ -38,8 +36,8 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     m_pdh.setSwitchableChannel(true);
-    m_Autos = new Autos(m_Intake, m_Spindexer, m_Climber, m_Shooter, m_Feeder, m_Swerve);
-    Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_Spindexer, m_Climber, m_Shooter, m_Feeder, m_Swerve);
+    m_Autos = new Autos(m_Intake, m_Spindexer, m_Shooter, m_Feeder, m_Swerve);
+    Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_Spindexer, m_Shooter, m_Feeder, m_Swerve);
 
     // Set default swerve drive command
     m_Swerve.setDefaultCommand(
