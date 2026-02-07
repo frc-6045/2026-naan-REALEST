@@ -20,7 +20,7 @@ public class Intake extends SubsystemBase {
   private final SparkFlex m_IntakeDeployMotor;
   SparkFlexConfig config = new SparkFlexConfig();
   private final SlewRateLimiter m_RampLimiter = new SlewRateLimiter(MotorConstants.kIntakeRampRate);
-  private double m_TargetSpeed = 0.0;
+  private double m_RollerTargetSpeed = 0.0;
 
   @SuppressWarnings("deprecation")
   public Intake() {
@@ -53,11 +53,11 @@ public class Intake extends SubsystemBase {
       SmartDashboard.putString("Intake Warning", warning);
     }
 
-    m_TargetSpeed = speed;
+    m_RollerTargetSpeed = speed;
   }
 
   public void stopIntakeMotor() {
-    m_TargetSpeed = 0.0;
+    m_RollerTargetSpeed = 0.0;
   }
 
   public void setDeploySpeed(double speed) {
@@ -79,27 +79,17 @@ public class Intake extends SubsystemBase {
     return m_IntakeMotor.getOutputCurrent();
   }
 
-  public boolean isRunning() {
-    return Math.abs(m_IntakeMotor.get()) > 0.01; // Small threshold to account for floating point errors
-  }
-
-  public boolean isRollerRunning() {
-    // Check if motor is running at roller speed (not deploy/stow speeds)
-    // This distinguishes between roller operation (0.5) and deploy/stow operations (±0.3)
-    return Math.abs(m_IntakeMotor.get()) > 0.4;
-  }
-
   @Override
   public void periodic() {
     // Apply rate-limited speed to motor each cycle for smooth ramp-up/ramp-down
-    double limitedSpeed = m_RampLimiter.calculate(m_TargetSpeed);
+    double limitedSpeed = m_RampLimiter.calculate(m_RollerTargetSpeed);
     m_IntakeMotor.set(limitedSpeed);
     SmartDashboard.putNumber("Intake speed", limitedSpeed);
 
     SmartDashboard.putNumber("Intake Current (A)", getCurrent());
     SmartDashboard.putNumber("Intake Deploy Current (A)", getDeployCurrent());
-    SmartDashboard.putBoolean("Intake Running", isRunning());
-    SmartDashboard.putBoolean("Intake Roller Running", isRollerRunning());
+    // SmartDashboard.putBoolean("Intake Running", isRunning());
+    // SmartDashboard.putBoolean("Intake Roller Running", isRollerRunning());
   }
 
   @Override
