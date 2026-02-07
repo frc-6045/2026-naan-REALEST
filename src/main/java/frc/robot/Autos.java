@@ -56,7 +56,6 @@ public class Autos {
     // Flywheel commands
     NamedCommands.registerCommand("spinUpShooter", new RevShooter(flywheel).asProxy());
     NamedCommands.registerCommand("stopShooter", new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel));
-    NamedCommands.registerCommand("shootWhenReady", getAutonomousCommand());// TODO: add shoot when ready
 
     // Feeder commands
     NamedCommands.registerCommand("feed", new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederShootSpeed), feeder));
