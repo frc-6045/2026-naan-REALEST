@@ -66,9 +66,9 @@ public final class Constants {
     public static final double kHoodEncoderOffset = 0.0;
     // Current Spike Detection Thresholds (Amps)
     public static final double kIntakeCurrentSpikeThreshold = 20.0; // Current threshold to detect stow/deploy complete
-    public static final double kIntakeStowSpeed = 0.8; // Speed for stowing intake
-    public static final double kIntakeDeploySpeed = -0.8; // Speed for deploying intake
-    public static final double kIntakeRollerSpeed = 0.5; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
+    public static final double kIntakeStowSpeed = -0.9; // Speed for stowing intake
+    public static final double kIntakeDeploySpeed = 0.9; // Speed for deploying intake
+    public static final double kIntakeRollerSpeed = 1.0; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
     public static final double kIntakeRampRate = 2.0; // Max change in motor output per second (units/sec) - prevents harsh stops on chain
     public static final double kIntakeDeployStowTimeout = 2.0; // Safety timeout for deploy/stow operations (seconds)
 
@@ -88,7 +88,7 @@ public final class Constants {
     public static final double kFeederShootSpeed = 0.5; // Speed to feed ball into shooter
 
     // Spindexer Speed for indexing game pieces
-    public static final double kSpindexerIndexSpeed = 0.4; // Speed to index balls from intake to feeder
+    public static final double kSpindexerIndexSpeed = 1.0; // Speed to index balls from intake to feeder
 
     // Climber Speeds and Thresholds
     public static final double kElevatorUpSpeed = 0.6; // Speed for elevator going up
