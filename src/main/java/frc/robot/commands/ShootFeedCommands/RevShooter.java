@@ -1,52 +1,52 @@
 package frc.robot.commands.ShootFeedCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Flywheel;
 import frc.robot.Constants.MotorConstants;
 
 /**
- * Command to spin up the shooter wheels to target velocity using PID control.
+ * Command to spin up the flywheel to target velocity using PID control.
  * This command runs continuously while the button is held and maintains the target speed.
  */
-public class SpinUpShooter extends Command {
-  private final Shooter m_shooter;
+public class RevShooter extends Command {
+  private final Flywheel m_flywheel;
   private final double m_targetRPM;
 
   /**
-   * Creates a new SpinUpShooter command with default target RPM.
-   * @param shooter The shooter subsystem
+   * Creates a new RevShooter command with default target RPM.
+   * @param flywheel The flywheel subsystem
    */
-  public SpinUpShooter(Shooter shooter) {
-    this(shooter, MotorConstants.kShooterTargetRPM);
+  public RevShooter(Flywheel flywheel) {
+    this(flywheel, MotorConstants.kShooterTargetRPM);
   }
 
   /**
-   * Creates a new SpinUpShooter command with custom target RPM.
-   * @param shooter The shooter subsystem
-   * @param targetRPM The desired shooter speed in RPM
+   * Creates a new RevShooter command with custom target RPM.
+   * @param flywheel The flywheel subsystem
+   * @param targetRPM The desired flywheel speed in RPM
    */
-  public SpinUpShooter(Shooter shooter, double targetRPM) {
-    m_shooter = shooter;
+  public RevShooter(Flywheel flywheel, double targetRPM) {
+    m_flywheel = flywheel;
     m_targetRPM = targetRPM;
-    addRequirements(shooter);
+    addRequirements(flywheel);
   }
 
   @Override
   public void initialize() {
-    // Start spinning up the shooter to target velocity
-    m_shooter.setShooterVelocity(m_targetRPM);
+    // Start spinning up the flywheel to target velocity
+    m_flywheel.setFlywheelVelocity(m_targetRPM);
   }
 
   @Override
   public void execute() {
     // Continuously re-apply the velocity setpoint to protect against motor controller resets
-    m_shooter.setShooterVelocity(m_targetRPM);
+    m_flywheel.setFlywheelVelocity(m_targetRPM);
   }
 
   @Override
   public void end(boolean interrupted) {
-    // Stop the shooter when button is released
-    m_shooter.stopShooterMotor();
+    // Stop the flywheel when button is released
+    m_flywheel.stopFlywheelMotor();
   }
 
   @Override
