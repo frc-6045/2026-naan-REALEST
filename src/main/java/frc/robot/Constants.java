@@ -56,7 +56,7 @@ public final class Constants {
 
     // Motor Current Limits (Amps)
     public static final int kClimberCurrentLimit = 40;
-    public static final int kFeederCurrentLimit = 35;
+    public static final int kFeederCurrentLimit = 40;
     public static final int kIntakeCurrentLimit = 30;
     public static final int kIntakePivotCurrentLimit = 30;
     public static final int kShooterCurrentLimit = 60;

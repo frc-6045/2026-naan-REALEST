@@ -44,7 +44,7 @@ public class Feeder extends SubsystemBase {
       SmartDashboard.putString("Feeder Warning", warning);
     }
 
-    m_FeederMotor.set(speed);
+    //m_FeederMotor.set(speed);
     SmartDashboard.putNumber("Feeder speed", speed);
   }
 
