@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.shooterSystem;
 
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkFlex;
