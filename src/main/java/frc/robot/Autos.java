@@ -88,8 +88,8 @@ public class Autos {
     autoChooser.setDefaultOption("None", null);
 
     // Add autos to chooser
-    autoChooser.addOption("normal auto", AutoBuilder.buildAuto("auto7(RyanAuto1)"));
-    autoChooser.addOption("quarter-field auto", AutoBuilder.buildAuto("auto9(RyanAuto2)"));
+    autoChooser.addOption("normal auto", AutoBuilder.buildAuto("halfauto"));
+    autoChooser.addOption("quarter-field auto", AutoBuilder.buildAuto("quarterauto"));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }

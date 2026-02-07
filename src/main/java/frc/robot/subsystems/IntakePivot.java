@@ -1,8 +1,7 @@
-package frc.robot.subsystems.IntakeSystem;
+package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SparkFlexConfig;
-
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -16,19 +15,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 
-public class Intake extends SubsystemBase {
-  private final SparkFlex m_IntakeMotor;
+public class IntakePivot extends SubsystemBase {
+  private final SparkFlex m_IntakeDeployMotor;
   SparkFlexConfig config = new SparkFlexConfig();
   private final SlewRateLimiter m_RampLimiter = new SlewRateLimiter(MotorConstants.kIntakeRampRate);
   private double m_TargetSpeed = 0.0;
 
   @SuppressWarnings("deprecation")
-  public Intake() {
-    m_IntakeMotor = new SparkFlex(MotorConstants.kIntakeMotorCanID, MotorType.kBrushless);
-    
+  public IntakePivot() {
+    m_IntakeDeployMotor = new SparkFlex(MotorConstants.kIntakeDeployMotorCanID, MotorType.kBrushless);
 
-    updateMotorSettings(m_IntakeMotor);
-    m_IntakeMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    updateMotorSettings(m_IntakeDeployMotor);
+    m_IntakeDeployMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 
    public void updateMotorSettings(SparkFlex motor) {
@@ -41,33 +39,33 @@ public class Intake extends SubsystemBase {
 
   public void setSpeed(double speed) {
     double requestedSpeed = speed;
-    speed = MathUtil.clamp(speed, -MotorConstants.kIntakeMotorMaximumSpeed, MotorConstants.kIntakeMotorMaximumSpeed);
+    speed = MathUtil.clamp(speed, -MotorConstants.kIntakePivotMotorMaximumSpeed, MotorConstants.kIntakePivotMotorMaximumSpeed);
 
     // Alert if speed was clamped (configuration issue)
     if (Math.abs(requestedSpeed) > Math.abs(speed)) {
-      String warning = String.format("Intake speed clamped: requested %.2f, limited to %.2f",
+      String warning = String.format("Intake pivot speed clamped: requested %.2f, limited to %.2f",
                                      requestedSpeed, speed);
       DriverStation.reportWarning(warning, false);
-      SmartDashboard.putString("Intake Warning", warning);
+      SmartDashboard.putString("Intake pivot Warning", warning);
     }
 
     m_TargetSpeed = speed;
   }
 
-  public void stopIntakeMotor() {
+  public void stopMotor() {
     m_TargetSpeed = 0.0;
   }
 
   public double getCurrent() {
-    return m_IntakeMotor.getOutputCurrent();
+    return m_IntakeDeployMotor.getOutputCurrent();
   }
 
   @Override
   public void periodic() {
-    // Apply rate-limited speed to motor each cycle for smooth ramp-up/ramp-down
-    m_IntakeMotor.set(m_TargetSpeed);
-    SmartDashboard.putNumber("Intake speed", m_TargetSpeed);
-    SmartDashboard.putNumber("Intake Current (A)", getCurrent());
+    double limitedSpeed = m_RampLimiter.calculate(m_TargetSpeed);
+    m_IntakeDeployMotor.set(limitedSpeed);
+    SmartDashboard.putNumber("Intake pivot speed", limitedSpeed);
+    SmartDashboard.putNumber("Intake pivot current (A)", getCurrent());
   }
 
   @Override
