@@ -27,6 +27,18 @@
           "data": {
             "pathName": "quarterpath4"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "quarterpath5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "quarterpath6"
+          }
         }
       ]
     }

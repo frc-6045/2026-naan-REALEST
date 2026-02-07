@@ -33,6 +33,18 @@
           "data": {
             "pathName": "halfpath5"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "halfpath6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "halfpath7"
+          }
         }
       ]
     }
