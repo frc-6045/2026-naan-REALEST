@@ -1,12 +1,10 @@
 package frc.robot.commands.IntakeCommands;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-<<<<<<< HEAD:src/main/java/frc/robot/commands/IntakeCommands/ToggleIntake.java
 import frc.robot.subsystems.IntakeSystem.Intake;
-=======
-import frc.robot.subsystems.Intake;
+
+import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.Constants.Directions;
->>>>>>> db4f4eaa0c8050579a3ec631c78f0b2d3fed8178:src/main/java/frc/robot/commands/IntakeCommands/RunIntake.java
 import frc.robot.Constants.MotorConstants;
 
 /**

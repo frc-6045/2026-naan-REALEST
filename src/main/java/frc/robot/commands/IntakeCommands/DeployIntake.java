@@ -2,11 +2,9 @@ package frc.robot.commands.IntakeCommands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-<<<<<<< HEAD
 import frc.robot.subsystems.IntakeSystem.Intake;
-=======
-import frc.robot.subsystems.IntakePivot;
->>>>>>> db4f4eaa0c8050579a3ec631c78f0b2d3fed8178
+import frc.robot.subsystems.IntakeSystem.IntakePivot;
+
 import frc.robot.Constants.MotorConstants;
 
 public class DeployIntake extends Command {

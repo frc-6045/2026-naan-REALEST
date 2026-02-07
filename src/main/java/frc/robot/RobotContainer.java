@@ -10,7 +10,7 @@ import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.Hood;
 import frc.robot.subsystems.IntakeSystem.Intake;
-import frc.robot.subsystems.IntakeSystem.intakePivot;
+import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.math.MathUtil;
