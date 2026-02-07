@@ -47,12 +47,12 @@ public final class Constants {
 
     // Motor Speed Limits (percentage, -1.0 to 1.0)
     public static final double kClimberMotorMaximumSpeed = .67;
-    public static final double kFeederMotorMaximumSpeed = .67;
+    public static final double kFeederMotorMaximumSpeed = 1;
     public static final double kIntakeMotorMaximumSpeed = .67;
     public static final double kIntakePivotMotorMaximumSpeed = .67;
-    public static final double kShooterMotorMaximumSpeed = .67;
-    public static final double kHoodMotorMaximumSpeed = .5;
-    public static final double kSpindexerMotorMaximumSpeed = .67;
+    public static final double kShooterMotorMaximumSpeed = 1;
+    public static final double kHoodMotorMaximumSpeed = 1;
+    public static final double kSpindexerMotorMaximumSpeed = 1;
 
     // Motor Current Limits (Amps)
     public static final int kClimberCurrentLimit = 40;
@@ -77,7 +77,7 @@ public final class Constants {
     public static final double kIntakeDeployStowTimeout = 3.14; // Safety timeout for deploy/stow operations (seconds)
     public static final double kFeederShootSpeed = 0.5; // Speed to feed ball into shooter
     public static final double kSpindexerIndexSpeed = 1.0; // Speed to index balls from intake to feeder
-    public static final double kHoodSpeed = .314;
+    public static final double kHoodSpeed = 1;
 
     // Shooter PID Constants (for velocity control in RPM)
     // TODO: Tune these values empirically on the robot
@@ -88,7 +88,7 @@ public final class Constants {
 
     // Shooter Target Speed (RPM)
     // TODO: Tune this value based on desired shot distance and trajectory
-    public static final double kShooterTargetRPM = 4000.0; // Target shooter wheel speed in RPM
+    public static final double kShooterTargetRPM = 6700.0; // Target shooter wheel speed in RPM
     public static final double kShooterRPMTolerance = 100.0; // Acceptable RPM tolerance before feeding
   }
 

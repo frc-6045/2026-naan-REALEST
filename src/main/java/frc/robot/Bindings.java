@@ -13,6 +13,7 @@ import frc.robot.commands.IntakeCommands.StowIntake;
 import frc.robot.commands.ShootFeedCommands.FeedToShooter;
 import frc.robot.commands.ShootFeedCommands.HoodOpenLoop;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
+import frc.robot.commands.ShootFeedCommands.RunFeeder;
 import frc.robot.commands.SpindexerCommands.RunSpindexer;
 import frc.robot.commands.IntakeCommands.RunIntake;
 import frc.robot.subsystems.shooterSystem.Feeder;
@@ -35,34 +36,35 @@ public class Bindings {
         /*============================*/
 
         // Start: Reset Gyro
-        //m_driverController.start().onTrue(Commands.runOnce(() -> swerve.zeroGyroWithAlliance()));
+        m_driverController.start().onTrue(Commands.runOnce(() -> swerve.zeroGyroWithAlliance()));
 
         // Back: Lock wheels in X pattern
-        //m_driverController.back().whileTrue(Commands.run(() -> swerve.lock(), swerve));
+        m_driverController.back().whileTrue(Commands.run(() -> swerve.lock(), swerve));
 
         // Intake rollers
-        m_driverController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
-        m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
+       // m_driverController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
+       // m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
 
         /*============================*/
         /*     Operator Bindings      */
         /*============================*/
 
         // Intake rollers
-        m_operatorController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
-        m_operatorController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
+       // m_operatorController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
+       // m_operatorController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
 
         // Rev shooter
-        m_operatorController.leftTrigger(.467).whileTrue(new RevShooter(flywheel));
+        m_operatorController.rightTrigger(.5).whileTrue(new RevShooter(flywheel));
 
         // Feed to shooter
-        m_operatorController.leftTrigger(.467).whileTrue(new FeedToShooter(feeder, spindexer, flywheel));
+        m_operatorController.leftTrigger(.467).whileTrue(new RunFeeder(feeder, Directions.IN));
+        m_operatorController.x().whileTrue(new RunFeeder(feeder, Directions.IN));
 
         // Deploy intake
-        m_operatorController.a().onTrue(new DeployIntake(intakePivot));
+       // m_operatorController.a().onTrue(new DeployIntake(intakePivot));
 
         // Stow intake
-        m_operatorController.b().onTrue(new StowIntake(intakePivot));
+       // m_operatorController.b().onTrue(new StowIntake(intakePivot));
 
         // Hood open loop up
         m_operatorController.pov(0).whileTrue(new HoodOpenLoop(hood, () -> {return MotorConstants.kHoodSpeed;}));
@@ -74,7 +76,7 @@ public class Bindings {
         m_operatorController.pov(90).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerIndexSpeed));
 
         // Spindexer CCW
-        m_operatorController.pov(90).whileTrue(new RunSpindexer(spindexer, -MotorConstants.kSpindexerIndexSpeed));
+        m_operatorController.pov(270).whileTrue(new RunSpindexer(spindexer, -MotorConstants.kSpindexerIndexSpeed));
 
     }
 }

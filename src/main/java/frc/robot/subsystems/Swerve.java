@@ -106,14 +106,14 @@ public class Swerve extends SubsystemBase {
      */
     public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX) {
         return run(() -> {
-            // m_swerveDrive.drive(
-            //     SwerveMath.scaleTranslation(new Translation2d(
-            //         translationX.getAsDouble() * m_swerveDrive.getMaximumChassisVelocity(),
-            //         translationY.getAsDouble() * m_swerveDrive.getMaximumChassisVelocity()), 0.8),
-            //     Math.pow(angularRotationX.getAsDouble(), 3) * m_swerveDrive.getMaximumChassisAngularVelocity(),
-            //     true,
-            //     false
-            // );
+            m_swerveDrive.drive(
+                SwerveMath.scaleTranslation(new Translation2d(
+                    translationX.getAsDouble() * m_swerveDrive.getMaximumChassisVelocity(),
+                    translationY.getAsDouble() * m_swerveDrive.getMaximumChassisVelocity()), 0.8),
+                Math.pow(angularRotationX.getAsDouble(), 3) * m_swerveDrive.getMaximumChassisAngularVelocity(),
+                true,
+                false
+            );
         });
     }
 

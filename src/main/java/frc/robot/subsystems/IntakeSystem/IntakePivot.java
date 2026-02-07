@@ -63,7 +63,7 @@ public class IntakePivot extends SubsystemBase {
   @Override
   public void periodic() {
     double limitedSpeed = m_RampLimiter.calculate(m_TargetSpeed);
-    m_IntakeDeployMotor.set(limitedSpeed);
+    //m_IntakeDeployMotor.set(limitedSpeed);
     SmartDashboard.putNumber("Intake pivot speed", limitedSpeed);
     SmartDashboard.putNumber("Intake pivot current (A)", getCurrent());
   }
