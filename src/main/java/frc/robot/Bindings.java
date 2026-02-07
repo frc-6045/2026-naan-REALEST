@@ -36,12 +36,11 @@ public class Bindings {
         // Start: Reset Gyro
         m_driverController.start().onTrue(Commands.runOnce(() -> swerve.zeroGyroWithAlliance()));
 
-        // LT: Deploy intake and run intake rollers + spindexer
+        // LT: Deploy intake and run intake rollers
         m_driverController.leftTrigger().onTrue(
             new DeployIntake(intake).andThen(
                 Commands.parallel(
-                    Commands.run(() -> intake.setSpeed(MotorConstants.kIntakeRollerSpeed), intake),
-                    new RunSpindexer(spindexer, MotorConstants.kSpindexerIndexSpeed)
+                    Commands.run(() -> intake.setSpeed(MotorConstants.kIntakeRollerSpeed), intake)
                 )
             )
         );
