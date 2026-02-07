@@ -5,25 +5,25 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ControllerConstants;
-import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Hood;
 
 /**
  * Open-loop control command for the shooter hood.
  * Allows manual control of hood angle via joystick or other input.
  */
 public class HoodOpenLoop extends Command {
-  private final Shooter m_Shooter;
+  private final Hood m_Hood;
   private final DoubleSupplier m_SpeedSupplier;
 
   /**
    * Creates a new HoodOpenLoop command.
-   * @param shooter The shooter subsystem
+   * @param hood The hood subsystem
    * @param speedSupplier Supplier for the desired speed (-1.0 to 1.0)
    */
-  public HoodOpenLoop(Shooter shooter, DoubleSupplier speedSupplier) {
-    m_Shooter = shooter;
+  public HoodOpenLoop(Hood hood, DoubleSupplier speedSupplier) {
+    m_Hood = hood;
     m_SpeedSupplier = speedSupplier;
-    addRequirements(shooter);
+    addRequirements(hood);
   }
 
   @Override
@@ -32,12 +32,12 @@ public class HoodOpenLoop extends Command {
   @Override
   public void execute() {
     double speed = MathUtil.applyDeadband(m_SpeedSupplier.getAsDouble(), ControllerConstants.kDeadband);
-    m_Shooter.setHoodSpeed(speed);
+    m_Hood.setHoodSpeed(speed);
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_Shooter.stopHoodMotor();
+    m_Hood.stopHoodMotor();
   }
 
   @Override

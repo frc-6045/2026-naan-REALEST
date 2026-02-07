@@ -49,6 +49,7 @@ public final class Constants {
     public static final double kClimberMotorMaximumSpeed = .67;
     public static final double kFeederMotorMaximumSpeed = .67;
     public static final double kIntakeMotorMaximumSpeed = .67;
+    public static final double kIntakePivotMotorMaximumSpeed = .67;
     public static final double kShooterMotorMaximumSpeed = .67;
     public static final double kHoodMotorMaximumSpeed = .5;
     public static final double kSpindexerMotorMaximumSpeed = .67;
@@ -57,6 +58,7 @@ public final class Constants {
     public static final int kClimberCurrentLimit = 40;
     public static final int kFeederCurrentLimit = 35;
     public static final int kIntakeCurrentLimit = 30;
+    public static final int kIntakePivotCurrentLimit = 30;
     public static final int kShooterCurrentLimit = 60;
     public static final int kHoodCurrentLimit = 30;
     public static final int kSpindexerCurrentLimit = 30;
@@ -66,11 +68,16 @@ public final class Constants {
     public static final double kHoodEncoderOffset = 0.0;
     // Current Spike Detection Thresholds (Amps)
     public static final double kIntakeCurrentSpikeThreshold = 20.0; // Current threshold to detect stow/deploy complete
+
+    // Default speeds
     public static final double kIntakeStowSpeed = -0.9; // Speed for stowing intake
     public static final double kIntakeDeploySpeed = 0.9; // Speed for deploying intake
-    public static final double kIntakeRollerSpeed = 1.0; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
+    public static final double kIntakeRollerSpeed = .67; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
     public static final double kIntakeRampRate = 2.0; // Max change in motor output per second (units/sec) - prevents harsh stops on chain
-    public static final double kIntakeDeployStowTimeout = 2.0; // Safety timeout for deploy/stow operations (seconds)
+    public static final double kIntakeDeployStowTimeout = 3.14; // Safety timeout for deploy/stow operations (seconds)
+    public static final double kFeederShootSpeed = 0.5; // Speed to feed ball into shooter
+    public static final double kSpindexerIndexSpeed = 1.0; // Speed to index balls from intake to feeder
+    public static final double kHoodSpeed = .314;
 
     // Shooter PID Constants (for velocity control in RPM)
     // TODO: Tune these values empirically on the robot
@@ -83,25 +90,6 @@ public final class Constants {
     // TODO: Tune this value based on desired shot distance and trajectory
     public static final double kShooterTargetRPM = 4000.0; // Target shooter wheel speed in RPM
     public static final double kShooterRPMTolerance = 100.0; // Acceptable RPM tolerance before feeding
-
-    // Feeder Speed for shooting
-    public static final double kFeederShootSpeed = 0.5; // Speed to feed ball into shooter
-
-    // Spindexer Speed for indexing game pieces
-    public static final double kSpindexerIndexSpeed = 1.0; // Speed to index balls from intake to feeder
-
-    // Climber Speeds and Thresholds
-    public static final double kElevatorUpSpeed = 0.6; // Speed for elevator going up
-    public static final double kElevatorDownSpeed = -0.6; // Speed for elevator going down (pulling robot up)
-    public static final double kLowHookOutSpeed = 0.5; // Speed for low hooks folding out
-    public static final double kLowHookInSpeed = -0.5; // Speed for low hooks folding in
-    public static final double kClimberCurrentSpikeThreshold = 30.0; // Current threshold to detect hard stop (Amps)
-
-    // Climber Timing (seconds) - TODO: Tune these values on robot
-    public static final double kElevatorUpTime = 1.5; // Time to extend elevator fully
-    public static final double kElevatorDownTime = 1.5; // Time to retract elevator fully
-    public static final double kLowHookOutTime = 0.5; // Time to fold low hooks out
-    public static final double kLowHookInTime = 0.5; // Time to fold low hooks in
   }
 
   public static class PositionConstants {
@@ -114,6 +102,12 @@ public final class Constants {
     // Maximum angular speed in radians per second
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI * 2;
     // Joystick deadband for driving - use ControllerConstants.kDeadband instead
+  }
+
+  public static enum Directions {
+    IN,
+    OUT,
+    TOGGLE
   }
 
 }

@@ -16,9 +16,10 @@ import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.SpindexerCommands.RunSpindexer;
 import frc.robot.commands.IntakeCommands.RunIntake;
 import frc.robot.subsystems.Feeder;
+import frc.robot.subsystems.Flywheel;
+import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakePivot;
-import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Spindexer;
 import frc.robot.subsystems.Swerve;
 
@@ -26,7 +27,7 @@ public class Bindings {
     public static void configureBindings(
         CommandXboxController m_driverController,
         CommandXboxController m_operatorController,
-        Intake intake, IntakePivot intakePivot, Spindexer spindexer, Shooter shooter, Feeder feeder, Swerve swerve
+        Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, Hood hood, Feeder feeder, Swerve swerve
     ){
 
         /*============================*/
@@ -52,10 +53,10 @@ public class Bindings {
         m_operatorController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
 
         // Rev shooter
-        m_operatorController.leftTrigger(.467).whileTrue(new RevShooter(shooter));
+        m_operatorController.leftTrigger(.467).whileTrue(new RevShooter(flywheel));
 
         // Feed to shooter
-        m_operatorController.leftTrigger(.467).whileTrue(new FeedToShooter(feeder, spindexer, shooter));
+        m_operatorController.leftTrigger(.467).whileTrue(new FeedToShooter(feeder, spindexer, flywheel));
 
         // Deploy intake
         m_operatorController.a().onTrue(new DeployIntake(intakePivot));
@@ -64,10 +65,10 @@ public class Bindings {
         m_operatorController.b().onTrue(new StowIntake(intakePivot));
 
         // Hood open loop up
-        m_operatorController.pov(0).whileTrue(new HoodOpenLoop(shooter, () -> {return MotorConstants.kHoodSpeed;}));
+        m_operatorController.pov(0).whileTrue(new HoodOpenLoop(hood, () -> {return MotorConstants.kHoodSpeed;}));
 
         // Hood open loop down
-        m_operatorController.pov(180).whileTrue(new HoodOpenLoop(shooter, () -> {return -MotorConstants.kHoodSpeed;}));
+        m_operatorController.pov(180).whileTrue(new HoodOpenLoop(hood, () -> {return -MotorConstants.kHoodSpeed;}));
 
         // Spindexer CW (NORMAL)
         m_operatorController.pov(90).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerIndexSpeed));

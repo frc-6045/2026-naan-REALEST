@@ -7,9 +7,10 @@ package frc.robot;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.Feeder;
+import frc.robot.subsystems.Flywheel;
+import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakePivot;
-import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Spindexer;
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.math.MathUtil;
@@ -24,7 +25,8 @@ public class RobotContainer {
   private final Intake m_Intake = new Intake();
   private final IntakePivot m_IntakePivot = new IntakePivot();
   private final Spindexer m_Spindexer = new Spindexer();
-  private final Shooter m_Shooter = new Shooter();
+  private final Flywheel m_Flywheel = new Flywheel();
+  private final Hood m_Hood = new Hood();
   private final Feeder m_Feeder = new Feeder();
   private final Swerve m_Swerve = new Swerve();
 
@@ -38,8 +40,8 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     m_pdh.setSwitchableChannel(true);
-    m_Autos = new Autos(m_Intake, m_IntakePivot, m_Spindexer, m_Shooter, m_Feeder, m_Swerve);
-    Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_IntakePivot, m_Spindexer, m_Shooter, m_Feeder, m_Swerve);
+    m_Autos = new Autos(m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_Feeder, m_Swerve);
+    Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_Hood, m_Feeder, m_Swerve);
 
     // Set default swerve drive command
     m_Swerve.setDefaultCommand(

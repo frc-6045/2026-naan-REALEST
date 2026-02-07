@@ -5,26 +5,26 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ControllerConstants;
-import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Flywheel;
 
 /**
- * Open-loop control command for the shooter.
- * Allows manual control of shooter speed via joystick or other input.
- * Note: For competition, use SpinUpShooter with PID control instead.
+ * Open-loop control command for the flywheel.
+ * Allows manual control of flywheel speed via joystick or other input.
+ * Note: For competition, use RevShooter with PID control instead.
  */
 public class ShooterOpenLoop extends Command {
-  private final Shooter m_Shooter;
+  private final Flywheel m_Flywheel;
   private final DoubleSupplier m_SpeedSupplier;
 
   /**
    * Creates a new ShooterOpenLoop command.
-   * @param shooter The shooter subsystem
+   * @param flywheel The flywheel subsystem
    * @param speedSupplier Supplier for the desired speed (-1.0 to 1.0)
    */
-  public ShooterOpenLoop(Shooter shooter, DoubleSupplier speedSupplier) {
-    m_Shooter = shooter;
+  public ShooterOpenLoop(Flywheel flywheel, DoubleSupplier speedSupplier) {
+    m_Flywheel = flywheel;
     m_SpeedSupplier = speedSupplier;
-    addRequirements(shooter);
+    addRequirements(flywheel);
   }
 
   @Override
@@ -33,12 +33,12 @@ public class ShooterOpenLoop extends Command {
   @Override
   public void execute() {
     double speed = MathUtil.applyDeadband(m_SpeedSupplier.getAsDouble(), ControllerConstants.kDeadband);
-    m_Shooter.setSpeed(speed);
+    m_Flywheel.setSpeed(speed);
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_Shooter.stopShooterMotor();
+    m_Flywheel.stopFlywheelMotor();
   }
 
   @Override

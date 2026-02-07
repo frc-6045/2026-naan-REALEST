@@ -16,11 +16,12 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.StowIntake;
-import frc.robot.commands.ShootFeedCommands.SpinUpShooter;
+import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.SpindexerCommands.StopSpindexer;
 import frc.robot.subsystems.Feeder;
+import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.IntakePivot;
 import frc.robot.subsystems.Spindexer;
 import frc.robot.subsystems.Swerve;
 
@@ -37,14 +38,14 @@ public class Autos {
    * ADD AUTO TO AUTO CHOOSER
    * autoChooser.addOption("exampleAutoName", AutoBuilder.buildAuto("NameOfAutoInPathplanner"));
    */
-  public Autos(Intake intake, Spindexer spindexer, Shooter shooter, Feeder feeder, Swerve swerve) {
+  public Autos(Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, Feeder feeder, Swerve swerve) {
     // PathPlanner AutoBuilder is configured in Swerve subsystem
 
     // --- Register NamedCommands for PathPlanner ---
 
     // Intake commands
-    NamedCommands.registerCommand("deployIntake", new DeployIntake(intake));
-    NamedCommands.registerCommand("stowIntake", new StowIntake(intake));
+    NamedCommands.registerCommand("deployIntake", new DeployIntake(intakePivot));
+    NamedCommands.registerCommand("stowIntake", new StowIntake(intakePivot));
     NamedCommands.registerCommand("startIntakeRoller", new InstantCommand(() -> intake.setSpeed(MotorConstants.kIntakeRollerSpeed), intake));
     NamedCommands.registerCommand("stopIntake", new InstantCommand(() -> intake.stopIntakeMotor(), intake));
 
@@ -52,9 +53,9 @@ public class Autos {
     NamedCommands.registerCommand("startSpindexer", new InstantCommand(() -> spindexer.setSpeed(MotorConstants.kSpindexerIndexSpeed), spindexer));
     NamedCommands.registerCommand("stopSpindexer", new StopSpindexer(spindexer));
 
-    // Shooter commands
-    NamedCommands.registerCommand("spinUpShooter", new SpinUpShooter(shooter).asProxy());
-    NamedCommands.registerCommand("stopShooter", new InstantCommand(() -> shooter.stopShooterMotor(), shooter));
+    // Flywheel commands
+    NamedCommands.registerCommand("spinUpShooter", new RevShooter(flywheel).asProxy());
+    NamedCommands.registerCommand("stopShooter", new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel));
 
     // Feeder commands
     NamedCommands.registerCommand("feed", new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederShootSpeed), feeder));
@@ -62,7 +63,7 @@ public class Autos {
 
     // Composite commands
     NamedCommands.registerCommand("intakeGamePiece", new SequentialCommandGroup(
-      new DeployIntake(intake),
+      new DeployIntake(intakePivot),
       new ParallelCommandGroup(
         new InstantCommand(() -> intake.setSpeed(MotorConstants.kIntakeRollerSpeed), intake),
         new InstantCommand(() -> spindexer.setSpeed(MotorConstants.kSpindexerIndexSpeed), spindexer)
@@ -70,7 +71,7 @@ public class Autos {
     ));
 
     NamedCommands.registerCommand("shoot", new SequentialCommandGroup(
-      new SpinUpShooter(shooter).until(() -> shooter.isAtTargetSpeed(MotorConstants.kShooterTargetRPM)),
+      new RevShooter(flywheel).until(() -> flywheel.isAtTargetSpeed(MotorConstants.kShooterTargetRPM)),
       new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederShootSpeed), feeder)
     ).asProxy());
 
@@ -78,7 +79,7 @@ public class Autos {
       new InstantCommand(() -> intake.stopIntakeMotor(), intake),
       new StopSpindexer(spindexer),
       new InstantCommand(() -> feeder.stopFeederMotor(), feeder),
-      new InstantCommand(() -> shooter.stopShooterMotor(), shooter)
+      new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel)
     ));
 
     // --- Auto Chooser ---

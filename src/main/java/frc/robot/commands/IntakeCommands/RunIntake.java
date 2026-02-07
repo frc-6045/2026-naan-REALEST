@@ -2,6 +2,7 @@ package frc.robot.commands.IntakeCommands;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Intake;
+import frc.robot.Constants.Directions;
 import frc.robot.Constants.MotorConstants;
 
 /**
@@ -11,23 +12,37 @@ import frc.robot.Constants.MotorConstants;
  * IMPORTANT: Bind this command using onTrue(), NOT whileTrue()
  * Example: button.onTrue(new ToggleIntake(intake));
  */
-public class ToggleIntake extends InstantCommand {
+public class RunIntake extends InstantCommand {
     private final Intake m_IntakeSubsystem;
+    private final Directions direction;
 
-    public ToggleIntake(Intake intakeSubsystem) {
+    public RunIntake(Intake intakeSubsystem, Directions direction) {
         m_IntakeSubsystem = intakeSubsystem;
+        this.direction = direction;
         addRequirements(m_IntakeSubsystem);
     }
 
     @Override
     public void initialize() {
-        // Check if intake roller is currently running (uses higher threshold to avoid detecting deploy/stow)
-        if (m_IntakeSubsystem.isRollerRunning()) {
-            // If running, stop it
-            m_IntakeSubsystem.stopIntakeMotor();
-        } else {
-            // If not running, start the roller at intake speed
+        if (direction==Directions.IN) {
             m_IntakeSubsystem.setSpeed(MotorConstants.kIntakeRollerSpeed);
+        } else if (direction==Directions.OUT) {
+            m_IntakeSubsystem.setSpeed(-MotorConstants.kIntakeRollerSpeed);
+        } else{
+            System.out.println("This is sus.");
         }
+        // // Check if intake roller is currently running (uses higher threshold to avoid detecting deploy/stow)
+        // if (m_IntakeSubsystem.isRollerRunning()) {
+        //     // If running, stop it
+        //     m_IntakeSubsystem.stopIntakeMotor();
+        // } else {
+        //     // If not running, start the roller at intake speed
+        //     m_IntakeSubsystem.setSpeed(MotorConstants.kIntakeRollerSpeed);
+        // }
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+
     }
 }
