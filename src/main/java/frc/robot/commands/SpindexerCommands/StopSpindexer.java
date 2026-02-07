@@ -11,7 +11,7 @@ public class StopSpindexer extends InstantCommand {
   /**
    * Creates a new StopSpindexer command.
    *
-   * @param spindexer The spindexer subsystem
+   * @param spindexer The spindexer subsystems
    */
   public StopSpindexer(Spindexer spindexer) {
     super(() -> spindexer.stopSpindexerMotor(), spindexer);

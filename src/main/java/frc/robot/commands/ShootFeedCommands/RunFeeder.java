@@ -1,5 +1,6 @@
 package frc.robot.commands.ShootFeedCommands;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.Directions;
 import frc.robot.Constants.MotorConstants;
@@ -12,7 +13,7 @@ import frc.robot.subsystems.shooterSystem.Feeder;
  * IMPORTANT: Bind this command using onTrue(), NOT whileTrue()
  * Example: button.onTrue(new ToggleIntake(intake));
  */
-public class RunFeeder extends InstantCommand {
+public class RunFeeder extends Command {
     private final Feeder m_Feeder;
     private final Directions direction;
 

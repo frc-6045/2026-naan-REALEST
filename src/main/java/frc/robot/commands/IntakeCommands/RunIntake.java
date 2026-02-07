@@ -1,5 +1,6 @@
 package frc.robot.commands.IntakeCommands;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.IntakeSystem.Intake;
 
@@ -14,7 +15,7 @@ import frc.robot.Constants.MotorConstants;
  * IMPORTANT: Bind this command using onTrue(), NOT whileTrue()
  * Example: button.onTrue(new ToggleIntake(intake));
  */
-public class RunIntake extends InstantCommand {
+public class RunIntake extends Command {
     private final Intake m_IntakeSubsystem;
     private final Directions direction;
 
