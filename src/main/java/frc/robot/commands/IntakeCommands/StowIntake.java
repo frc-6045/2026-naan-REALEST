@@ -16,7 +16,8 @@ public class StowIntake extends Command {
 
     @Override
     public void initialize() {
-        // Start stowing the intake and reset timer
+        // Stop the intake rollers and start stowing
+        m_IntakeSubsystem.stopIntakeMotor();
         m_Timer.reset();
         m_Timer.start();
         m_IntakeSubsystem.setDeploySpeed(MotorConstants.kIntakeStowSpeed);
