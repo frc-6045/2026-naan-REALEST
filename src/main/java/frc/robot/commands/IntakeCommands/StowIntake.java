@@ -19,7 +19,7 @@ public class StowIntake extends Command {
         // Start stowing the intake and reset timer
         m_Timer.reset();
         m_Timer.start();
-        m_IntakeSubsystem.setSpeed(MotorConstants.kIntakeStowSpeed);
+        m_IntakeSubsystem.setDeploySpeed(MotorConstants.kIntakeStowSpeed);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class StowIntake extends Command {
     public boolean isFinished() {
         // Stop when current spike is detected (intake has reached mechanical limit)
         // OR when timeout is reached (safety)
-        return m_IntakeSubsystem.getCurrent() >= MotorConstants.kIntakeCurrentSpikeThreshold
+        return m_IntakeSubsystem.getDeployCurrent() >= MotorConstants.kIntakeCurrentSpikeThreshold
             || m_Timer.hasElapsed(MotorConstants.kIntakeDeployStowTimeout);
     }
 
@@ -40,7 +40,7 @@ public class StowIntake extends Command {
     public void end(boolean interrupted) {
         // Stop the motor and timer when done or interrupted
         m_Timer.stop();
-        m_IntakeSubsystem.setSpeed(0);
+        m_IntakeSubsystem.stopDeployMotor();
     }
 
 }
