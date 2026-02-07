@@ -1,7 +1,7 @@
 package frc.robot.commands.SpindexerCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Spindexer;
+import frc.robot.subsystems.shooterSystem.Spindexer;
 
 /**
  * Command to run the spindexer at a specified speed.

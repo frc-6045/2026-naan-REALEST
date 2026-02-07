@@ -1,7 +1,7 @@
 package frc.robot.commands.ShootFeedCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Flywheel;
+import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.Constants.MotorConstants;
 
 /**

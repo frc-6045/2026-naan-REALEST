@@ -18,11 +18,11 @@ import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.StowIntake;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.SpindexerCommands.StopSpindexer;
-import frc.robot.subsystems.Feeder;
-import frc.robot.subsystems.Flywheel;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.IntakePivot;
-import frc.robot.subsystems.Spindexer;
+import frc.robot.subsystems.shooterSystem.Feeder;
+import frc.robot.subsystems.shooterSystem.Flywheel;
+import frc.robot.subsystems.IntakeSystem.Intake;
+import frc.robot.subsystems.IntakeSystem.IntakePivot;
+import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.Swerve;
 
 public class Autos {

@@ -1,7 +1,7 @@
 package frc.robot.commands.SpindexerCommands;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.subsystems.Spindexer;
+import frc.robot.subsystems.shooterSystem.Spindexer;
 
 /**
  * Instant command to stop the spindexer motor.

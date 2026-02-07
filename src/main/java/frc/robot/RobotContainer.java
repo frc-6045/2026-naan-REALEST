@@ -6,12 +6,12 @@ package frc.robot;
 
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.Feeder;
-import frc.robot.subsystems.Flywheel;
-import frc.robot.subsystems.Hood;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.IntakePivot;
-import frc.robot.subsystems.Spindexer;
+import frc.robot.subsystems.shooterSystem.Feeder;
+import frc.robot.subsystems.shooterSystem.Flywheel;
+import frc.robot.subsystems.shooterSystem.Hood;
+import frc.robot.subsystems.IntakeSystem.Intake;
+import frc.robot.subsystems.IntakeSystem.intakePivot;
+import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.PowerDistribution;

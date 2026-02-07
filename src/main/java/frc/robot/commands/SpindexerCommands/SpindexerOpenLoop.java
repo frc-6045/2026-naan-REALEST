@@ -5,7 +5,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ControllerConstants;
-import frc.robot.subsystems.Spindexer;
+import frc.robot.subsystems.shooterSystem.Spindexer;
 
 public class SpindexerOpenLoop extends Command {
   private final Spindexer m_Spindexer;
