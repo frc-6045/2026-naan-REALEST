@@ -7,37 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "auto7path1"
+            "pathName": "quarterpath1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "auto7path2"
+            "pathName": "quarterpath2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "auto7path3"
+            "pathName": "quarterpath3"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "auto7path4"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "auto7path5"
+            "pathName": "quarterpath4"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Auto Outlines",
+  "folder": null,
   "choreoAuto": false
 }

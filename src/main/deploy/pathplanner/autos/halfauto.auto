@@ -7,31 +7,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "auto5path1"
+            "pathName": "halfpath1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "auto5path2"
+            "pathName": "halfpath2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "auto5path3"
+            "pathName": "halfpath3"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "auto5path4"
+            "pathName": "halfpath4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "halfpath5"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Auto Outlines",
+  "folder": null,
   "choreoAuto": false
 }
