@@ -34,7 +34,7 @@ public class Bindings {
         /*============================*/
 
         // Start: Reset Gyro
-        m_driverController.start().onTrue(Commands.runOnce(() -> swerve.zeroGyroWithAlliance()));
+        //m_driverController.start().onTrue(Commands.runOnce(() -> swerve.zeroGyroWithAlliance()));
 
         // LT: Deploy intake and run intake rollers
         m_driverController.leftTrigger().onTrue(
@@ -78,7 +78,7 @@ public class Bindings {
         m_driverController.a().onTrue(new ToggleIntake(intake));
 
         // Back: Lock wheels in X pattern
-        m_driverController.back().whileTrue(Commands.run(() -> swerve.lock(), swerve));
+        //m_driverController.back().whileTrue(Commands.run(() -> swerve.lock(), swerve));
 
         /*============================*/
         /*     Operator Bindings      */

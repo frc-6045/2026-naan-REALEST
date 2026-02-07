@@ -106,14 +106,14 @@ public class Swerve extends SubsystemBase {
      */
     public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX) {
         return run(() -> {
-            m_swerveDrive.drive(
-                SwerveMath.scaleTranslation(new Translation2d(
-                    translationX.getAsDouble() * m_swerveDrive.getMaximumChassisVelocity(),
-                    translationY.getAsDouble() * m_swerveDrive.getMaximumChassisVelocity()), 0.8),
-                Math.pow(angularRotationX.getAsDouble(), 3) * m_swerveDrive.getMaximumChassisAngularVelocity(),
-                true,
-                false
-            );
+            // m_swerveDrive.drive(
+            //     SwerveMath.scaleTranslation(new Translation2d(
+            //         translationX.getAsDouble() * m_swerveDrive.getMaximumChassisVelocity(),
+            //         translationY.getAsDouble() * m_swerveDrive.getMaximumChassisVelocity()), 0.8),
+            //     Math.pow(angularRotationX.getAsDouble(), 3) * m_swerveDrive.getMaximumChassisAngularVelocity(),
+            //     true,
+            //     false
+            // );
         });
     }
 
@@ -153,7 +153,7 @@ public class Swerve extends SubsystemBase {
      * @param fieldRelative Whether to drive field-relative
      */
     public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
-        m_swerveDrive.drive(translation, rotation, fieldRelative, false);
+        //m_swerveDrive.drive(translation, rotation, fieldRelative, false);
     }
 
     /**
@@ -162,7 +162,7 @@ public class Swerve extends SubsystemBase {
      * @param velocity ChassisSpeeds object representing the desired field-relative velocities
      */
     public void driveFieldOriented(ChassisSpeeds velocity) {
-        m_swerveDrive.driveFieldOriented(velocity);
+       // m_swerveDrive.driveFieldOriented(velocity);
     }
 
     /**
@@ -171,7 +171,7 @@ public class Swerve extends SubsystemBase {
      * @param velocity ChassisSpeeds object representing the desired robot-relative velocities
      */
     public void drive(ChassisSpeeds velocity) {
-        m_swerveDrive.drive(velocity);
+       // m_swerveDrive.drive(velocity);
     }
 
     /**
