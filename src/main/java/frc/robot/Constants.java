@@ -69,6 +69,7 @@ public final class Constants {
     public static final double kIntakeStowSpeed = -0.3; // Speed for stowing intake (negative)
     public static final double kIntakeDeploySpeed = 0.3; // Speed for deploying intake (positive)
     public static final double kIntakeRollerSpeed = 0.5; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
+    public static final double kIntakeRampRate = 2.0; // Max change in motor output per second (units/sec) - prevents harsh stops on chain
     public static final double kIntakeDeployStowTimeout = 2.0; // Safety timeout for deploy/stow operations (seconds)
 
     // Shooter PID Constants (for velocity control in RPM)
