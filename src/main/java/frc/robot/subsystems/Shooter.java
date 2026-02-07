@@ -41,9 +41,11 @@ public class Shooter extends SubsystemBase {
     m_HoodMotor = new SparkFlex(MotorConstants.kHoodMotorCanID, MotorType.kBrushless);
 
     updateMotorSettings(m_ShooterMotor1);
+    config.inverted(false);
     m_ShooterMotor1.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     updateMotorSettings(m_ShooterMotor2);
+    config.inverted(true);
     m_ShooterMotor2.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     updateHoodMotorSettings();
@@ -167,7 +169,9 @@ public class Shooter extends SubsystemBase {
           .d(tunedD)
           .velocityFF(tunedFF);
 
+      config.inverted(false);
       m_ShooterMotor1.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+      config.inverted(true);
       m_ShooterMotor2.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
       m_lastP = tunedP;
