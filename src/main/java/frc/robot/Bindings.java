@@ -57,7 +57,7 @@ public class Bindings {
         m_driverController.rightBumper().whileTrue(new SpinUpShooter(shooter));
 
         // RT: Release fuel (confirm) - feed to shooter (only when at speed)
-        m_driverController.rightTrigger().whileTrue(new FeedToShooter(feeder, shooter));
+        m_driverController.rightTrigger().whileTrue(new FeedToShooter(feeder, spindexer, shooter));
 
         // X: Hood close position
         m_driverController.x().whileTrue(
