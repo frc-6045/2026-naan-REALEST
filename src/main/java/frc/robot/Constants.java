@@ -143,16 +143,12 @@ public final class Constants {
   }
 
   public static class ShootingConstants {
-    // Auto-feed speeds (matching FeedToShooter behavior)
-    public static final double kAutoFeedSpeed = 0.67; // Feeder speed during auto-shoot
-    public static final double kAutoSpindexerSpeed = 1.0; // Spindexer speed during auto-shoot
-
     // Valid shooting distance range (meters)
     // TODO: Adjust based on robot capabilities
     public static final double kMinShootingDistanceMeters = 1.0;
     public static final double kMaxShootingDistanceMeters = 7.0;
 
-    // Autonomous auto-aim timing
+    // Autonomous auto-aim timing (seconds)
     public static final double kAutoShootFeedDurationSec = 0.5; // How long to run feeder after auto-fire triggers
     public static final double kAutoShootTimeoutSec = 5.0; // Safety timeout to prevent stalling auto
   }

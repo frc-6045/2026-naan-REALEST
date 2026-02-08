@@ -92,24 +92,27 @@ public class Autos {
 
     // Auto-aim commands (Limelight-based shooting for autonomous)
 
-    // Prep only — spins flywheel + sets hood while PathPlanner drives
+    // Prep only -- spins flywheel + sets hood while PathPlanner drives
     NamedCommands.registerCommand("autoAim", new AutoAimPrepare(flywheel, hood).asProxy());
 
-    // Full stop-aim-shoot — stops driving, rotates to target, fires, ends after feeding
+    // Full stop-aim-shoot -- stops driving, rotates to target, fires, ends after feeding
     NamedCommands.registerCommand("autoAimAndShoot", Commands.defer(() -> {
       Timer feedTimer = new Timer();
       AutoAimAndShoot cmd = new AutoAimAndShoot(
           swerve, flywheel, hood, feeder, spindexer, () -> 0.0, () -> 0.0);
+
       return cmd.until(() -> {
         if (cmd.isFeedingActive()) {
-          if (!feedTimer.isRunning()) feedTimer.start();
+          if (!feedTimer.isRunning()) {
+            feedTimer.start();
+          }
           return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
         }
         return false;
       }).withTimeout(ShootingConstants.kAutoShootTimeoutSec);
     }, Set.of(swerve, flywheel, hood, feeder, spindexer)).asProxy());
 
-    // Cancel prep — kills flywheel and hood
+    // Cancel prep -- stops flywheel and hood
     NamedCommands.registerCommand("stopAim", new ParallelCommandGroup(
       new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel),
       new InstantCommand(() -> hood.stopHoodMotor(), hood)
@@ -117,7 +120,7 @@ public class Autos {
 
     // --- Auto Chooser ---
 
-    autoChooser = new SendableChooser<Command>();
+    autoChooser = new SendableChooser<>();
     autoChooser.setDefaultOption("None", null);
 
     // Add autos to chooser

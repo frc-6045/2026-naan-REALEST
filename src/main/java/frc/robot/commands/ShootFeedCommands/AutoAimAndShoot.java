@@ -43,7 +43,6 @@ public class AutoAimAndShoot extends Command {
     private final PIDController m_aimPID;
 
     private double m_lastTargetRPM = MotorConstants.kShooterTargetRPM;
-    private double m_lastHoodAngle = 170.0; // Reasonable default mid-range
     private boolean m_feeding = false;
 
     public AutoAimAndShoot(
@@ -123,12 +122,8 @@ public class AutoAimAndShoot extends Command {
             double targetHoodAngle = ShootingLookupTable.getHoodAngle(compensatedDistance);
             double targetRPM = ShootingLookupTable.getFlywheelRPM(compensatedDistance);
             m_lastTargetRPM = targetRPM;
-            m_lastHoodAngle = targetHoodAngle;
 
-            // Set hood angle via PID
             m_hood.setHoodAngle(targetHoodAngle);
-
-            // Set flywheel velocity via PID
             m_flywheel.setFlywheelVelocity(targetRPM);
 
             // Calculate auto-rotation from aim PID (tx -> rad/s)
@@ -150,8 +145,8 @@ public class AutoAimAndShoot extends Command {
 
             if (readyToFire) {
                 // Auto-feed
-                m_feeder.setSpeed(ShootingConstants.kAutoFeedSpeed);
-                m_spindexer.setSpeed(ShootingConstants.kAutoSpindexerSpeed);
+                m_feeder.setSpeed(MotorConstants.kFeederShootSpeed);
+                m_spindexer.setSpeed(MotorConstants.kSpindexerIndexSpeed);
                 m_feeding = true;
             } else {
                 m_feeder.stopFeederMotor();
@@ -183,23 +178,13 @@ public class AutoAimAndShoot extends Command {
             // No valid target: drive with zero rotation, keep flywheel spinning at last RPM
             m_swerve.drive(translation, 0.0, true);
             m_flywheel.setFlywheelVelocity(m_lastTargetRPM);
-            // Hood holds position (brake mode) - no need to command it
             m_feeder.stopFeederMotor();
             m_spindexer.stopSpindexerMotor();
             m_feeding = false;
 
             SmartDashboard.putBoolean("AutoAim Aimed", false);
             SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
-
-            // Clear VComp telemetry
-            SmartDashboard.putBoolean("VComp Active", false);
-            SmartDashboard.putNumber("VComp Aim Lead (deg)", 0.0);
-            SmartDashboard.putNumber("VComp Adjusted Dist", 0.0);
-            SmartDashboard.putNumber("VComp Raw Dist", 0.0);
-            SmartDashboard.putNumber("VComp Flight Time (s)", 0.0);
-            SmartDashboard.putNumber("VComp Lateral V (m/s)", 0.0);
-            SmartDashboard.putNumber("VComp Radial V (m/s)", 0.0);
-            SmartDashboard.putNumber("VComp Robot Speed (m/s)", 0.0);
+            clearVCompTelemetry();
         }
 
         // Common telemetry
@@ -224,7 +209,7 @@ public class AutoAimAndShoot extends Command {
 
     @Override
     public boolean isFinished() {
-        return false; // Run until button is released
+        return false; // Runs until interrupted (button release or autonomous deadline)
     }
 
     /**
@@ -235,9 +220,6 @@ public class AutoAimAndShoot extends Command {
         return m_feeding;
     }
 
-    /**
-     * Check if a detected AprilTag ID is in our valid target list.
-     */
     private boolean isValidTagID(int id) {
         for (int validID : LimelightConstants.kTargetAprilTagIDs) {
             if (id == validID) {
@@ -245,5 +227,17 @@ public class AutoAimAndShoot extends Command {
             }
         }
         return false;
+    }
+
+    /** Zeros all velocity-compensation telemetry when no target is visible. */
+    private void clearVCompTelemetry() {
+        SmartDashboard.putBoolean("VComp Active", false);
+        SmartDashboard.putNumber("VComp Aim Lead (deg)", 0.0);
+        SmartDashboard.putNumber("VComp Adjusted Dist", 0.0);
+        SmartDashboard.putNumber("VComp Raw Dist", 0.0);
+        SmartDashboard.putNumber("VComp Flight Time (s)", 0.0);
+        SmartDashboard.putNumber("VComp Lateral V (m/s)", 0.0);
+        SmartDashboard.putNumber("VComp Radial V (m/s)", 0.0);
+        SmartDashboard.putNumber("VComp Robot Speed (m/s)", 0.0);
     }
 }
