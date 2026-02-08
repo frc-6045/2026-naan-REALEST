@@ -57,7 +57,7 @@ public class Bindings {
         m_operatorController.rightTrigger(.5).whileTrue(new RevShooter(flywheel));
 
         // Feed to shooter
-        m_operatorController.leftTrigger(.467).whileTrue(new RunFeeder(feeder, Directions.IN));
+        m_operatorController.leftTrigger(.467).whileTrue(new FeedToShooter(feeder, spindexer, flywheel));
         m_operatorController.x().whileTrue(new RunFeeder(feeder, Directions.IN));
 
         // Deploy intake
