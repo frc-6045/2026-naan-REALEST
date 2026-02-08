@@ -27,7 +27,7 @@ public class Feeder extends SubsystemBase {
 
    public void updateMotorSettings(SparkFlex motor) {
     config
-        .idleMode(IdleMode.kBrake)
+        .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(MotorConstants.kFeederCurrentLimit);
     config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
@@ -44,7 +44,7 @@ public class Feeder extends SubsystemBase {
       SmartDashboard.putString("Feeder Warning", warning);
     }
 
-    //m_FeederMotor.set(speed);
+    m_FeederMotor.set(speed);
     SmartDashboard.putNumber("Feeder speed", speed);
   }
 
