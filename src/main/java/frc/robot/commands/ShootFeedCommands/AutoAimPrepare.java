@@ -45,7 +45,7 @@ public class AutoAimPrepare extends Command {
         double ty = LimelightHelpers.getTY(ll);
         double detectedID = LimelightHelpers.getFiducialID(ll);
 
-        boolean validTarget = hasTarget && isValidTagID((int) detectedID);
+        boolean validTarget = hasTarget && LimelightConstants.isValidTagID((int) detectedID);
 
         if (validTarget) {
             // Calculate distance using trigonometry (same as AutoAimAndShoot)
@@ -84,12 +84,4 @@ public class AutoAimPrepare extends Command {
         return false; // Runs until interrupted
     }
 
-    private boolean isValidTagID(int id) {
-        for (int validID : LimelightConstants.kTargetAprilTagIDs) {
-            if (id == validID) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

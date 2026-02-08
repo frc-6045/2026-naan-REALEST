@@ -94,7 +94,7 @@ public class AutoAimAndShoot extends Command {
         Translation2d translation = new Translation2d(translationX, translationY);
 
         // Validate that detected tag is in our valid list
-        boolean validTarget = hasTarget && isValidTagID((int) detectedID);
+        boolean validTarget = hasTarget && LimelightConstants.isValidTagID((int) detectedID);
 
         if (validTarget) {
             // Calculate distance using trigonometry
@@ -218,15 +218,6 @@ public class AutoAimAndShoot extends Command {
      */
     public boolean isFeedingActive() {
         return m_feeding;
-    }
-
-    private boolean isValidTagID(int id) {
-        for (int validID : LimelightConstants.kTargetAprilTagIDs) {
-            if (id == validID) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /** Zeros all velocity-compensation telemetry when no target is visible. */

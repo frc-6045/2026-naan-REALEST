@@ -130,6 +130,16 @@ public final class Constants {
     // Valid AprilTag IDs for scoring targets
     // TODO: Update with actual scoring target tag IDs for the 2026 game
     public static final int[] kTargetAprilTagIDs = {7, 4};
+
+    /** Check if a detected AprilTag ID is in our valid scoring target list. */
+    public static boolean isValidTagID(int id) {
+      for (int validID : kTargetAprilTagIDs) {
+        if (id == validID) {
+          return true;
+        }
+      }
+      return false;
+    }
   }
 
   public static class AimConstants {

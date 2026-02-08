@@ -109,14 +109,15 @@ public class Autos {
           return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
         }
         return false;
-      }).withTimeout(ShootingConstants.kAutoShootTimeoutSec);
+      }).finallyDo(() -> feedTimer.stop())
+        .withTimeout(ShootingConstants.kAutoShootTimeoutSec);
     }, Set.of(swerve, flywheel, hood, feeder, spindexer)).asProxy());
 
     // Cancel prep -- stops flywheel and hood
     NamedCommands.registerCommand("stopAim", new ParallelCommandGroup(
       new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel),
       new InstantCommand(() -> hood.stopHoodMotor(), hood)
-    ));
+    ).asProxy());
 
     // --- Auto Chooser ---
 
