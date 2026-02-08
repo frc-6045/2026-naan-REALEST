@@ -62,6 +62,7 @@ public class Flywheel extends SubsystemBase {
 
   public void setSpeed(double speed) {
     double requestedSpeed = speed;
+    SmartDashboard.putNumber("Flywheel requested speed", speed);
     speed = MathUtil.clamp(speed, -MotorConstants.kShooterMotorMaximumSpeed, MotorConstants.kShooterMotorMaximumSpeed);
 
     if (Math.abs(requestedSpeed) > Math.abs(speed)) {
