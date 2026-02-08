@@ -27,6 +27,7 @@ public class Feeder extends SubsystemBase {
 
    public void updateMotorSettings(SparkFlex motor) {
     config
+        .inverted(true)
         .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(MotorConstants.kFeederCurrentLimit);
     config.closedLoop

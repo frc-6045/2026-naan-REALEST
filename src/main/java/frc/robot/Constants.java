@@ -77,7 +77,7 @@ public final class Constants {
     public static final double kIntakeRollerSpeed = .67; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
     public static final double kIntakeRampRate = 2.0; // Max change in motor output per second (units/sec) - prevents harsh stops on chain
     public static final double kIntakeDeployStowTimeout = 3.14; // Safety timeout for deploy/stow operations (seconds)
-    public static final double kFeederShootSpeed = -0.67; // Speed to feed ball into shooter
+    public static final double kFeederShootSpeed = 0.67; // Speed to feed ball into shooter
     public static final double kSpindexerIndexSpeed = 1.0; // Speed to index balls from intake to feeder
     public static final double kHoodSpeed = .5;
 
