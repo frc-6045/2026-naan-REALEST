@@ -228,6 +228,14 @@ public class AutoAimAndShoot extends Command {
     }
 
     /**
+     * Check if the command is currently feeding a game piece to the shooter.
+     * Used by autonomous compositions to detect when shooting is in progress.
+     */
+    public boolean isFeedingActive() {
+        return m_feeding;
+    }
+
+    /**
      * Check if a detected AprilTag ID is in our valid target list.
      */
     private boolean isValidTagID(int id) {

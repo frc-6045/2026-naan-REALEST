@@ -151,6 +151,10 @@ public final class Constants {
     // TODO: Adjust based on robot capabilities
     public static final double kMinShootingDistanceMeters = 1.0;
     public static final double kMaxShootingDistanceMeters = 7.0;
+
+    // Autonomous auto-aim timing
+    public static final double kAutoShootFeedDurationSec = 0.5; // How long to run feeder after auto-fire triggers
+    public static final double kAutoShootTimeoutSec = 5.0; // Safety timeout to prevent stalling auto
   }
 
   public static class VelocityCompensationConstants {
