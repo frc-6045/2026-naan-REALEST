@@ -83,10 +83,11 @@ public final class Constants {
 
     // Shooter PID Constants (for velocity control in RPM)
     // TODO: Tune these values empirically on the robot
-    public static final double kShooterP = 0.0001; // Proportional gain
-    public static final double kShooterI = 0.0; // Integral gain
+    public static final double kShooterP = 0.0003; // Proportional gain
+    public static final double kShooterI = 0.0000005; // Integral gain
     public static final double kShooterD = 0.0; // Derivative gain
     public static final double kShooterFF = 0.00018; // Feed-forward gain (velocity feed-forward)
+    public static final double kShooterIZone = 400.0; // I term only active within this RPM error range
 
     // Shooter Target Speed (RPM)
     // TODO: Tune this value based on desired shot distance and trajectory

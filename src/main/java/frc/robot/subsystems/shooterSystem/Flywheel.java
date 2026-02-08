@@ -57,7 +57,8 @@ public class Flywheel extends SubsystemBase {
         .p(MotorConstants.kShooterP)
         .i(MotorConstants.kShooterI)
         .d(MotorConstants.kShooterD)
-        .velocityFF(MotorConstants.kShooterFF);
+        .velocityFF(MotorConstants.kShooterFF)
+        .iZone(MotorConstants.kShooterIZone);
   }
 
   public void setSpeed(double speed) {
