@@ -5,9 +5,11 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.LimelightHelpers;
+import frc.robot.ShotCompensation;
 import frc.robot.ShootingLookupTable;
 import frc.robot.Constants.AimConstants;
 import frc.robot.Constants.LimelightConstants;
@@ -106,9 +108,20 @@ public class AutoAimAndShoot extends Command {
                     ShootingConstants.kMinShootingDistanceMeters,
                     ShootingConstants.kMaxShootingDistanceMeters);
 
-            // Look up hood angle and RPM from distance
-            double targetHoodAngle = ShootingLookupTable.getHoodAngle(distance);
-            double targetRPM = ShootingLookupTable.getFlywheelRPM(distance);
+            // Velocity compensation for shoot-while-moving
+            ChassisSpeeds fieldVelocity = m_swerve.getFieldVelocity();
+            double headingDeg = m_swerve.getHeading().getDegrees();
+            ShotCompensation.CompensationResult compensation =
+                    ShotCompensation.calculate(fieldVelocity, headingDeg, tx, distance);
+
+            // Use compensated distance for hood/RPM lookups, clamped to valid range
+            double compensatedDistance = MathUtil.clamp(compensation.adjustedDistanceMeters,
+                    ShootingConstants.kMinShootingDistanceMeters,
+                    ShootingConstants.kMaxShootingDistanceMeters);
+
+            // Look up hood angle and RPM from compensated distance
+            double targetHoodAngle = ShootingLookupTable.getHoodAngle(compensatedDistance);
+            double targetRPM = ShootingLookupTable.getFlywheelRPM(compensatedDistance);
             m_lastTargetRPM = targetRPM;
             m_lastHoodAngle = targetHoodAngle;
 
@@ -118,9 +131,10 @@ public class AutoAimAndShoot extends Command {
             // Set flywheel velocity via PID
             m_flywheel.setFlywheelVelocity(targetRPM);
 
-            // Calculate auto-rotation from aim PID (tx -> rad/s, setpoint = 0)
-            // TODO: May need to negate tx if robot rotates AWAY from target
-            double aimOutput = m_aimPID.calculate(tx);
+            // Calculate auto-rotation from aim PID (tx -> rad/s)
+            // Setpoint is the aim lead angle (0 when stationary, offset when moving)
+            double aimSetpoint = compensation.aimLeadDegrees;
+            double aimOutput = m_aimPID.calculate(tx, aimSetpoint);
             double rotationSpeed = MathUtil.clamp(aimOutput,
                     -AimConstants.kMaxAutoRotationRadPerSec,
                     AimConstants.kMaxAutoRotationRadPerSec);
@@ -128,8 +142,8 @@ public class AutoAimAndShoot extends Command {
             // Drive: driver translation + auto rotation, field-relative
             m_swerve.drive(translation, rotationSpeed, true);
 
-            // Check if all conditions are met
-            boolean aimed = Math.abs(tx) < AimConstants.kAimToleranceDegrees;
+            // Check if all conditions are met (aimed = reached lead angle, not necessarily centered)
+            boolean aimed = Math.abs(tx - aimSetpoint) < AimConstants.kAimToleranceDegrees;
             boolean hoodReady = m_hood.isAtTargetAngle(targetHoodAngle);
             boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
             boolean readyToFire = aimed && hoodReady && flywheelReady;
@@ -153,6 +167,18 @@ public class AutoAimAndShoot extends Command {
             SmartDashboard.putBoolean("AutoAim HoodReady", hoodReady);
             SmartDashboard.putBoolean("AutoAim FlywheelReady", flywheelReady);
             SmartDashboard.putBoolean("AutoAim ReadyToFire", readyToFire);
+
+            // Velocity compensation telemetry
+            double robotSpeed = Math.hypot(fieldVelocity.vxMetersPerSecond,
+                    fieldVelocity.vyMetersPerSecond);
+            SmartDashboard.putBoolean("VComp Active", compensation.compensationActive);
+            SmartDashboard.putNumber("VComp Aim Lead (deg)", compensation.aimLeadDegrees);
+            SmartDashboard.putNumber("VComp Adjusted Dist", compensation.adjustedDistanceMeters);
+            SmartDashboard.putNumber("VComp Raw Dist", distance);
+            SmartDashboard.putNumber("VComp Flight Time (s)", compensation.flightTimeSec);
+            SmartDashboard.putNumber("VComp Lateral V (m/s)", compensation.lateralVelocityMps);
+            SmartDashboard.putNumber("VComp Radial V (m/s)", compensation.radialVelocityMps);
+            SmartDashboard.putNumber("VComp Robot Speed (m/s)", robotSpeed);
         } else {
             // No valid target: drive with zero rotation, keep flywheel spinning at last RPM
             m_swerve.drive(translation, 0.0, true);
@@ -164,6 +190,16 @@ public class AutoAimAndShoot extends Command {
 
             SmartDashboard.putBoolean("AutoAim Aimed", false);
             SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
+
+            // Clear VComp telemetry
+            SmartDashboard.putBoolean("VComp Active", false);
+            SmartDashboard.putNumber("VComp Aim Lead (deg)", 0.0);
+            SmartDashboard.putNumber("VComp Adjusted Dist", 0.0);
+            SmartDashboard.putNumber("VComp Raw Dist", 0.0);
+            SmartDashboard.putNumber("VComp Flight Time (s)", 0.0);
+            SmartDashboard.putNumber("VComp Lateral V (m/s)", 0.0);
+            SmartDashboard.putNumber("VComp Radial V (m/s)", 0.0);
+            SmartDashboard.putNumber("VComp Robot Speed (m/s)", 0.0);
         }
 
         // Common telemetry

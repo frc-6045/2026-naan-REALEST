@@ -153,6 +153,31 @@ public final class Constants {
     public static final double kMaxShootingDistanceMeters = 7.0;
   }
 
+  public static class VelocityCompensationConstants {
+    // Master toggle -- set false to disable for A/B testing
+    public static final boolean kEnableVelocityCompensation = true;
+
+    // Horizontal ball exit speed in m/s
+    // TODO: Measure empirically (shoot at known distance, time flight)
+    // Starting estimate: 4500 RPM, 4" wheel, ~50% efficiency ≈ 12 m/s
+    public static final double kBallExitVelocityMps = 12.0;
+
+    // Multiplier on aim lead angle (start under-compensating; over-compensation is worse)
+    public static final double kAimLeadScalar = 0.7;
+
+    // Multiplier on distance adjustment (start conservative)
+    public static final double kDistanceCompScalar = 0.5;
+
+    // Deadband below which compensation is zeroed (avoids jitter from noisy odometry)
+    public static final double kMinCompensationVelocityMps = 0.15;
+
+    // Clamp to prevent wild aim at close range
+    public static final double kMaxAimLeadDegrees = 15.0;
+
+    // Clamp to keep lookup table queries in valid range
+    public static final double kMaxDistanceAdjustmentMeters = 1.5;
+  }
+
   public static enum Directions {
     IN,
     OUT,
