@@ -61,10 +61,10 @@ public class Bindings {
         m_operatorController.x().whileTrue(new RunFeeder(feeder, Directions.IN));
 
         // Deploy intake
-        m_operatorController.a().onTrue(new DeployIntake(intakePivot));
+       // m_operatorController.a().onTrue(new DeployIntake(intakePivot));
 
         // Stow intake
-        m_operatorController.b().onTrue(new StowIntake(intakePivot));
+       // m_operatorController.b().onTrue(new StowIntake(intakePivot));
 
         // Hood open loop up
         m_operatorController.pov(0).whileTrue(new HoodOpenLoop(hood, () -> {return MotorConstants.kHoodSpeed;}));
