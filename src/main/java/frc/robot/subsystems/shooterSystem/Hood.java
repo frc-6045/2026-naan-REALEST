@@ -22,27 +22,27 @@ public class Hood extends SubsystemBase {
   private final SparkFlex m_HoodMotor;
   private final SparkAbsoluteEncoder m_HoodEncoder;
   private final SparkClosedLoopController m_HoodPIDController;
-  SparkFlexConfig hoodConfig = new SparkFlexConfig();
+  private final SparkFlexConfig m_hoodConfig = new SparkFlexConfig();
 
   @SuppressWarnings("deprecation")
   public Hood() {
     m_HoodMotor = new SparkFlex(MotorConstants.kHoodMotorCanID, MotorType.kBrushless);
 
     updateHoodMotorSettings();
-    m_HoodMotor.configure(hoodConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    m_HoodMotor.configure(m_hoodConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     m_HoodEncoder = m_HoodMotor.getAbsoluteEncoder();
     m_HoodPIDController = m_HoodMotor.getClosedLoopController();
   }
 
   public void updateHoodMotorSettings() {
-    hoodConfig
+    m_hoodConfig
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(MotorConstants.kHoodCurrentLimit);
-    hoodConfig.absoluteEncoder
+    m_hoodConfig.absoluteEncoder
         .positionConversionFactor(360.0) // Convert rotations to degrees
         .zeroOffset(MotorConstants.kHoodEncoderOffset);
-    hoodConfig.closedLoop
+    m_hoodConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         .p(MotorConstants.kHoodP)
         .i(MotorConstants.kHoodI)
@@ -50,6 +50,10 @@ public class Hood extends SubsystemBase {
         .outputRange(-MotorConstants.kHoodMotorMaximumSpeed, MotorConstants.kHoodMotorMaximumSpeed);
   }
 
+  /**
+   * Set the hood motor speed with clamping and soft limit warnings.
+   * @param speed Desired speed (-1.0 to 1.0)
+   */
   public void setHoodSpeed(double speed) {
     double requestedSpeed = speed;
     speed = MathUtil.clamp(speed, -MotorConstants.kHoodMotorMaximumSpeed, MotorConstants.kHoodMotorMaximumSpeed);
@@ -60,11 +64,11 @@ public class Hood extends SubsystemBase {
       DriverStation.reportWarning(warning, false);
       SmartDashboard.putString("Hood Warning", warning);
     }
-    if (getHoodAngle()>MotorConstants.kHoodUpperLimit && speed>0) {
-      // speed=0;
+    if (getHoodAngle() > MotorConstants.kHoodUpperLimit && speed > 0) {
+      // speed = 0;
       SmartDashboard.putBoolean("Upper limit", true);
-    } else if (getHoodAngle()<MotorConstants.kHoodLowerLimit && speed<0) {
-      // speed=0;
+    } else if (getHoodAngle() < MotorConstants.kHoodLowerLimit && speed < 0) {
+      // speed = 0;
       SmartDashboard.putBoolean("Lower limit", true);
     } else {
       SmartDashboard.putBoolean("Upper limit", false);
@@ -75,6 +79,7 @@ public class Hood extends SubsystemBase {
     SmartDashboard.putNumber("Hood speed", speed);
   }
 
+  /** Stop the hood motor and report zero speed to dashboard. */
   public void stopHoodMotor() {
     m_HoodMotor.stopMotor();
     SmartDashboard.putNumber("Hood speed", 0);
@@ -99,7 +104,10 @@ public class Hood extends SubsystemBase {
     return Math.abs(getHoodAngle() - targetDegrees) < MotorConstants.kHoodAngleTolerance;
   }
 
-  // Hood angle getter (in degrees)
+  /**
+   * Get the current hood angle from the absolute encoder.
+   * @return Hood angle in degrees
+   */
   public double getHoodAngle() {
     return m_HoodEncoder.getPosition();
   }
