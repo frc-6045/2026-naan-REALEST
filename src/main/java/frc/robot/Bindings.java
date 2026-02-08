@@ -4,12 +4,15 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.Directions;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.StowIntake;
+import frc.robot.commands.ShootFeedCommands.AutoAimAndShoot;
 import frc.robot.commands.ShootFeedCommands.FeedToShooter;
 import frc.robot.commands.ShootFeedCommands.HoodOpenLoop;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
@@ -44,6 +47,15 @@ public class Bindings {
         // Intake rollers
         m_driverController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
         m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
+
+        // Auto-aim and auto-shoot (driver retains left stick translational control)
+        m_driverController.rightTrigger(0.5).whileTrue(
+            new AutoAimAndShoot(
+                swerve, flywheel, hood, feeder, spindexer,
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
+            )
+        );
 
         /*============================*/
         /*     Operator Bindings      */

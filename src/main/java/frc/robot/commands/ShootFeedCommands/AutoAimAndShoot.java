@@ -1,0 +1,205 @@
+package frc.robot.commands.ShootFeedCommands;
+
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.LimelightHelpers;
+import frc.robot.ShootingLookupTable;
+import frc.robot.Constants.AimConstants;
+import frc.robot.Constants.LimelightConstants;
+import frc.robot.Constants.MotorConstants;
+import frc.robot.Constants.ShootingConstants;
+import frc.robot.Constants.SwerveConstants;
+import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.shooterSystem.Feeder;
+import frc.robot.subsystems.shooterSystem.Flywheel;
+import frc.robot.subsystems.shooterSystem.Hood;
+import frc.robot.subsystems.shooterSystem.Spindexer;
+
+/**
+ * Auto-aim and auto-shoot command using Limelight AprilTag tracking.
+ * When active (driver holds RT):
+ * - Reads Limelight for target AprilTag
+ * - Auto-rotates toward target (driver retains translational control)
+ * - Adjusts hood angle and flywheel RPM based on distance
+ * - Auto-feeds when all conditions are met (aimed, hood ready, flywheel ready)
+ */
+public class AutoAimAndShoot extends Command {
+    private final Swerve m_swerve;
+    private final Flywheel m_flywheel;
+    private final Hood m_hood;
+    private final Feeder m_feeder;
+    private final Spindexer m_spindexer;
+
+    private final DoubleSupplier m_translationXSupplier; // Forward/back (field-relative Y on joystick)
+    private final DoubleSupplier m_translationYSupplier; // Left/right (field-relative X on joystick)
+
+    private final PIDController m_aimPID;
+
+    private double m_lastTargetRPM = MotorConstants.kShooterTargetRPM;
+    private double m_lastHoodAngle = 170.0; // Reasonable default mid-range
+    private boolean m_feeding = false;
+
+    public AutoAimAndShoot(
+            Swerve swerve, Flywheel flywheel, Hood hood, Feeder feeder, Spindexer spindexer,
+            DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier) {
+        m_swerve = swerve;
+        m_flywheel = flywheel;
+        m_hood = hood;
+        m_feeder = feeder;
+        m_spindexer = spindexer;
+        m_translationXSupplier = translationXSupplier;
+        m_translationYSupplier = translationYSupplier;
+
+        m_aimPID = new PIDController(AimConstants.kAimP, AimConstants.kAimI, AimConstants.kAimD);
+        m_aimPID.setTolerance(AimConstants.kAimToleranceDegrees);
+        m_aimPID.setSetpoint(0.0); // Target: zero tx offset
+
+        addRequirements(swerve, flywheel, hood, feeder, spindexer);
+    }
+
+    @Override
+    public void initialize() {
+        // Set Limelight to AprilTag pipeline
+        LimelightHelpers.setPipelineIndex(LimelightConstants.kLimelightName, LimelightConstants.kAprilTagPipeline);
+
+        // Filter to only track scoring target AprilTags
+        LimelightHelpers.SetFiducialIDFiltersOverride(
+                LimelightConstants.kLimelightName, LimelightConstants.kTargetAprilTagIDs);
+
+        m_aimPID.reset();
+        m_feeding = false;
+
+        SmartDashboard.putBoolean("AutoAim Active", true);
+    }
+
+    @Override
+    public void execute() {
+        String ll = LimelightConstants.kLimelightName;
+
+        // Read Limelight data
+        boolean hasTarget = LimelightHelpers.getTV(ll);
+        double tx = LimelightHelpers.getTX(ll);
+        double ty = LimelightHelpers.getTY(ll);
+        double detectedID = LimelightHelpers.getFiducialID(ll);
+
+        // Get driver translation input, scale to m/s
+        double translationX = m_translationXSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
+        double translationY = m_translationYSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
+        Translation2d translation = new Translation2d(translationX, translationY);
+
+        // Validate that detected tag is in our valid list
+        boolean validTarget = hasTarget && isValidTagID((int) detectedID);
+
+        if (validTarget) {
+            // Calculate distance using trigonometry
+            double angleToTargetRad = Math.toRadians(LimelightConstants.kLimelightMountAngleDegrees + ty);
+            double distance = (LimelightConstants.kTargetHeightMeters - LimelightConstants.kLimelightMountHeightMeters)
+                    / Math.tan(angleToTargetRad);
+
+            // Clamp distance to valid range
+            distance = MathUtil.clamp(distance,
+                    ShootingConstants.kMinShootingDistanceMeters,
+                    ShootingConstants.kMaxShootingDistanceMeters);
+
+            // Look up hood angle and RPM from distance
+            double targetHoodAngle = ShootingLookupTable.getHoodAngle(distance);
+            double targetRPM = ShootingLookupTable.getFlywheelRPM(distance);
+            m_lastTargetRPM = targetRPM;
+            m_lastHoodAngle = targetHoodAngle;
+
+            // Set hood angle via PID
+            m_hood.setHoodAngle(targetHoodAngle);
+
+            // Set flywheel velocity via PID
+            m_flywheel.setFlywheelVelocity(targetRPM);
+
+            // Calculate auto-rotation from aim PID (tx -> rad/s, setpoint = 0)
+            // TODO: May need to negate tx if robot rotates AWAY from target
+            double aimOutput = m_aimPID.calculate(tx);
+            double rotationSpeed = MathUtil.clamp(aimOutput,
+                    -AimConstants.kMaxAutoRotationRadPerSec,
+                    AimConstants.kMaxAutoRotationRadPerSec);
+
+            // Drive: driver translation + auto rotation, field-relative
+            m_swerve.drive(translation, rotationSpeed, true);
+
+            // Check if all conditions are met
+            boolean aimed = Math.abs(tx) < AimConstants.kAimToleranceDegrees;
+            boolean hoodReady = m_hood.isAtTargetAngle(targetHoodAngle);
+            boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
+            boolean readyToFire = aimed && hoodReady && flywheelReady;
+
+            if (readyToFire) {
+                // Auto-feed
+                m_feeder.setSpeed(ShootingConstants.kAutoFeedSpeed);
+                m_spindexer.setSpeed(ShootingConstants.kAutoSpindexerSpeed);
+                m_feeding = true;
+            } else {
+                m_feeder.stopFeederMotor();
+                m_spindexer.stopSpindexerMotor();
+                m_feeding = false;
+            }
+
+            // Telemetry
+            SmartDashboard.putNumber("AutoAim Distance", distance);
+            SmartDashboard.putNumber("AutoAim Target Hood", targetHoodAngle);
+            SmartDashboard.putNumber("AutoAim Target RPM", targetRPM);
+            SmartDashboard.putBoolean("AutoAim Aimed", aimed);
+            SmartDashboard.putBoolean("AutoAim HoodReady", hoodReady);
+            SmartDashboard.putBoolean("AutoAim FlywheelReady", flywheelReady);
+            SmartDashboard.putBoolean("AutoAim ReadyToFire", readyToFire);
+        } else {
+            // No valid target: drive with zero rotation, keep flywheel spinning at last RPM
+            m_swerve.drive(translation, 0.0, true);
+            m_flywheel.setFlywheelVelocity(m_lastTargetRPM);
+            // Hood holds position (brake mode) - no need to command it
+            m_feeder.stopFeederMotor();
+            m_spindexer.stopSpindexerMotor();
+            m_feeding = false;
+
+            SmartDashboard.putBoolean("AutoAim Aimed", false);
+            SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
+        }
+
+        // Common telemetry
+        SmartDashboard.putBoolean("AutoAim HasTarget", validTarget);
+        SmartDashboard.putNumber("AutoAim TX", tx);
+        SmartDashboard.putNumber("AutoAim TY", ty);
+        SmartDashboard.putBoolean("AutoAim Feeding", m_feeding);
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        m_flywheel.stopFlywheelMotor();
+        m_hood.stopHoodMotor();
+        m_feeder.stopFeederMotor();
+        m_spindexer.stopSpindexerMotor();
+        // Swerve default command auto-resumes
+
+        SmartDashboard.putBoolean("AutoAim Active", false);
+        SmartDashboard.putBoolean("AutoAim Feeding", false);
+        SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false; // Run until button is released
+    }
+
+    /**
+     * Check if a detected AprilTag ID is in our valid target list.
+     */
+    private boolean isValidTagID(int id) {
+        for (int validID : LimelightConstants.kTargetAprilTagIDs) {
+            if (id == validID) {
+                return true;
+            }
+        }
+        return false;
+    }
+}

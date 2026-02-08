@@ -93,6 +93,13 @@ public final class Constants {
     // TODO: Tune this value based on desired shot distance and trajectory
     public static final double kShooterTargetRPM = 4500.0; // Target shooter wheel speed in RPM
     public static final double kShooterRPMTolerance = 100.0; // Acceptable RPM tolerance before feeding
+
+    // Hood PID Constants (for position control in degrees via absolute encoder)
+    // TODO: Tune these values empirically on the robot
+    public static final double kHoodP = 0.02; // Proportional gain
+    public static final double kHoodI = 0.0; // Integral gain
+    public static final double kHoodD = 0.001; // Derivative gain
+    public static final double kHoodAngleTolerance = 2.0; // Degrees of acceptable error
   }
 
   public static class PositionConstants {
@@ -105,6 +112,45 @@ public final class Constants {
     // Maximum angular speed in radians per second
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI * 2;
     // Joystick deadband for driving - use ControllerConstants.kDeadband instead
+  }
+
+  public static class LimelightConstants {
+    public static final String kLimelightName = "limelight"; // NetworkTables name
+    public static final int kAprilTagPipeline = 0; // Pipeline index for AprilTag detection
+
+    // Limelight mounting configuration (relative to robot center)
+    // TODO: Measure and update these values for your robot
+    public static final double kLimelightMountHeightMeters = 0.5; // Height of lens from floor (meters)
+    public static final double kLimelightMountAngleDegrees = 30.0; // Angle above horizontal (degrees)
+
+    // Target configuration
+    // TODO: Update target height for 2026 game scoring element
+    public static final double kTargetHeightMeters = 1.45; // Height of AprilTag center from floor (meters)
+
+    // Valid AprilTag IDs for scoring targets
+    // TODO: Update with actual scoring target tag IDs for the 2026 game
+    public static final int[] kTargetAprilTagIDs = {7, 4};
+  }
+
+  public static class AimConstants {
+    // Rotation PID gains for auto-aim
+    // TODO: Tune these values empirically on the robot
+    public static final double kAimP = 0.05; // Proportional gain
+    public static final double kAimI = 0.0; // Integral gain
+    public static final double kAimD = 0.005; // Derivative gain
+    public static final double kAimToleranceDegrees = 2.0; // Acceptable aim error (degrees)
+    public static final double kMaxAutoRotationRadPerSec = 3.0; // Max rotation speed during auto-aim (rad/s)
+  }
+
+  public static class ShootingConstants {
+    // Auto-feed speeds (matching FeedToShooter behavior)
+    public static final double kAutoFeedSpeed = 0.67; // Feeder speed during auto-shoot
+    public static final double kAutoSpindexerSpeed = 1.0; // Spindexer speed during auto-shoot
+
+    // Valid shooting distance range (meters)
+    // TODO: Adjust based on robot capabilities
+    public static final double kMinShootingDistanceMeters = 1.0;
+    public static final double kMaxShootingDistanceMeters = 7.0;
   }
 
   public static enum Directions {

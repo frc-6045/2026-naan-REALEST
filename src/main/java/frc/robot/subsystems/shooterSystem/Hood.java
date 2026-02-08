@@ -2,6 +2,9 @@ package frc.robot.subsystems.shooterSystem;
 
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -18,6 +21,7 @@ import frc.robot.Constants.MotorConstants;
 public class Hood extends SubsystemBase {
   private final SparkFlex m_HoodMotor;
   private final SparkAbsoluteEncoder m_HoodEncoder;
+  private final SparkClosedLoopController m_HoodPIDController;
   SparkFlexConfig hoodConfig = new SparkFlexConfig();
 
   @SuppressWarnings("deprecation")
@@ -28,6 +32,7 @@ public class Hood extends SubsystemBase {
     m_HoodMotor.configure(hoodConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     m_HoodEncoder = m_HoodMotor.getAbsoluteEncoder();
+    m_HoodPIDController = m_HoodMotor.getClosedLoopController();
   }
 
   public void updateHoodMotorSettings() {
@@ -38,7 +43,11 @@ public class Hood extends SubsystemBase {
         .positionConversionFactor(360.0) // Convert rotations to degrees
         .zeroOffset(MotorConstants.kHoodEncoderOffset);
     hoodConfig.closedLoop
-        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
+        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+        .p(MotorConstants.kHoodP)
+        .i(MotorConstants.kHoodI)
+        .d(MotorConstants.kHoodD)
+        .outputRange(-MotorConstants.kHoodMotorMaximumSpeed, MotorConstants.kHoodMotorMaximumSpeed);
   }
 
   public void setHoodSpeed(double speed) {
@@ -69,6 +78,25 @@ public class Hood extends SubsystemBase {
   public void stopHoodMotor() {
     m_HoodMotor.stopMotor();
     SmartDashboard.putNumber("Hood speed", 0);
+  }
+
+  /**
+   * Set the hood to a target angle using onboard PID position control.
+   * @param degrees Target angle in degrees, clamped to safe range
+   */
+  public void setHoodAngle(double degrees) {
+    degrees = MathUtil.clamp(degrees, MotorConstants.kHoodLowerLimit, MotorConstants.kHoodUpperLimit);
+    m_HoodPIDController.setReference(degrees, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    SmartDashboard.putNumber("Hood Target Angle", degrees);
+  }
+
+  /**
+   * Check if the hood is within tolerance of a target angle.
+   * @param targetDegrees Target angle in degrees
+   * @return true if within kHoodAngleTolerance of target
+   */
+  public boolean isAtTargetAngle(double targetDegrees) {
+    return Math.abs(getHoodAngle() - targetDegrees) < MotorConstants.kHoodAngleTolerance;
   }
 
   // Hood angle getter (in degrees)
