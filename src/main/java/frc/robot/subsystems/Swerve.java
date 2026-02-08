@@ -51,7 +51,7 @@ public class Swerve extends SubsystemBase {
         m_swerveDrive.setHeadingCorrection(false);
         m_swerveDrive.setCosineCompensator(false);
         m_swerveDrive.setAngularVelocityCompensation(true, true, 0.1);
-        m_swerveDrive.setModuleEncoderAutoSynchronize(true, 1); // TODO: originally false, testing auto-sync
+        m_swerveDrive.setModuleEncoderAutoSynchronize(true, 1); // TODO: was originally false, set to true to auto-sync absolute encoders
 
         // Setup PathPlanner
         setupPathPlanner();
