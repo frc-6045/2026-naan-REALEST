@@ -51,6 +51,16 @@ public class Hood extends SubsystemBase {
       DriverStation.reportWarning(warning, false);
       SmartDashboard.putString("Hood Warning", warning);
     }
+    if (getHoodAngle()>MotorConstants.kHoodUpperLimit && speed>0) {
+      // speed=0;
+      SmartDashboard.putBoolean("Upper limit", true);
+    } else if (getHoodAngle()<MotorConstants.kHoodLowerLimit && speed<0) {
+      // speed=0;
+      SmartDashboard.putBoolean("Lower limit", true);
+    } else {
+      SmartDashboard.putBoolean("Upper limit", false);
+      SmartDashboard.putBoolean("Lower limit", false);
+    }
 
     m_HoodMotor.set(speed);
     SmartDashboard.putNumber("Hood speed", speed);
