@@ -124,12 +124,13 @@ public final class Constants {
     public static final double kLimelightMountAngleDegrees = 30.0; // Angle above horizontal (degrees)
 
     // Target configuration
-    // TODO: Update target height for 2026 game scoring element
-    public static final double kTargetHeightMeters = 1.45; // Height of AprilTag center from floor (meters)
+    // HUB AprilTag centers are 44.25in (1.124m) off the floor
+    public static final double kTargetHeightMeters = 44.25 * 0.0254; // ~1.124m
 
-    // Valid AprilTag IDs for scoring targets
-    // TODO: Update with actual scoring target tag IDs for the 2026 game
-    public static final int[] kTargetAprilTagIDs = {7, 4};
+    // HUB AprilTag IDs -- all four faces of each HUB, 2 tags per face
+    public static final int[] kTargetAprilTagIDs = {
+        2, 3, 4, 5, 8, 9, 10, 11, 18, 19, 20, 21, 24, 25, 26, 27
+    };
 
     /** Check if a detected AprilTag ID is in our valid scoring target list. */
     public static boolean isValidTagID(int id) {
