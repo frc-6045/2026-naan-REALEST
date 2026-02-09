@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -192,12 +195,57 @@ public final class Constants {
   }
 
   public static class FieldConstants {
-    // Known field positions of the scoring target cube center
-    // TODO: Update with actual 2026 field coordinates from the field manual
-    public static final Translation2d kBlueScoringTarget = new Translation2d(0.0, 5.55); // meters
-    public static final Translation2d kRedScoringTarget = new Translation2d(16.54, 5.55); // meters
+    // Load the official 2026 field layout from WPILib (includes all AprilTag positions)
+    public static final AprilTagFieldLayout kFieldLayout =
+        AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
-    /** Returns the scoring target position for the current alliance. */
+    public static final double kFieldLengthMeters = kFieldLayout.getFieldLength();
+    public static final double kFieldWidthMeters = kFieldLayout.getFieldWidth();
+
+    // HUB AprilTag IDs -- all four faces of each HUB, 2 tags per face
+    // Tag centers are 44.25in (1.124m) off the floor
+    public static final int[] kHubTagIDs = {
+        2, 3, 4, 5, 8, 9, 10, 11, 18, 19, 20, 21, 24, 25, 26, 27
+    };
+
+    // HUB centers computed by averaging the X/Y of all HUB tags on each half of the field
+    public static final Translation2d kBlueScoringTarget;
+    public static final Translation2d kRedScoringTarget;
+
+    static {
+      double midX = kFieldLengthMeters / 2.0;
+      double blueSumX = 0, blueSumY = 0;
+      int blueCount = 0;
+      double redSumX = 0, redSumY = 0;
+      int redCount = 0;
+
+      for (int id : kHubTagIDs) {
+        var maybePose = kFieldLayout.getTagPose(id);
+        if (maybePose.isPresent()) {
+          Pose3d pose = maybePose.get();
+          double x = pose.getX();
+          double y = pose.getY();
+          if (x < midX) {
+            blueSumX += x;
+            blueSumY += y;
+            blueCount++;
+          } else {
+            redSumX += x;
+            redSumY += y;
+            redCount++;
+          }
+        }
+      }
+
+      kBlueScoringTarget = blueCount > 0
+          ? new Translation2d(blueSumX / blueCount, blueSumY / blueCount)
+          : new Translation2d(0.0, kFieldWidthMeters / 2.0);
+      kRedScoringTarget = redCount > 0
+          ? new Translation2d(redSumX / redCount, redSumY / redCount)
+          : new Translation2d(kFieldLengthMeters, kFieldWidthMeters / 2.0);
+    }
+
+    /** Returns the scoring target (HUB center) for the current alliance. */
     public static Translation2d getScoringTarget() {
       var alliance = DriverStation.getAlliance();
       if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {

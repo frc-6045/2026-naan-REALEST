@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.VisionConstants;
@@ -373,7 +374,8 @@ public class Swerve extends SubsystemBase {
         // Reject if pose is off the field (invalid estimate)
         double x = estimate.pose.getX();
         double y = estimate.pose.getY();
-        if (x < 0 || x > 16.54 || y < 0 || y > 8.21) {
+        if (x < 0 || x > FieldConstants.kFieldLengthMeters
+                || y < 0 || y > FieldConstants.kFieldWidthMeters) {
             return;
         }
 
