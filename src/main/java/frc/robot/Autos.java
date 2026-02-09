@@ -109,7 +109,7 @@ public class Autos {
           return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
         }
         return false;
-      }).finallyDo(() -> feedTimer.stop())
+      }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
         .withTimeout(ShootingConstants.kAutoShootTimeoutSec);
     }, Set.of(swerve, flywheel, hood, feeder, spindexer)).asProxy());
 

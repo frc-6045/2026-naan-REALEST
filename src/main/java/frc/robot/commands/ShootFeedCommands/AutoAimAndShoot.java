@@ -41,7 +41,6 @@ public class AutoAimAndShoot extends Command {
 
     private final PIDController m_aimPID;
 
-    private double m_lastTargetRPM = MotorConstants.kShooterTargetRPM;
     private boolean m_feeding = false;
 
     public AutoAimAndShoot(
@@ -111,12 +110,12 @@ public class AutoAimAndShoot extends Command {
         // Look up hood angle and RPM from compensated distance
         double targetHoodAngle = ShootingLookupTable.getHoodAngle(compensatedDistance);
         double targetRPM = ShootingLookupTable.getFlywheelRPM(compensatedDistance);
-        m_lastTargetRPM = targetRPM;
 
         m_hood.setHoodAngle(targetHoodAngle);
         m_flywheel.setFlywheelVelocity(targetRPM);
 
-        // Calculate auto-rotation from aim PID (angular error in degrees -> rad/s)
+        // Calculate auto-rotation from aim PID
+        // Input/setpoint are in degrees; output is treated as rad/s (gains account for unit conversion)
         // Setpoint includes aim lead offset from velocity compensation
         double aimSetpointDeg = compensation.aimLeadDegrees;
         double aimOutput = m_aimPID.calculate(angularErrorDeg, aimSetpointDeg);
@@ -128,7 +127,8 @@ public class AutoAimAndShoot extends Command {
         m_swerve.drive(translation, rotationSpeed, true);
 
         // Check if all conditions are met
-        boolean aimed = Math.abs(angularErrorDeg - aimSetpointDeg) < AimConstants.kAimToleranceDegrees;
+        boolean aimed = Math.abs(MathUtil.inputModulus(angularErrorDeg - aimSetpointDeg, -180, 180))
+                < AimConstants.kAimToleranceDegrees;
         boolean hoodReady = m_hood.isAtTargetAngle(targetHoodAngle);
         boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
         boolean readyToFire = aimed && hoodReady && flywheelReady;
