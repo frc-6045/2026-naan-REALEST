@@ -4,6 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -93,6 +99,13 @@ public final class Constants {
     // TODO: Tune this value based on desired shot distance and trajectory
     public static final double kShooterTargetRPM = 4500.0; // Target shooter wheel speed in RPM
     public static final double kShooterRPMTolerance = 100.0; // Acceptable RPM tolerance before feeding
+
+    // Hood PID Constants (for position control in degrees via absolute encoder)
+    // TODO: Tune these values empirically on the robot
+    public static final double kHoodP = 0.02; // Proportional gain
+    public static final double kHoodI = 0.0; // Integral gain
+    public static final double kHoodD = 0.001; // Derivative gain
+    public static final double kHoodAngleTolerance = 2.0; // Degrees of acceptable error
   }
 
   public static class PositionConstants {
@@ -105,6 +118,163 @@ public final class Constants {
     // Maximum angular speed in radians per second
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI * 2;
     // Joystick deadband for driving - use ControllerConstants.kDeadband instead
+  }
+
+  public static class LimelightConstants {
+    public static final String kLimelightName = "limelight"; // NetworkTables name
+    public static final int kAprilTagPipeline = 0; // Pipeline index for AprilTag detection
+
+    // Limelight mounting configuration (relative to robot center)
+    // TODO: Measure and update these values for your robot
+    public static final double kLimelightMountHeightMeters = 0.5; // Height of lens from floor (meters)
+    public static final double kLimelightMountAngleDegrees = 30.0; // Angle above horizontal (degrees)
+
+    // Target configuration
+    // HUB opening front edge is 72in (1.83m) off the floor
+    public static final double kTargetHeightMeters = 72.0 * 0.0254; // ~1.829m
+  }
+
+  public static class AimConstants {
+    // Rotation PID gains for auto-aim
+    // TODO: Tune these values empirically on the robot
+    public static final double kAimP = 0.05; // Proportional gain
+    public static final double kAimI = 0.0; // Integral gain
+    public static final double kAimD = 0.005; // Derivative gain
+    public static final double kAimToleranceDegrees = 2.0; // Acceptable aim error (degrees)
+    public static final double kMaxAutoRotationRadPerSec = 3.0; // Max rotation speed during auto-aim (rad/s)
+  }
+
+  public static class ShootingConstants {
+    // Valid shooting distance range (meters)
+    // TODO: Adjust based on robot capabilities
+    public static final double kMinShootingDistanceMeters = 1.0;
+    public static final double kMaxShootingDistanceMeters = 7.0;
+
+    // Autonomous auto-aim timing (seconds)
+    public static final double kAutoShootFeedDurationSec = 0.5; // How long to run feeder after auto-fire triggers
+    public static final double kAutoShootTimeoutSec = 5.0; // Safety timeout to prevent stalling auto
+  }
+
+  public static class VelocityCompensationConstants {
+    // Master toggle -- set false to disable for A/B testing
+    public static final boolean kEnableVelocityCompensation = true;
+
+    // Horizontal ball exit speed in m/s
+    // TODO: Measure empirically (shoot at known distance, time flight)
+    // Starting estimate: 4500 RPM, 4" wheel, ~50% efficiency ≈ 12 m/s
+    public static final double kBallExitVelocityMps = 12.0;
+
+    // Multiplier on aim lead angle (start under-compensating; over-compensation is worse)
+    public static final double kAimLeadScalar = 0.7;
+
+    // Multiplier on distance adjustment (start conservative)
+    public static final double kDistanceCompScalar = 0.5;
+
+    // Deadband below which compensation is zeroed (avoids jitter from noisy odometry)
+    public static final double kMinCompensationVelocityMps = 0.15;
+
+    // Clamp to prevent wild aim at close range
+    public static final double kMaxAimLeadDegrees = 15.0;
+
+    // Clamp to keep lookup table queries in valid range
+    public static final double kMaxDistanceAdjustmentMeters = 1.5;
+  }
+
+  public static class FieldConstants {
+    // Load the official 2026 field layout from WPILib (includes all AprilTag positions)
+    public static final AprilTagFieldLayout kFieldLayout =
+            AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+
+    public static final double kFieldLengthMeters = kFieldLayout.getFieldLength();
+    public static final double kFieldWidthMeters = kFieldLayout.getFieldWidth();
+
+    // HUB physical dimensions
+    public static final double kHubWidthMeters = 47.0 * 0.0254; // 47in square base
+    public static final double kHubOpeningDiameterMeters = 41.7 * 0.0254; // 41.7in hexagonal opening
+    public static final double kHubOpeningRadiusMeters = kHubOpeningDiameterMeters / 2.0; // ~0.53m
+    public static final double kHubOpeningHeightMeters = 72.0 * 0.0254; // front edge of opening, 72in off floor
+    public static final double kHubTagHeightMeters = 44.25 * 0.0254; // tag centers, 44.25in off floor
+
+    // HUB AprilTag IDs -- all four faces of each HUB, 2 tags per face
+    public static final int[] kHubTagIDs = {
+            2, 3, 4, 5, 8, 9, 10, 11, 18, 19, 20, 21, 24, 25, 26, 27
+    };
+
+    // HUB centers computed by averaging the X/Y of all HUB tags on each half of the field
+    public static final Translation2d kBlueScoringTarget;
+    public static final Translation2d kRedScoringTarget;
+
+    static {
+        double midX = kFieldLengthMeters / 2.0;
+        double blueSumX = 0, blueSumY = 0;
+        int blueCount = 0;
+        double redSumX = 0, redSumY = 0;
+        int redCount = 0;
+
+        for (int id : kHubTagIDs) {
+            var maybePose = kFieldLayout.getTagPose(id);
+            if (maybePose.isPresent()) {
+                Pose3d pose = maybePose.get();
+                double x = pose.getX();
+                double y = pose.getY();
+                if (x < midX) {
+                    blueSumX += x;
+                    blueSumY += y;
+                    blueCount++;
+                } else {
+                    redSumX += x;
+                    redSumY += y;
+                    redCount++;
+                }
+            }
+        }
+
+        kBlueScoringTarget = blueCount > 0
+                ? new Translation2d(blueSumX / blueCount, blueSumY / blueCount)
+                : new Translation2d(0.0, kFieldWidthMeters / 2.0);
+        kRedScoringTarget = redCount > 0
+                ? new Translation2d(redSumX / redCount, redSumY / redCount)
+                : new Translation2d(kFieldLengthMeters, kFieldWidthMeters / 2.0);
+    }
+
+    /** Returns the scoring target (HUB center) for the current alliance. */
+    public static Translation2d getScoringTarget() {
+        var alliance = DriverStation.getAlliance();
+        if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+            return kRedScoringTarget;
+        }
+        return kBlueScoringTarget;
+    }
+
+    /**
+     * Computes the effective shooting distance from the robot to the near edge of the HUB opening.
+     * The ball enters from above, so the relevant distance is to the rim, not the HUB center.
+     * Subtracts the opening radius from the center-to-center distance.
+     *
+     * @param distanceToCenterMeters Euclidean distance from robot to HUB center
+     * @return Effective distance to the near edge of the opening (meters, minimum 0)
+     */
+    public static double getEffectiveShootingDistance(double distanceToCenterMeters) {
+        return Math.max(0, distanceToCenterMeters - kHubOpeningRadiusMeters);
+    }
+  }
+
+  public static class VisionConstants {
+    // Standard deviations for vision pose estimation (x, y, theta in meters/radians)
+    // Lower = more trust in vision; higher = more trust in odometry
+
+    // Single-tag base std devs (scaled by distance^2 at runtime)
+    public static final double kSingleTagXYStdDev = 0.5; // meters
+    // Multi-tag base std devs (more accurate, less scaling needed)
+    public static final double kMultiTagXYStdDev = 0.3; // meters
+
+    // MegaTag2 theta std dev -- set to MAX_VALUE to ignore rotation from vision
+    // (our gyro is the source of truth for heading; fusing vision rotation would be circular)
+    public static final double kThetaStdDev = Double.MAX_VALUE;
+
+    // Rejection thresholds
+    public static final double kMaxTagDistanceMeters = 5.0; // reject estimates from tags farther than this
+    public static final double kMaxAngularVelocityDegPerSec = 720.0; // reject vision during fast spins
   }
 
   public static enum Directions {
