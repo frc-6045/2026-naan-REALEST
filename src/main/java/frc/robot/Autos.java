@@ -93,7 +93,7 @@ public class Autos {
     // Auto-aim commands (Limelight-based shooting for autonomous)
 
     // Prep only -- spins flywheel + sets hood while PathPlanner drives
-    NamedCommands.registerCommand("autoAim", new AutoAimPrepare(flywheel, hood).asProxy());
+    NamedCommands.registerCommand("autoAim", new AutoAimPrepare(flywheel, hood, swerve).asProxy());
 
     // Full stop-aim-shoot -- stops driving, rotates to target, fires, ends after feeding
     NamedCommands.registerCommand("autoAimAndShoot", Commands.defer(() -> {

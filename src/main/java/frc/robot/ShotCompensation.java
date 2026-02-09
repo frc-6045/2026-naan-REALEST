@@ -49,13 +49,12 @@ public final class ShotCompensation {
      * Calculate aim lead and distance adjustment for shoot-while-moving compensation.
      *
      * @param fieldVelocity Robot's field-relative velocity from swerve odometry
-     * @param headingDegrees Robot heading in degrees (0 = field-forward, CCW positive)
-     * @param txDegrees Limelight tx (horizontal offset to target, + = target right of crosshair)
+     * @param targetBearingRad Field-frame bearing to target in radians (from pose math)
      * @param distanceMeters Raw distance to target in meters
      * @return CompensationResult with aim lead and adjusted distance
      */
-    public static CompensationResult calculate(ChassisSpeeds fieldVelocity, double headingDegrees,
-            double txDegrees, double distanceMeters) {
+    public static CompensationResult calculate(ChassisSpeeds fieldVelocity,
+            double targetBearingRad, double distanceMeters) {
         // Early return if disabled
         if (!VelocityCompensationConstants.kEnableVelocityCompensation) {
             return CompensationResult.zero(distanceMeters);
@@ -71,9 +70,8 @@ public final class ShotCompensation {
             return CompensationResult.zero(distanceMeters);
         }
 
-        // Bearing to target in field coords (radians)
-        // Robot heading - tx gives field-frame direction to target
-        double bearingRad = Math.toRadians(headingDegrees - txDegrees);
+        // Bearing to target already computed from poses
+        double bearingRad = targetBearingRad;
 
         // Unit vector toward target in field frame
         double bearingX = Math.cos(bearingRad);

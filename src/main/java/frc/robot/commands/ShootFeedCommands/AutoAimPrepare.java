@@ -1,75 +1,59 @@
 package frc.robot.commands.ShootFeedCommands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.LimelightHelpers;
 import frc.robot.ShootingLookupTable;
-import frc.robot.Constants.LimelightConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShootingConstants;
+import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.Hood;
 
 /**
  * Lightweight auto-aim prep command for autonomous use.
- * Spins flywheel and sets hood angle based on Limelight distance.
- * Does NOT require Swerve, so it can run alongside PathPlanner paths.
+ * Spins flywheel and sets hood angle based on pose-estimated distance.
+ * Does NOT require Swerve (read-only), so it can run alongside PathPlanner paths.
  */
 public class AutoAimPrepare extends Command {
     private final Flywheel m_flywheel;
     private final Hood m_hood;
+    private final Swerve m_swerve;
 
-    public AutoAimPrepare(Flywheel flywheel, Hood hood) {
+    public AutoAimPrepare(Flywheel flywheel, Hood hood, Swerve swerve) {
         m_flywheel = flywheel;
         m_hood = hood;
+        m_swerve = swerve;
+        // Only require flywheel and hood -- Swerve is read-only so PathPlanner can still drive
         addRequirements(flywheel, hood);
     }
 
     @Override
     public void initialize() {
-        // Set Limelight to AprilTag pipeline
-        LimelightHelpers.setPipelineIndex(LimelightConstants.kLimelightName, LimelightConstants.kAprilTagPipeline);
-
-        // Filter to only track scoring target AprilTags
-        LimelightHelpers.SetFiducialIDFiltersOverride(
-                LimelightConstants.kLimelightName, LimelightConstants.kTargetAprilTagIDs);
-
         SmartDashboard.putBoolean("AutoAimPrep Active", true);
     }
 
     @Override
     public void execute() {
-        String ll = LimelightConstants.kLimelightName;
+        // Get scoring target and distance from current pose
+        Translation2d target = FieldConstants.getScoringTarget();
+        double[] distBearing = m_swerve.getDistanceAndBearingTo(target);
+        double distance = distBearing[0];
 
-        boolean hasTarget = LimelightHelpers.getTV(ll);
-        double ty = LimelightHelpers.getTY(ll);
-        double detectedID = LimelightHelpers.getFiducialID(ll);
+        distance = MathUtil.clamp(distance,
+                ShootingConstants.kMinShootingDistanceMeters,
+                ShootingConstants.kMaxShootingDistanceMeters);
 
-        boolean validTarget = hasTarget && LimelightConstants.isValidTagID((int) detectedID);
+        double targetHoodAngle = ShootingLookupTable.getHoodAngle(distance);
+        double targetRPM = ShootingLookupTable.getFlywheelRPM(distance);
 
-        if (validTarget) {
-            // Calculate distance using trigonometry (same as AutoAimAndShoot)
-            double angleToTargetRad = Math.toRadians(LimelightConstants.kLimelightMountAngleDegrees + ty);
-            double distance = (LimelightConstants.kTargetHeightMeters - LimelightConstants.kLimelightMountHeightMeters)
-                    / Math.tan(angleToTargetRad);
+        m_hood.setHoodAngle(targetHoodAngle);
+        m_flywheel.setFlywheelVelocity(targetRPM);
 
-            distance = MathUtil.clamp(distance,
-                    ShootingConstants.kMinShootingDistanceMeters,
-                    ShootingConstants.kMaxShootingDistanceMeters);
-
-            double targetHoodAngle = ShootingLookupTable.getHoodAngle(distance);
-            double targetRPM = ShootingLookupTable.getFlywheelRPM(distance);
-
-            m_hood.setHoodAngle(targetHoodAngle);
-            m_flywheel.setFlywheelVelocity(targetRPM);
-
-            SmartDashboard.putNumber("AutoAimPrep Distance", distance);
-            SmartDashboard.putNumber("AutoAimPrep Target Hood", targetHoodAngle);
-            SmartDashboard.putNumber("AutoAimPrep Target RPM", targetRPM);
-            SmartDashboard.putBoolean("AutoAimPrep HasTarget", true);
-        } else {
-            SmartDashboard.putBoolean("AutoAimPrep HasTarget", false);
-        }
+        SmartDashboard.putNumber("AutoAimPrep Distance", distance);
+        SmartDashboard.putNumber("AutoAimPrep Target Hood", targetHoodAngle);
+        SmartDashboard.putNumber("AutoAimPrep Target RPM", targetRPM);
     }
 
     @Override
@@ -83,5 +67,4 @@ public class AutoAimPrepare extends Command {
     public boolean isFinished() {
         return false; // Runs until interrupted
     }
-
 }

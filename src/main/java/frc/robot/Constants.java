@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -186,6 +189,40 @@ public final class Constants {
 
     // Clamp to keep lookup table queries in valid range
     public static final double kMaxDistanceAdjustmentMeters = 1.5;
+  }
+
+  public static class FieldConstants {
+    // Known field positions of the scoring target cube center
+    // TODO: Update with actual 2026 field coordinates from the field manual
+    public static final Translation2d kBlueScoringTarget = new Translation2d(0.0, 5.55); // meters
+    public static final Translation2d kRedScoringTarget = new Translation2d(16.54, 5.55); // meters
+
+    /** Returns the scoring target position for the current alliance. */
+    public static Translation2d getScoringTarget() {
+      var alliance = DriverStation.getAlliance();
+      if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+        return kRedScoringTarget;
+      }
+      return kBlueScoringTarget;
+    }
+  }
+
+  public static class VisionConstants {
+    // Standard deviations for vision pose estimation (x, y, theta in meters/radians)
+    // Lower = more trust in vision; higher = more trust in odometry
+
+    // Single-tag base std devs (scaled by distance^2 at runtime)
+    public static final double kSingleTagXYStdDev = 0.5; // meters
+    // Multi-tag base std devs (more accurate, less scaling needed)
+    public static final double kMultiTagXYStdDev = 0.3; // meters
+
+    // MegaTag2 theta std dev -- set to MAX_VALUE to ignore rotation from vision
+    // (our gyro is the source of truth for heading; fusing vision rotation would be circular)
+    public static final double kThetaStdDev = Double.MAX_VALUE;
+
+    // Rejection thresholds
+    public static final double kMaxTagDistanceMeters = 5.0; // reject estimates from tags farther than this
+    public static final double kMaxAngularVelocityDegPerSec = 720.0; // reject vision during fast spins
   }
 
   public static enum Directions {
