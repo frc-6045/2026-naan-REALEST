@@ -39,9 +39,11 @@ public class AutoAimPrepare extends Command {
         // Get scoring target and distance from current pose
         Translation2d target = FieldConstants.getScoringTarget();
         double[] distBearing = m_swerve.getDistanceAndBearingTo(target);
-        double distance = distBearing[0];
+        double rawDistance = distBearing[0];
 
-        distance = MathUtil.clamp(distance,
+        // Effective shooting distance = distance to near edge of HUB opening
+        double distance = MathUtil.clamp(
+                FieldConstants.getEffectiveShootingDistance(rawDistance),
                 ShootingConstants.kMinShootingDistanceMeters,
                 ShootingConstants.kMaxShootingDistanceMeters);
 

@@ -90,8 +90,11 @@ public class AutoAimAndShoot extends Command {
         double translationY = m_translationYSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
         Translation2d translation = new Translation2d(translationX, translationY);
 
+        // Effective shooting distance = distance to near edge of HUB opening
+        double effectiveDistance = FieldConstants.getEffectiveShootingDistance(distance);
+
         // Clamp distance to valid range
-        double clampedDistance = MathUtil.clamp(distance,
+        double clampedDistance = MathUtil.clamp(effectiveDistance,
                 ShootingConstants.kMinShootingDistanceMeters,
                 ShootingConstants.kMaxShootingDistanceMeters);
 

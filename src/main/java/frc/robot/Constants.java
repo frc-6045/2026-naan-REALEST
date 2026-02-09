@@ -130,22 +130,8 @@ public final class Constants {
     public static final double kLimelightMountAngleDegrees = 30.0; // Angle above horizontal (degrees)
 
     // Target configuration
-    // TODO: Update target height for 2026 game scoring element
-    public static final double kTargetHeightMeters = 1.45; // Height of AprilTag center from floor (meters)
-
-    // Valid AprilTag IDs for scoring targets
-    // TODO: Update with actual scoring target tag IDs for the 2026 game
-    public static final int[] kTargetAprilTagIDs = {7, 4};
-
-    /** Check if a detected AprilTag ID is in our valid scoring target list. */
-    public static boolean isValidTagID(int id) {
-      for (int validID : kTargetAprilTagIDs) {
-        if (id == validID) {
-          return true;
-        }
-      }
-      return false;
-    }
+    // HUB opening front edge is 72in (1.83m) off the floor
+    public static final double kTargetHeightMeters = 72.0 * 0.0254; // ~1.829m
   }
 
   public static class AimConstants {
@@ -202,8 +188,14 @@ public final class Constants {
     public static final double kFieldLengthMeters = kFieldLayout.getFieldLength();
     public static final double kFieldWidthMeters = kFieldLayout.getFieldWidth();
 
+    // HUB physical dimensions
+    public static final double kHubWidthMeters = 47.0 * 0.0254; // 47in square base
+    public static final double kHubOpeningDiameterMeters = 41.7 * 0.0254; // 41.7in hexagonal opening
+    public static final double kHubOpeningRadiusMeters = kHubOpeningDiameterMeters / 2.0; // ~0.53m
+    public static final double kHubOpeningHeightMeters = 72.0 * 0.0254; // front edge of opening, 72in off floor
+    public static final double kHubTagHeightMeters = 44.25 * 0.0254; // tag centers, 44.25in off floor
+
     // HUB AprilTag IDs -- all four faces of each HUB, 2 tags per face
-    // Tag centers are 44.25in (1.124m) off the floor
     public static final int[] kHubTagIDs = {
         2, 3, 4, 5, 8, 9, 10, 11, 18, 19, 20, 21, 24, 25, 26, 27
     };
@@ -252,6 +244,18 @@ public final class Constants {
         return kRedScoringTarget;
       }
       return kBlueScoringTarget;
+    }
+
+    /**
+     * Computes the effective shooting distance from the robot to the near edge of the HUB opening.
+     * The ball enters from above, so the relevant distance is to the rim, not the HUB center.
+     * Subtracts the opening radius from the center-to-center distance.
+     *
+     * @param distanceToCenterMeters Euclidean distance from robot to HUB center
+     * @return Effective distance to the near edge of the opening (meters, minimum 0)
+     */
+    public static double getEffectiveShootingDistance(double distanceToCenterMeters) {
+      return Math.max(0, distanceToCenterMeters - kHubOpeningRadiusMeters);
     }
   }
 
