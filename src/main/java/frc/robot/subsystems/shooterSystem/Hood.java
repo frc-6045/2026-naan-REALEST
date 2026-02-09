@@ -55,28 +55,30 @@ public class Hood extends SubsystemBase {
    * @param speed Desired speed (-1.0 to 1.0)
    */
   public void setHoodSpeed(double speed) {
-    double requestedSpeed = speed;
-    speed = MathUtil.clamp(speed, -MotorConstants.kHoodMotorMaximumSpeed, MotorConstants.kHoodMotorMaximumSpeed);
+    double clampedSpeed = MathUtil.clamp(speed,
+            -MotorConstants.kHoodMotorMaximumSpeed, MotorConstants.kHoodMotorMaximumSpeed);
 
-    if (Math.abs(requestedSpeed) > Math.abs(speed)) {
+    if (clampedSpeed != speed) {
       String warning = String.format("Hood speed clamped: requested %.2f, limited to %.2f",
-                                     requestedSpeed, speed);
+                                     speed, clampedSpeed);
       DriverStation.reportWarning(warning, false);
       SmartDashboard.putString("Hood Warning", warning);
     }
-    if (getHoodAngle() > MotorConstants.kHoodUpperLimit && speed > 0) {
-      speed = 0;
-      SmartDashboard.putBoolean("Upper limit", true);
-    } else if (getHoodAngle() < MotorConstants.kHoodLowerLimit && speed < 0) {
-      speed = 0;
-      SmartDashboard.putBoolean("Lower limit", true);
-    } else {
-      SmartDashboard.putBoolean("Upper limit", false);
-      SmartDashboard.putBoolean("Lower limit", false);
+
+    // Soft limits: prevent driving past physical endpoints
+    double hoodAngle = getHoodAngle();
+    boolean atUpperLimit = hoodAngle > MotorConstants.kHoodUpperLimit && clampedSpeed > 0;
+    boolean atLowerLimit = hoodAngle < MotorConstants.kHoodLowerLimit && clampedSpeed < 0;
+
+    if (atUpperLimit || atLowerLimit) {
+      clampedSpeed = 0;
     }
 
-    m_HoodMotor.set(speed);
-    SmartDashboard.putNumber("Hood speed", speed);
+    SmartDashboard.putBoolean("Upper limit", atUpperLimit);
+    SmartDashboard.putBoolean("Lower limit", atLowerLimit);
+
+    m_HoodMotor.set(clampedSpeed);
+    SmartDashboard.putNumber("Hood speed", clampedSpeed);
   }
 
   /** Stop the hood motor and report zero speed to dashboard. */

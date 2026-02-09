@@ -183,7 +183,7 @@ public final class Constants {
   public static class FieldConstants {
     // Load the official 2026 field layout from WPILib (includes all AprilTag positions)
     public static final AprilTagFieldLayout kFieldLayout =
-        AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+            AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
     public static final double kFieldLengthMeters = kFieldLayout.getFieldLength();
     public static final double kFieldWidthMeters = kFieldLayout.getFieldWidth();
@@ -197,7 +197,7 @@ public final class Constants {
 
     // HUB AprilTag IDs -- all four faces of each HUB, 2 tags per face
     public static final int[] kHubTagIDs = {
-        2, 3, 4, 5, 8, 9, 10, 11, 18, 19, 20, 21, 24, 25, 26, 27
+            2, 3, 4, 5, 8, 9, 10, 11, 18, 19, 20, 21, 24, 25, 26, 27
     };
 
     // HUB centers computed by averaging the X/Y of all HUB tags on each half of the field
@@ -205,45 +205,45 @@ public final class Constants {
     public static final Translation2d kRedScoringTarget;
 
     static {
-      double midX = kFieldLengthMeters / 2.0;
-      double blueSumX = 0, blueSumY = 0;
-      int blueCount = 0;
-      double redSumX = 0, redSumY = 0;
-      int redCount = 0;
+        double midX = kFieldLengthMeters / 2.0;
+        double blueSumX = 0, blueSumY = 0;
+        int blueCount = 0;
+        double redSumX = 0, redSumY = 0;
+        int redCount = 0;
 
-      for (int id : kHubTagIDs) {
-        var maybePose = kFieldLayout.getTagPose(id);
-        if (maybePose.isPresent()) {
-          Pose3d pose = maybePose.get();
-          double x = pose.getX();
-          double y = pose.getY();
-          if (x < midX) {
-            blueSumX += x;
-            blueSumY += y;
-            blueCount++;
-          } else {
-            redSumX += x;
-            redSumY += y;
-            redCount++;
-          }
+        for (int id : kHubTagIDs) {
+            var maybePose = kFieldLayout.getTagPose(id);
+            if (maybePose.isPresent()) {
+                Pose3d pose = maybePose.get();
+                double x = pose.getX();
+                double y = pose.getY();
+                if (x < midX) {
+                    blueSumX += x;
+                    blueSumY += y;
+                    blueCount++;
+                } else {
+                    redSumX += x;
+                    redSumY += y;
+                    redCount++;
+                }
+            }
         }
-      }
 
-      kBlueScoringTarget = blueCount > 0
-          ? new Translation2d(blueSumX / blueCount, blueSumY / blueCount)
-          : new Translation2d(0.0, kFieldWidthMeters / 2.0);
-      kRedScoringTarget = redCount > 0
-          ? new Translation2d(redSumX / redCount, redSumY / redCount)
-          : new Translation2d(kFieldLengthMeters, kFieldWidthMeters / 2.0);
+        kBlueScoringTarget = blueCount > 0
+                ? new Translation2d(blueSumX / blueCount, blueSumY / blueCount)
+                : new Translation2d(0.0, kFieldWidthMeters / 2.0);
+        kRedScoringTarget = redCount > 0
+                ? new Translation2d(redSumX / redCount, redSumY / redCount)
+                : new Translation2d(kFieldLengthMeters, kFieldWidthMeters / 2.0);
     }
 
     /** Returns the scoring target (HUB center) for the current alliance. */
     public static Translation2d getScoringTarget() {
-      var alliance = DriverStation.getAlliance();
-      if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
-        return kRedScoringTarget;
-      }
-      return kBlueScoringTarget;
+        var alliance = DriverStation.getAlliance();
+        if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+            return kRedScoringTarget;
+        }
+        return kBlueScoringTarget;
     }
 
     /**
@@ -255,7 +255,7 @@ public final class Constants {
      * @return Effective distance to the near edge of the opening (meters, minimum 0)
      */
     public static double getEffectiveShootingDistance(double distanceToCenterMeters) {
-      return Math.max(0, distanceToCenterMeters - kHubOpeningRadiusMeters);
+        return Math.max(0, distanceToCenterMeters - kHubOpeningRadiusMeters);
     }
   }
 

@@ -70,12 +70,9 @@ public final class ShotCompensation {
             return CompensationResult.zero(distanceMeters);
         }
 
-        // Bearing to target already computed from poses
-        double bearingRad = targetBearingRad;
-
         // Unit vector toward target in field frame
-        double bearingX = Math.cos(bearingRad);
-        double bearingY = Math.sin(bearingRad);
+        double bearingX = Math.cos(targetBearingRad);
+        double bearingY = Math.sin(targetBearingRad);
 
         // Decompose field velocity into radial (toward target) and lateral (perpendicular) components
         // Dot product = radial component (positive = moving toward target)

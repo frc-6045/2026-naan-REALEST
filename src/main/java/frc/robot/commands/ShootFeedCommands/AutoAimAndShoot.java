@@ -89,11 +89,9 @@ public class AutoAimAndShoot extends Command {
         double translationY = m_translationYSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
         Translation2d translation = new Translation2d(translationX, translationY);
 
-        // Effective shooting distance = distance to near edge of HUB opening
-        double effectiveDistance = FieldConstants.getEffectiveShootingDistance(distance);
-
-        // Clamp distance to valid range
-        double clampedDistance = MathUtil.clamp(effectiveDistance,
+        // Effective shooting distance = distance to near edge of HUB opening, clamped to valid range
+        double clampedDistance = MathUtil.clamp(
+                FieldConstants.getEffectiveShootingDistance(distance),
                 ShootingConstants.kMinShootingDistanceMeters,
                 ShootingConstants.kMaxShootingDistanceMeters);
 
@@ -126,22 +124,20 @@ public class AutoAimAndShoot extends Command {
         // Drive: driver translation + auto rotation, field-relative
         m_swerve.drive(translation, rotationSpeed, true);
 
-        // Check if all conditions are met
+        // Check if all conditions are met for auto-fire
         boolean aimed = Math.abs(MathUtil.inputModulus(angularErrorDeg - aimSetpointDeg, -180, 180))
                 < AimConstants.kAimToleranceDegrees;
         boolean hoodReady = m_hood.isAtTargetAngle(targetHoodAngle);
         boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
         boolean readyToFire = aimed && hoodReady && flywheelReady;
+        m_feeding = readyToFire;
 
         if (readyToFire) {
-            // Auto-feed
             m_feeder.setSpeed(MotorConstants.kFeederShootSpeed);
             m_spindexer.setSpeed(MotorConstants.kSpindexerIndexSpeed);
-            m_feeding = true;
         } else {
             m_feeder.stopFeederMotor();
             m_spindexer.stopSpindexerMotor();
-            m_feeding = false;
         }
 
         // Telemetry
@@ -175,7 +171,6 @@ public class AutoAimAndShoot extends Command {
         m_hood.stopHoodMotor();
         m_feeder.stopFeederMotor();
         m_spindexer.stopSpindexerMotor();
-        // Swerve default command auto-resumes
 
         SmartDashboard.putBoolean("AutoAim Active", false);
         SmartDashboard.putBoolean("AutoAim Feeding", false);
