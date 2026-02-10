@@ -42,16 +42,16 @@ public class Bindings {
         m_driverController.back().whileTrue(Commands.run(() -> swerve.lock(), swerve));
 
         // Intake rollers
-       // m_driverController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
-       // m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
+        m_driverController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
+        m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
 
         /*============================*/
         /*     Operator Bindings      */
         /*============================*/
 
         // Intake rollers
-       // m_operatorController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
-       // m_operatorController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
+        m_operatorController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
+        m_operatorController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
 
         // Rev shooter
         m_operatorController.rightTrigger(.5).whileTrue(new RevShooter(flywheel));
