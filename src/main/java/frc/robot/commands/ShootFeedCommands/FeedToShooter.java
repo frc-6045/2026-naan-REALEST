@@ -26,7 +26,7 @@ public class FeedToShooter extends Command {
    * @param flywheel The flywheel subsystem (to check speed)
    */
   public FeedToShooter(Feeder feeder, Spindexer spindexer, Flywheel flywheel) {
-    this(feeder, spindexer, flywheel, MotorConstants.kShooterTargetRPM, true);
+    this(feeder, spindexer, flywheel, MotorConstants.kShooterTargetRPM, false);
   }
 
   /**
