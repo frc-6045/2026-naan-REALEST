@@ -65,7 +65,7 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     // Apply rate-limited speed to motor each cycle for smooth ramp-up/ramp-down
-    //m_IntakeMotor.set(m_TargetSpeed);
+    m_IntakeMotor.set(m_RampLimiter.calculate(m_TargetSpeed));
     SmartDashboard.putNumber("Intake speed", m_TargetSpeed);
     SmartDashboard.putNumber("Intake Current (A)", getCurrent());
   }
