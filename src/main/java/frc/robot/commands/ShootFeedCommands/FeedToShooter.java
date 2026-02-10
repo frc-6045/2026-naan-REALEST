@@ -56,8 +56,8 @@ public class FeedToShooter extends Command {
   public void execute() {
     // Only feed if flywheel is at target speed (or if check is disabled)
     if (!m_checkSpeed || m_flywheel.isAtTargetSpeed(m_targetRPM)) {
-      m_feeder.setSpeed(MotorConstants.kFeederShootSpeed);
-      m_spindexer.setSpeed(MotorConstants.kSpindexerIndexSpeed);
+      m_feeder.setSpeed(MotorConstants.kFeederSpeed);
+      m_spindexer.setSpeed(MotorConstants.kSpindexerSpeed);
       SmartDashboard.putBoolean("Feeding", true);
       SmartDashboard.putBoolean("Shooter Ready", true);
     } else {

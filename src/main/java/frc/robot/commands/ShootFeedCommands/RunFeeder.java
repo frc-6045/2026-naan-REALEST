@@ -25,9 +25,9 @@ public class RunFeeder extends Command {
     @Override
     public void initialize() {
         if (direction==Directions.IN) {
-            m_Feeder.setSpeed(MotorConstants.kFeederShootSpeed);
+            m_Feeder.setSpeed(MotorConstants.kFeederSpeed);
         } else if (direction==Directions.OUT) {
-            m_Feeder.setSpeed(-MotorConstants.kFeederShootSpeed);
+            m_Feeder.setSpeed(-MotorConstants.kFeederSpeed);
         } else{
             System.out.println("This is sus.");
         }

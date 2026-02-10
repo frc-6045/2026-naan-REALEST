@@ -2,7 +2,6 @@ package frc.robot.commands.IntakeCommands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
 
 import frc.robot.Constants.MotorConstants;

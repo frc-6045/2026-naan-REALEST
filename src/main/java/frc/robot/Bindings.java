@@ -73,10 +73,10 @@ public class Bindings {
         m_operatorController.pov(180).whileTrue(new HoodOpenLoop(hood, () -> {return -MotorConstants.kHoodSpeed;}));
 
         // Spindexer CW (NORMAL)
-        m_operatorController.pov(90).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerIndexSpeed));
+        m_operatorController.pov(90).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerSpeed));
 
         // Spindexer CCW
-        m_operatorController.pov(270).whileTrue(new RunSpindexer(spindexer, -MotorConstants.kSpindexerIndexSpeed));
+        m_operatorController.pov(270).whileTrue(new RunSpindexer(spindexer, -MotorConstants.kSpindexerSpeed));
 
     }
 }

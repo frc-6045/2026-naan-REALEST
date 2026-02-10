@@ -13,6 +13,8 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static final String LIMELIGHT = "limelight-sabre";
+  
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
@@ -77,8 +79,9 @@ public final class Constants {
     public static final double kIntakeRollerSpeed = 1.0; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
     public static final double kIntakeRampRate = 2.0; // Max change in motor output per second (units/sec) - prevents harsh stops on chain
     public static final double kIntakeDeployStowTimeout = 3.14; // Safety timeout for deploy/stow operations (seconds)
-    public static final double kFeederShootSpeed = 1; // Speed to feed ball into shooter
-    public static final double kSpindexerIndexSpeed = 1; // Speed to index balls from intake to feeder
+    
+    public static final double kFeederSpeed = 1; // Speed to feed ball into shooter
+    public static final double kSpindexerSpeed = 1; // Speed to index balls from intake to feeder
     public static final double kHoodSpeed = .5;
 
     // Shooter PID Constants (for velocity control in RPM)
