@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Directions;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.commands.IntakeCommands.DeployIntake;
@@ -43,7 +44,7 @@ public class Bindings {
 
         // Intake rollers
         m_driverController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
-        m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
+      //  m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
 
         /*============================*/
         /*     Operator Bindings      */
@@ -52,12 +53,25 @@ public class Bindings {
         // Intake rollers
         m_operatorController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
         m_operatorController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
-
-        // Rev shooter
+//QUINN
+        m_operatorController.leftTrigger(0.05).whileTrue(
+            Commands.runEnd(
+                () -> {
+                    double t = m_operatorController.getLeftTriggerAxis(); // 0..1
+                    intake.setSpeed(t); // scale with trigger (negative if that's your IN direction)
+                },
+                () -> intake.setSpeed(0.0),
+                intake
+            )
+        );
+    m_operatorController.start().onTrue(Commands.runOnce(() -> swerve.zeroGyroWithAlliance()));
+ //QUINN     
+    
+    // Rev shooter
         m_operatorController.rightTrigger(.5).whileTrue(new RevShooter(flywheel));
 
         // Feed to shooter
-        m_operatorController.leftTrigger(.467).whileTrue(new FeedToShooter(feeder, spindexer, flywheel));
+     //   m_operatorController.leftTrigger(.467).whileTrue(new FeedToShooter(feeder, spindexer, flywheel));
         m_operatorController.x().whileTrue(new RunFeeder(feeder, Directions.IN));
 
         // Deploy intake
