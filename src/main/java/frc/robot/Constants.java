@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -132,9 +134,10 @@ public final class Constants {
     public static final double kTargetHeightMeters = 44.25 * 0.0254; // ~1.124m
 
     // HUB AprilTag IDs -- all four faces of each HUB, 2 tags per face
-    public static final int[] kTargetAprilTagIDs = {
-        2, 3, 4, 5, 8, 9, 10, 11, 18, 19, 20, 21, 24, 25, 26, 27
-    };
+    public static final int[] kTargetAprilTagIDs =
+      (DriverStation.getAlliance().get() == DriverStation.Alliance.Red)
+        ? new int[] {2, 5, 8, 9, 10, 11}
+        : new int[] {18, 21, 24, 25, 26, 27};
 
     /** Check if a detected AprilTag ID is in our valid scoring target list. */
     public static boolean isValidTagID(int id) {
