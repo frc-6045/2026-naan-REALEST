@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -57,19 +59,20 @@ public final class Constants {
     public static final double kSpindexerMotorMaximumSpeed = 1;
 
     // Motor Current Limits (Amps)
-    public static final int kClimberCurrentLimit = 40;
-    public static final int kFeederCurrentLimit = 40;
+    public static final int kClimberCurrentLimit = 60;
+    public static final int kFeederCurrentLimit = 60;
     public static final int kIntakeCurrentLimit = 60;
-    public static final int kIntakePivotCurrentLimit = 30;
+    public static final int kIntakePivotCurrentLimit = 60;
     public static final int kShooterCurrentLimit = 80;
-    public static final int kHoodCurrentLimit = 30;
+    public static final int kHoodCurrentLimit = 60;
     public static final int kSpindexerCurrentLimit = 80;
 
     // Hood encoder offset (rotations, adjust based on physical zero position)
     // TODO: Calibrate this value with the hood at its zero/home position
-    public static final double kHoodEncoderOffset = 73.0/360;
-    public static final double kHoodUpperLimit = 290;
-    public static final double kHoodLowerLimit = 50;
+    public static final double kHoodEncoderOffset = 0;
+    public static final double kHoodUpperLimit = 330;
+    public static final double kHoodLowerLimit = 75; 
+
     // Current Spike Detection Thresholds (Amps)
     public static final double kIntakeCurrentSpikeThreshold = 20.0; // Current threshold to detect stow/deploy complete
 
@@ -96,6 +99,13 @@ public final class Constants {
     // TODO: Tune this value based on desired shot distance and trajectory
     public static final double kShooterTargetRPM = 4500.0; // Target shooter wheel speed in RPM
     public static final double kShooterRPMTolerance = 100.0; // Acceptable RPM tolerance before feeding
+
+    // Hood PID Constants (for position control in degrees via absolute encoder)
+    // TODO: Tune these values empirically on the robot
+    public static final double kHoodP = 0.02; // Proportional gain
+    public static final double kHoodI = 0.0; // Integral gain
+    public static final double kHoodD = 0.001; // Derivative gain
+    public static final double kHoodAngleTolerance = 2.0; // Degrees of acceptable error
   }
 
   public static class PositionConstants {
@@ -108,6 +118,82 @@ public final class Constants {
     // Maximum angular speed in radians per second
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI * 2;
     // Joystick deadband for driving - use ControllerConstants.kDeadband instead
+  }
+
+  public static class LimelightConstants {
+    public static final String kLimelightName = "limelight"; // NetworkTables name
+    public static final int kAprilTagPipeline = 0; // Pipeline index for AprilTag detection
+
+    // Limelight mounting configuration (relative to robot center)
+    // TODO: Measure and update these values for your robot
+    public static final double kLimelightMountHeightMeters = 0.625475; // Height of lens from floor (meters)
+    public static final double kLimelightMountAngleDegrees = 0.0; // Angle above horizontal (degrees)
+
+    // Target configuration
+    // HUB AprilTag centers are 44.25in (1.124m) off the floor
+    public static final double kTargetHeightMeters = 44.25 * 0.0254; // ~1.124m
+
+    // HUB AprilTag IDs -- all four faces of each HUB, 2 tags per face
+    public static final int[] kTargetAprilTagIDs =
+      (DriverStation.getAlliance().get() == DriverStation.Alliance.Red)
+        ? new int[] {2, 5, 8, 9, 10, 11}
+        : new int[] {18, 21, 24, 25, 26, 27};
+
+    /** Check if a detected AprilTag ID is in our valid scoring target list. */
+    public static boolean isValidTagID(int id) {
+      for (int validID : kTargetAprilTagIDs) {
+        if (id == validID) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+
+  public static class AimConstants {
+    // Rotation PID gains for auto-aim
+    // TODO: Tune these values empirically on the robot
+    public static final double kAimP = 0.05; // Proportional gain
+    public static final double kAimI = 0.0; // Integral gain
+    public static final double kAimD = 0.005; // Derivative gain
+    public static final double kAimToleranceDegrees = 2.0; // Acceptable aim error (degrees)
+    public static final double kMaxAutoRotationRadPerSec = 3.0; // Max rotation speed during auto-aim (rad/s)
+  }
+
+  public static class ShootingConstants {
+    // Valid shooting distance range (meters)
+    // TODO: Adjust based on robot capabilities
+    public static final double kMinShootingDistanceMeters = 1.0;
+    public static final double kMaxShootingDistanceMeters = 7.0;
+
+    // Autonomous auto-aim timing (seconds)
+    public static final double kAutoShootFeedDurationSec = 0.5; // How long to run feeder after auto-fire triggers
+    public static final double kAutoShootTimeoutSec = 5.0; // Safety timeout to prevent stalling auto
+  }
+
+  public static class VelocityCompensationConstants {
+    // Master toggle -- set false to disable for A/B testing
+    public static final boolean kEnableVelocityCompensation = true;
+
+    // Horizontal ball exit speed in m/s
+    // TODO: Measure empirically (shoot at known distance, time flight)
+    // Starting estimate: 4500 RPM, 4" wheel, ~50% efficiency ≈ 12 m/s
+    public static final double kBallExitVelocityMps = 12.0;
+
+    // Multiplier on aim lead angle (start under-compensating; over-compensation is worse)
+    public static final double kAimLeadScalar = 0.7;
+
+    // Multiplier on distance adjustment (start conservative)
+    public static final double kDistanceCompScalar = 0.5;
+
+    // Deadband below which compensation is zeroed (avoids jitter from noisy odometry)
+    public static final double kMinCompensationVelocityMps = 0.15;
+
+    // Clamp to prevent wild aim at close range
+    public static final double kMaxAimLeadDegrees = 15.0;
+
+    // Clamp to keep lookup table queries in valid range
+    public static final double kMaxDistanceAdjustmentMeters = 1.5;
   }
 
   public static enum Directions {
