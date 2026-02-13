@@ -58,7 +58,7 @@ public class Autos {
     NamedCommands.registerCommand("stopIntake", new InstantCommand(() -> intake.stopIntakeMotor(), intake));
 
     // Spindexer commands
-    NamedCommands.registerCommand("startSpindexer", new InstantCommand(() -> spindexer.setSpeed(MotorConstants.kSpindexerIndexSpeed), spindexer));
+    NamedCommands.registerCommand("startSpindexer", new InstantCommand(() -> spindexer.setSpeed(MotorConstants.kSpindexerSpeed), spindexer));
     NamedCommands.registerCommand("stopSpindexer", new StopSpindexer(spindexer));
 
     // Flywheel commands
@@ -66,7 +66,7 @@ public class Autos {
     NamedCommands.registerCommand("stopShooter", new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel));
 
     // Feeder commands
-    NamedCommands.registerCommand("feed", new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederShootSpeed), feeder));
+    NamedCommands.registerCommand("feed", new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederSpeed), feeder));
     NamedCommands.registerCommand("stopFeeder", new InstantCommand(() -> feeder.stopFeederMotor(), feeder));
 
     // Composite commands
@@ -74,13 +74,13 @@ public class Autos {
       new DeployIntake(intakePivot),
       new ParallelCommandGroup(
         new InstantCommand(() -> intake.setSpeed(MotorConstants.kIntakeRollerSpeed), intake),
-        new InstantCommand(() -> spindexer.setSpeed(MotorConstants.kSpindexerIndexSpeed), spindexer)
+        new InstantCommand(() -> spindexer.setSpeed(MotorConstants.kSpindexerSpeed), spindexer)
       )
     ));
 
     NamedCommands.registerCommand("shoot", new SequentialCommandGroup(
       new RevShooter(flywheel).until(() -> flywheel.isAtTargetSpeed(MotorConstants.kShooterTargetRPM)),
-      new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederShootSpeed), feeder)
+      new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederSpeed), feeder)
     ).asProxy());
 
     NamedCommands.registerCommand("stopAll", new ParallelCommandGroup(

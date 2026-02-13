@@ -13,6 +13,8 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static final String LIMELIGHT = "limelight-sabre";
+  
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
@@ -46,22 +48,22 @@ public final class Constants {
     public static final int kSpindexerMotorCanID = 17;
 
     // Motor Speed Limits (percentage, -1.0 to 1.0)
-    public static final double kClimberMotorMaximumSpeed = .67;
+    public static final double kClimberMotorMaximumSpeed = 1;
     public static final double kFeederMotorMaximumSpeed = 1;
-    public static final double kIntakeMotorMaximumSpeed = .67;
-    public static final double kIntakePivotMotorMaximumSpeed = .67;
-    public static final double kShooterMotorMaximumSpeed = 1.5;
+    public static final double kIntakeMotorMaximumSpeed = 1;
+    public static final double kIntakePivotMotorMaximumSpeed = 1;
+    public static final double kShooterMotorMaximumSpeed = 1;
     public static final double kHoodMotorMaximumSpeed = 1;
     public static final double kSpindexerMotorMaximumSpeed = 1;
 
     // Motor Current Limits (Amps)
     public static final int kClimberCurrentLimit = 40;
     public static final int kFeederCurrentLimit = 40;
-    public static final int kIntakeCurrentLimit = 30;
+    public static final int kIntakeCurrentLimit = 60;
     public static final int kIntakePivotCurrentLimit = 30;
-    public static final int kShooterCurrentLimit = 60;
+    public static final int kShooterCurrentLimit = 80;
     public static final int kHoodCurrentLimit = 30;
-    public static final int kSpindexerCurrentLimit = 30;
+    public static final int kSpindexerCurrentLimit = 80;
 
     // Hood encoder offset (rotations, adjust based on physical zero position)
     // TODO: Calibrate this value with the hood at its zero/home position
@@ -75,11 +77,12 @@ public final class Constants {
     // Default speeds
     public static final double kIntakeStowSpeed = -0.9; // Speed for stowing intake
     public static final double kIntakeDeploySpeed = 0.9; // Speed for deploying intake
-    public static final double kIntakeRollerSpeed = .67; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
+    public static final double kIntakeRollerSpeed = 1.0; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
     public static final double kIntakeRampRate = 2.0; // Max change in motor output per second (units/sec) - prevents harsh stops on chain
     public static final double kIntakeDeployStowTimeout = 3.14; // Safety timeout for deploy/stow operations (seconds)
-    public static final double kFeederShootSpeed = 0.67; // Speed to feed ball into shooter
-    public static final double kSpindexerIndexSpeed = 1.0; // Speed to index balls from intake to feeder
+    
+    public static final double kFeederSpeed = 1; // Speed to feed ball into shooter
+    public static final double kSpindexerSpeed = 1; // Speed to index balls from intake to feeder
     public static final double kHoodSpeed = .5;
 
     // Shooter PID Constants (for velocity control in RPM)

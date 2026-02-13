@@ -46,9 +46,9 @@ public class RobotContainer {
     // Set default swerve drive command
     m_Swerve.setDefaultCommand(
         m_Swerve.driveCommand(
-            () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
-            () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband),
-            () -> -MathUtil.applyDeadband(m_driverController.getRightX(), ControllerConstants.kDeadband)
+            () -> -MathUtil.applyDeadband(m_driverController.getLeftY()+m_operatorController.getLeftY(), ControllerConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(m_driverController.getLeftX()+m_operatorController.getLeftX(), ControllerConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(m_driverController.getRightX()+m_operatorController.getRightX(), ControllerConstants.kDeadband)
         )
     );
   }

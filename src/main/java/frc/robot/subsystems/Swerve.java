@@ -51,7 +51,7 @@ public class Swerve extends SubsystemBase {
         m_swerveDrive.setHeadingCorrection(false);
         m_swerveDrive.setCosineCompensator(false);
         m_swerveDrive.setAngularVelocityCompensation(true, true, 0.1);
-        m_swerveDrive.setModuleEncoderAutoSynchronize(true, 1); // TODO: was originally false, set to true to auto-sync absolute encoders
+        m_swerveDrive.setModuleEncoderAutoSynchronize(true, 1); // TODO: orignially false, testign stuff
 
         // Setup PathPlanner
         setupPathPlanner();
@@ -153,7 +153,7 @@ public class Swerve extends SubsystemBase {
      * @param fieldRelative Whether to drive field-relative
      */
     public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
-        m_swerveDrive.drive(translation, rotation, fieldRelative, false);
+        //m_swerveDrive.drive(translation, rotation, fieldRelative, false);
     }
 
     /**
@@ -162,7 +162,7 @@ public class Swerve extends SubsystemBase {
      * @param velocity ChassisSpeeds object representing the desired field-relative velocities
      */
     public void driveFieldOriented(ChassisSpeeds velocity) {
-        m_swerveDrive.driveFieldOriented(velocity);
+       // m_swerveDrive.driveFieldOriented(velocity);
     }
 
     /**
@@ -171,7 +171,7 @@ public class Swerve extends SubsystemBase {
      * @param velocity ChassisSpeeds object representing the desired robot-relative velocities
      */
     public void drive(ChassisSpeeds velocity) {
-        m_swerveDrive.drive(velocity);
+       // m_swerveDrive.drive(velocity);
     }
 
     /**
@@ -202,6 +202,19 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
+     * Zero the gyro and align odometry heading to 0 degrees.
+     * Keeps pose estimator and IMU synchronized.
+     */
+    public void zeroGyroWithOdometry() {
+        m_swerveDrive.zeroGyro();
+
+        Pose2d currentPose = m_swerveDrive.getPose();
+        m_swerveDrive.resetOdometry(
+            new Pose2d(currentPose.getTranslation(), new Rotation2d())
+        );
+    }
+
+    /**
      * Gets the current robot velocity as ChassisSpeeds.
      *
      * @return The current robot-relative ChassisSpeeds
@@ -225,7 +238,7 @@ public class Swerve extends SubsystemBase {
      * @return The heading as a Rotation2d
      */
     public Rotation2d getHeading() {
-        return getPose().getRotation();
+        return m_swerveDrive.getYaw();
     }
 
     /**
@@ -257,7 +270,7 @@ public class Swerve extends SubsystemBase {
     /**
      * Zeros the gyro and resets odometry to face the correct direction based on alliance.
      * Red alliance faces 180 degrees, blue alliance faces 0 degrees.
-     */
+ //programmer lead    */
     public void zeroGyroWithAlliance() {
         if (isRedAlliance()) {
             zeroGyro();
@@ -266,7 +279,7 @@ public class Swerve extends SubsystemBase {
             zeroGyro();
         }
     }
-
+//programmer lead
     /**
      * Locks the swerve modules in an X pattern to prevent movement.
      */
@@ -304,5 +317,6 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {
         // Telemetry is handled by YAGSL's SwerveDriveTelemetry when verbosity is HIGH
+       // System.out.println("Yaw(deg): " + m_swerveDrive.getYaw().getDegrees());
     }
 }

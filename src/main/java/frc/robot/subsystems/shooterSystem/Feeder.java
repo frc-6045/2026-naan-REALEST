@@ -18,6 +18,7 @@ public class Feeder extends SubsystemBase {
   private final SparkFlex m_FeederMotor;
   SparkFlexConfig config = new SparkFlexConfig();
 
+  @SuppressWarnings("deprecation")
   public Feeder() {
     m_FeederMotor = new SparkFlex(MotorConstants.kFeederMotorCanID, MotorType.kBrushless);
 
