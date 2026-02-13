@@ -124,7 +124,7 @@ public final class Constants {
 
     // Limelight mounting configuration (relative to robot center)
     // TODO: Measure and update these values for your robot
-    public static final double kLimelightMountHeightMeters = 0.320675; // Height of lens from floor (meters)
+    public static final double kLimelightMountHeightMeters = 0.625475; // Height of lens from floor (meters)
     public static final double kLimelightMountAngleDegrees = 0.0; // Angle above horizontal (degrees)
 
     // Target configuration

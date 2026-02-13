@@ -145,8 +145,8 @@ public class AutoAimAndShoot extends Command {
 
             if (readyToFire) {
                 // Auto-feed
-                m_feeder.setSpeed(MotorConstants.kFeederShootSpeed);
-                m_spindexer.setSpeed(MotorConstants.kSpindexerIndexSpeed);
+                m_feeder.setSpeed(MotorConstants.kFeederSpeed);
+                m_spindexer.setSpeed(MotorConstants.kSpindexerSpeed);
                 m_feeding = true;
             } else {
                 m_feeder.stopFeederMotor();
