@@ -38,10 +38,12 @@ public class Hood extends SubsystemBase {
   public void updateHoodMotorSettings() {
     m_hoodConfig
         .idleMode(IdleMode.kBrake)
+        .inverted(true)
         .smartCurrentLimit(MotorConstants.kHoodCurrentLimit);
     m_hoodConfig.absoluteEncoder
         .positionConversionFactor(360.0) // Convert rotations to degrees
-        .zeroOffset(MotorConstants.kHoodEncoderOffset);
+        .zeroOffset(MotorConstants.kHoodEncoderOffset)
+        .inverted(true);
     m_hoodConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         .p(MotorConstants.kHoodP)

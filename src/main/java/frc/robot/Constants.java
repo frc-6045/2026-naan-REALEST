@@ -57,19 +57,19 @@ public final class Constants {
     public static final double kSpindexerMotorMaximumSpeed = 1;
 
     // Motor Current Limits (Amps)
-    public static final int kClimberCurrentLimit = 40;
-    public static final int kFeederCurrentLimit = 40;
+    public static final int kClimberCurrentLimit = 60;
+    public static final int kFeederCurrentLimit = 60;
     public static final int kIntakeCurrentLimit = 60;
-    public static final int kIntakePivotCurrentLimit = 30;
+    public static final int kIntakePivotCurrentLimit = 60;
     public static final int kShooterCurrentLimit = 80;
-    public static final int kHoodCurrentLimit = 30;
+    public static final int kHoodCurrentLimit = 60;
     public static final int kSpindexerCurrentLimit = 80;
 
     // Hood encoder offset (rotations, adjust based on physical zero position)
     // TODO: Calibrate this value with the hood at its zero/home position
-    public static final double kHoodEncoderOffset = 139.0 / 360;
-    public static final double kHoodUpperLimit = 230;
-    public static final double kHoodLowerLimit = 5; 
+    public static final double kHoodEncoderOffset = 0;
+    public static final double kHoodUpperLimit = 330;
+    public static final double kHoodLowerLimit = 75; 
 
     // Current Spike Detection Thresholds (Amps)
     public static final double kIntakeCurrentSpikeThreshold = 20.0; // Current threshold to detect stow/deploy complete

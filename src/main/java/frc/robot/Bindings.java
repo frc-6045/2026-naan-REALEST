@@ -100,7 +100,7 @@ public class Bindings {
         m_operatorController.pov(90).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerSpeed));
 
         // Spindexer CCW
-        m_operatorController.pov(270).whileTrue(new RunSpindexer(spindexer, -MotorConstants.kSpindexerSpeed));
+        m_operatorController.y().whileTrue(new RunSpindexer(spindexer, -MotorConstants.kSpindexerSpeed));
 
     }
 }
