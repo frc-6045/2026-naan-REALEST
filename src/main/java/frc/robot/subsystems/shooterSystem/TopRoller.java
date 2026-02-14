@@ -111,6 +111,8 @@ public class TopRoller extends SubsystemBase {
 
   // Get current flywheel velocity in RPM
   public double getRPM() {
+    if (m_Motor.getEncoder().getVelocity()!=0)
+    System.out.println(m_Motor.getEncoder().getVelocity());
     return m_Encoder.getVelocity();
   }
 
