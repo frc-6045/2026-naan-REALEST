@@ -32,6 +32,18 @@ public class TopRoller extends SubsystemBase {
 
     // Get PID controllers for velocity control
     m_PIDController = m_Motor.getClosedLoopController();
+
+    // Initialize SmartDashboard target RPM input (editable in Elastic)
+    SmartDashboard.putNumber("Roller Target RPM Input", MotorConstants.kRollerTargetRPM);
+  }
+
+  /**
+   * Gets the target RPM from SmartDashboard input.
+   * This allows real-time tuning via Elastic dashboard.
+   * @return The target RPM set in SmartDashboard
+   */
+  public double getTargetRPMFromDashboard() {
+    return SmartDashboard.getNumber("Roller Target RPM Input", MotorConstants.kRollerTargetRPM);
   }
 
   public void updateHoodMotorSettings() {
@@ -93,7 +105,7 @@ public class TopRoller extends SubsystemBase {
 
   @Override
   public void periodic() {
-    
+    SmartDashboard.putNumber("Roller Velocity (RPM)", getFlywheelVelocity());
   }
 
   @Override

@@ -46,6 +46,18 @@ public class Flywheel extends SubsystemBase {
     // Get PID controllers for velocity control
     m_FlywheelPIDController1 = m_FlywheelMotor1.getClosedLoopController();
     m_FlywheelPIDController2 = m_FlywheelMotor2.getClosedLoopController();
+
+    // Initialize SmartDashboard target RPM input (editable in Elastic)
+    SmartDashboard.putNumber("Flywheel Target RPM Input", MotorConstants.kShooterTargetRPM);
+  }
+
+  /**
+   * Gets the target RPM from SmartDashboard input.
+   * This allows real-time tuning via Elastic dashboard.
+   * @return The target RPM set in SmartDashboard
+   */
+  public double getTargetRPMFromDashboard() {
+    return SmartDashboard.getNumber("Flywheel Target RPM Input", MotorConstants.kShooterTargetRPM);
   }
 
   public void updateMotorSettings(SparkFlex motor) {
