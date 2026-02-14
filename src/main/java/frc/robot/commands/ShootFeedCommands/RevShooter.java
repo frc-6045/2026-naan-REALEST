@@ -40,18 +40,21 @@ public class RevShooter extends Command {
   public void initialize() {
     // Start spinning up the flywheel to target velocity
     m_flywheel.setFlywheelVelocity(m_targetRPM);
+    m_roller.setVelocity(m_targetRollerRPM);
   }
 
   @Override
   public void execute() {
     // Continuously re-apply the velocity setpoint to protect against motor controller resets
     m_flywheel.setFlywheelVelocity(m_targetRPM);
+    m_roller.setVelocity(m_targetRollerRPM);
   }
 
   @Override
   public void end(boolean interrupted) {
     // Stop the flywheel when button is released
     m_flywheel.stopFlywheelMotor();
+    m_roller.stopRollerMotor();
   }
 
   @Override
