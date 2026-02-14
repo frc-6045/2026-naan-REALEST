@@ -101,27 +101,27 @@ public class Flywheel extends SubsystemBase {
   }
 
   // PID Velocity Control Methods
-  public void setFlywheelVelocity(double targetRPM) {
+  public void setTargetRPM(double targetRPM) {
     m_FlywheelPIDController1.setReference(targetRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     m_FlywheelPIDController2.setReference(targetRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     SmartDashboard.putNumber("Flywheel Target RPM", targetRPM);
   }
 
   // Get current flywheel velocity in RPM
-  public double getFlywheelVelocity() {
+  public double getRPM() {
     // Average the velocity of both motors
     return (m_FlywheelMotor1.getEncoder().getVelocity() + m_FlywheelMotor2.getEncoder().getVelocity()) / 2.0;
   }
 
   // Check if flywheel is at target speed (within tolerance)
   public boolean isAtTargetSpeed(double targetRPM) {
-    double currentVelocity = getFlywheelVelocity();
+    double currentVelocity = getRPM();
     return Math.abs(currentVelocity - targetRPM) < MotorConstants.kShooterRPMTolerance;
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Flywheel Velocity (RPM)", getFlywheelVelocity());
+    SmartDashboard.putNumber("Flywheel Velocity (RPM)", getRPM());
     SmartDashboard.putNumber("Flywheel Motor 1 Velocity", m_FlywheelMotor1.getEncoder().getVelocity());
     SmartDashboard.putNumber("Flywheel Motor 2 Velocity", m_FlywheelMotor2.getEncoder().getVelocity());
 

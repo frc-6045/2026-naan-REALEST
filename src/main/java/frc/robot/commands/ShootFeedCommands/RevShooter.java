@@ -27,15 +27,15 @@ public class RevShooter extends Command {
   @Override
   public void initialize() {
     // Start spinning up to dashboard target velocities
-    m_flywheel.setFlywheelVelocity(m_flywheel.getTargetRPMFromDashboard());
-    m_roller.setVelocity(m_roller.getTargetRPMFromDashboard());
+    m_flywheel.setTargetRPM(m_flywheel.getTargetRPMFromDashboard());
+    m_roller.setRPM(m_roller.getTargetRPMFromDashboard());
   }
 
   @Override
   public void execute() {
     // Continuously read target RPM from dashboard for real-time tuning
-    m_flywheel.setFlywheelVelocity(m_flywheel.getTargetRPMFromDashboard());
-    m_roller.setVelocity(m_roller.getTargetRPMFromDashboard());
+    m_flywheel.setTargetRPM(m_flywheel.getTargetRPMFromDashboard());
+    m_roller.setRPM(m_roller.getTargetRPMFromDashboard());
   }
 
   @Override

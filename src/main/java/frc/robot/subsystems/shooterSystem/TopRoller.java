@@ -98,26 +98,25 @@ public class TopRoller extends SubsystemBase {
   }
 
   // PID Velocity Control Methods
-  public void setVelocity(double targetRPM) {
+  public void setRPM(double targetRPM) {
     m_PIDController.setReference(targetRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     SmartDashboard.putNumber("Roller Target RPM", targetRPM);
   }
 
   // Get current flywheel velocity in RPM
-  public double getFlywheelVelocity() {
-    // Average the velocity of both motors
+  public double getRPM() {
     return m_Motor.getEncoder().getVelocity();
   }
 
   // Check if flywheel is at target speed (within tolerance)
   public boolean isAtTargetSpeed(double targetRPM) {
-    double currentVelocity = getFlywheelVelocity();
+    double currentVelocity = getRPM();
     return Math.abs(currentVelocity - targetRPM) < MotorConstants.kShooterRPMTolerance;
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Roller Velocity (RPM)", getFlywheelVelocity());
+    SmartDashboard.putNumber("Roller Velocity (RPM)", getRPM());
 
     // Live PID tuning - check if values changed on SmartDashboard
     double tunedP = SmartDashboard.getNumber("Roller P", MotorConstants.kRollerP);
