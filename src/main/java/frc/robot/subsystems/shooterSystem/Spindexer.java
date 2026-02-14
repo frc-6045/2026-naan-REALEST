@@ -54,6 +54,10 @@ public class Spindexer extends SubsystemBase {
     SmartDashboard.putNumber("Spindexer speed", 0);
   }
 
+  public double getRPM() {
+    return m_SpindexerMotor.getEncoder().getVelocity();
+  }
+
   public double getCurrent() {
     return m_SpindexerMotor.getOutputCurrent();
   }
@@ -61,6 +65,7 @@ public class Spindexer extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Spindexer Current (A)", getCurrent());
+    SmartDashboard.putNumber("Spindexer Velocity (RPM)", getRPM());
   }
 
   @Override

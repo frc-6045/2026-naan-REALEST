@@ -65,10 +65,10 @@ public class TopRoller extends SubsystemBase {
         .idleMode(IdleMode.kBrake)
         .inverted(true)
         .smartCurrentLimit(MotorConstants.kHoodCurrentLimit);
-    // Configure encoder - velocity is already in RPM for brushless motors
-    m_rollerConfig.encoder
-        .velocityConversionFactor(1.0)  // 1:1, no gearing - raw motor RPM
-        .positionConversionFactor(1.0);
+    // // Configure encoder - velocity is already in RPM for brushless motors
+    // m_rollerConfig.encoder
+    //     .velocityConversionFactor(1.0)  // 1:1, no gearing - raw motor RPM
+    //     .positionConversionFactor(1.0);
     m_rollerConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(MotorConstants.kRollerP)
@@ -111,8 +111,8 @@ public class TopRoller extends SubsystemBase {
 
   // Get current flywheel velocity in RPM
   public double getRPM() {
-    if (m_Motor.getEncoder().getVelocity()!=0)
-    System.out.println(m_Motor.getEncoder().getVelocity());
+    // if (m_Motor.getEncoder().getVelocity()!=0)
+    // System.out.println(m_Motor.getEncoder().getVelocity());
     return m_Encoder.getVelocity();
   }
 
