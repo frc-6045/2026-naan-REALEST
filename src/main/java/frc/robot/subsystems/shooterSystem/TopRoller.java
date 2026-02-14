@@ -65,10 +65,6 @@ public class TopRoller extends SubsystemBase {
         .idleMode(IdleMode.kBrake)
         .inverted(true)
         .smartCurrentLimit(MotorConstants.kHoodCurrentLimit);
-    // Configure encoder - velocity is already in RPM for brushless motors
-    m_rollerConfig.encoder
-        .velocityConversionFactor(1.0)  // 1:1, no gearing - raw motor RPM
-        .positionConversionFactor(1.0);
     m_rollerConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(MotorConstants.kRollerP)
@@ -125,6 +121,13 @@ public class TopRoller extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Roller Velocity (RPM)", getRPM());
+
+    // Diagnostics - remove after debugging
+    SmartDashboard.putNumber("Roller Encoder Position", m_Encoder.getPosition());
+    SmartDashboard.putNumber("Roller Output Current (A)", m_Motor.getOutputCurrent());
+    SmartDashboard.putNumber("Roller Applied Output", m_Motor.getAppliedOutput());
+    SmartDashboard.putNumber("Roller Motor Temp (C)", m_Motor.getMotorTemperature());
+    SmartDashboard.putNumber("Roller Faults", m_Motor.getFaults().rawBits);
 
     // Live PID tuning - check if values changed on SmartDashboard
     double tunedP = SmartDashboard.getNumber("Roller P", MotorConstants.kRollerP);
