@@ -8,12 +8,10 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ControllerConstants;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Directions;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.commands.IntakeCommands.RunIntake;
 import frc.robot.commands.ShootFeedCommands.AutoAimAndShoot;
-import frc.robot.commands.ShootFeedCommands.FeedToShooter;
 import frc.robot.commands.ShootFeedCommands.HoodOpenLoop;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.ShootFeedCommands.RunFeeder;
@@ -61,8 +59,8 @@ public class Bindings {
         /*============================*/
 
         // Intake rollers
-        m_operatorController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
-        m_operatorController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
+        //m_operatorController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
+        //m_operatorController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
 //QUINN
         m_operatorController.leftTrigger(0.05).whileTrue(
             Commands.runEnd(
