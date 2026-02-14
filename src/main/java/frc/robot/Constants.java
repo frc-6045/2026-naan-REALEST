@@ -103,8 +103,8 @@ public final class Constants {
 
     // Shooter Target Speed (RPM)
     // TODO: Tune this value based on desired shot distance and trajectory
-    public static final double kShooterTargetRPM = 5500.0; // Target shooter wheel speed in RPM
-    public static final double kRollerTargetRPM = 5500.0; // Target shooter wheel speed in RPM
+    public static final double kShooterTargetRPM = 2850.0; // Target shooter wheel speed in RPM
+    public static final double kRollerTargetRPM = 2665.0; // Target shooter wheel speed in RPM
     public static final double kShooterRPMTolerance = 100.0; // Acceptable RPM tolerance before feeding
 
     // Hood PID Constants (for position control in degrees via absolute encoder)
