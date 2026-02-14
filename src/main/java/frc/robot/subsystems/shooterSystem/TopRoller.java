@@ -23,6 +23,12 @@ public class TopRoller extends SubsystemBase {
   private final SparkFlexConfig m_rollerConfig = new SparkFlexConfig();
   private final SparkClosedLoopController m_PIDController;
 
+  // Track last PID values to detect changes
+  private double m_lastP = MotorConstants.kRollerP;
+  private double m_lastI = MotorConstants.kRollerI;
+  private double m_lastD = MotorConstants.kRollerD;
+  private double m_lastFF = MotorConstants.kRollerFF;
+
   @SuppressWarnings("deprecation")
   public TopRoller() {
     m_Motor = new SparkFlex(MotorConstants.kHoodMotorCanID, MotorType.kBrushless);
@@ -35,6 +41,12 @@ public class TopRoller extends SubsystemBase {
 
     // Initialize SmartDashboard target RPM input (editable in Elastic)
     SmartDashboard.putNumber("Roller Target RPM Input", MotorConstants.kRollerTargetRPM);
+
+    // Initialize SmartDashboard PID tuning values
+    SmartDashboard.putNumber("Roller P", MotorConstants.kRollerP);
+    SmartDashboard.putNumber("Roller I", MotorConstants.kRollerI);
+    SmartDashboard.putNumber("Roller D", MotorConstants.kRollerD);
+    SmartDashboard.putNumber("Roller FF", MotorConstants.kRollerFF);
   }
 
   /**
@@ -106,6 +118,32 @@ public class TopRoller extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Roller Velocity (RPM)", getFlywheelVelocity());
+
+    // Live PID tuning - check if values changed on SmartDashboard
+    double tunedP = SmartDashboard.getNumber("Roller P", MotorConstants.kRollerP);
+    double tunedI = SmartDashboard.getNumber("Roller I", MotorConstants.kRollerI);
+    double tunedD = SmartDashboard.getNumber("Roller D", MotorConstants.kRollerD);
+    double tunedFF = SmartDashboard.getNumber("Roller FF", MotorConstants.kRollerFF);
+
+    // If any PID value changed, update motor controller
+    if (tunedP != m_lastP || tunedI != m_lastI || tunedD != m_lastD || tunedFF != m_lastFF) {
+      m_rollerConfig.closedLoop
+          .p(tunedP)
+          .i(tunedI)
+          .d(tunedD)
+          .velocityFF(tunedFF);
+
+      m_Motor.configure(m_rollerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+
+      m_lastP = tunedP;
+      m_lastI = tunedI;
+      m_lastD = tunedD;
+      m_lastFF = tunedFF;
+
+      SmartDashboard.putString("Roller PID Status", "Updated!");
+    } else {
+      SmartDashboard.putString("Roller PID Status", "OK");
+    }
   }
 
   @Override
