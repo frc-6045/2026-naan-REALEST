@@ -100,7 +100,7 @@ public class TopRoller extends SubsystemBase {
   // PID Velocity Control Methods
   public void setVelocity(double targetRPM) {
     m_PIDController.setReference(targetRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    SmartDashboard.putNumber("Flywheel Target RPM", targetRPM);
+    SmartDashboard.putNumber("Roller Target RPM", targetRPM);
   }
 
   // Get current flywheel velocity in RPM
