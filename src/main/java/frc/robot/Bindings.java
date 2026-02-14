@@ -11,7 +11,6 @@ import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.Directions;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.commands.IntakeCommands.RunIntake;
-import frc.robot.commands.ShootFeedCommands.AutoAimAndShoot;
 import frc.robot.commands.ShootFeedCommands.HoodOpenLoop;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.ShootFeedCommands.RunFeeder;
@@ -21,14 +20,15 @@ import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
-import frc.robot.subsystems.shooterSystem.Hood;
+import frc.robot.subsystems.shooterSystem.TopRoller;
 import frc.robot.subsystems.shooterSystem.Spindexer;
 
 public class Bindings {
     public static void configureBindings(
         CommandXboxController m_driverController,
         CommandXboxController m_operatorController,
-        Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, Hood hood, Feeder feeder, Swerve swerve
+        CommandXboxController m_testController,
+        Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve
     ){
 
         /*============================*/
@@ -46,13 +46,13 @@ public class Bindings {
       //  m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
 
         // Auto-aim and auto-shoot (driver retains left stick translational control)
-        m_driverController.rightTrigger(0.5).whileTrue(
-            new AutoAimAndShoot(
-                swerve, flywheel, hood, feeder, spindexer,
-                () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
-                () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
-            )
-        );
+        // m_driverController.rightTrigger(0.5).whileTrue(
+        //     new AutoAimAndShoot(
+        //         swerve, flywheel, topRoller, feeder, spindexer,
+        //         () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
+        //         () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
+        //     )
+        // );
 
         /*============================*/
         /*     Operator Bindings      */
@@ -76,7 +76,7 @@ public class Bindings {
  //QUINN
 
     // Rev shooter
-        m_operatorController.rightTrigger(.5).whileTrue(new RevShooter(flywheel));
+        m_operatorController.rightTrigger(.5).whileTrue(new RevShooter(flywheel, topRoller));
 
         // Feed to shooter
      //   m_operatorController.leftTrigger(.467).whileTrue(new FeedToShooter(feeder, spindexer, flywheel));
@@ -89,16 +89,21 @@ public class Bindings {
         // m_operatorController.b().onTrue(new StowIntake(intakePivot));
 
         // Hood open loop up
-        m_operatorController.pov(0).whileTrue(new HoodOpenLoop(hood, () -> MotorConstants.kHoodSpeed));
+        m_operatorController.pov(0).whileTrue(new HoodOpenLoop(topRoller, () -> MotorConstants.kHoodSpeed));
 
         // Hood open loop down
-        m_operatorController.pov(180).whileTrue(new HoodOpenLoop(hood, () -> -MotorConstants.kHoodSpeed));
+        m_operatorController.pov(180).whileTrue(new HoodOpenLoop(topRoller, () -> -MotorConstants.kHoodSpeed));
 
         // Spindexer CW (NORMAL)
         m_operatorController.pov(90).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerSpeed));
 
         // Spindexer CCW
         m_operatorController.y().whileTrue(new RunSpindexer(spindexer, -MotorConstants.kSpindexerSpeed));
+        
+
+        /*============================*/
+        /*       Test Bindings        */
+        /*============================*/
 
     }
 }

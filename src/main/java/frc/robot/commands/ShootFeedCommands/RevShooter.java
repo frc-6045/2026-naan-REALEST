@@ -2,6 +2,7 @@ package frc.robot.commands.ShootFeedCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooterSystem.Flywheel;
+import frc.robot.subsystems.shooterSystem.TopRoller;
 import frc.robot.Constants.MotorConstants;
 
 /**
@@ -10,14 +11,16 @@ import frc.robot.Constants.MotorConstants;
  */
 public class RevShooter extends Command {
   private final Flywheel m_flywheel;
+  private final TopRoller m_roller;
   private final double m_targetRPM;
+  private final double m_targetRollerRPM;
 
   /**
    * Creates a new RevShooter command with default target RPM.
    * @param flywheel The flywheel subsystem
    */
-  public RevShooter(Flywheel flywheel) {
-    this(flywheel, MotorConstants.kShooterTargetRPM);
+  public RevShooter(Flywheel flywheel, TopRoller roller) {
+    this(flywheel, MotorConstants.kShooterTargetRPM, roller, MotorConstants.kRollerTargetRPM);
   }
 
   /**
@@ -25,9 +28,11 @@ public class RevShooter extends Command {
    * @param flywheel The flywheel subsystem
    * @param targetRPM The desired flywheel speed in RPM
    */
-  public RevShooter(Flywheel flywheel, double targetRPM) {
+  public RevShooter(Flywheel flywheel, double targetRPM, TopRoller roller, double targetRollerRPM) {
     m_flywheel = flywheel;
     m_targetRPM = targetRPM;
+    m_roller = roller;
+    m_targetRollerRPM = targetRollerRPM;
     addRequirements(flywheel);
   }
 

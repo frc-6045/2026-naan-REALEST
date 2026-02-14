@@ -95,9 +95,16 @@ public final class Constants {
     public static final double kShooterFF = 0.00018; // Feed-forward gain (velocity feed-forward)
     public static final double kShooterIZone = 400.0; // I term only active within this RPM error range
 
+    public static final double kRollerP = 0.0003; // Proportional gain
+    public static final double kRollerI = 0.0000005; // Integral gain
+    public static final double kRollerD = 0.0; // Derivative gain
+    public static final double kRollerFF = 0.00018; // Feed-forward gain (velocity feed-forward)
+    public static final double kRollerIZone = 400.0; // I term only active within this RPM error range
+
     // Shooter Target Speed (RPM)
     // TODO: Tune this value based on desired shot distance and trajectory
-    public static final double kShooterTargetRPM = 4500.0; // Target shooter wheel speed in RPM
+    public static final double kShooterTargetRPM = 5500.0; // Target shooter wheel speed in RPM
+    public static final double kRollerTargetRPM = 5500.0; // Target shooter wheel speed in RPM
     public static final double kShooterRPMTolerance = 100.0; // Acceptable RPM tolerance before feeding
 
     // Hood PID Constants (for position control in degrees via absolute encoder)

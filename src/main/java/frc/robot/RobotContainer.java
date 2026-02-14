@@ -8,12 +8,13 @@ import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
-import frc.robot.subsystems.shooterSystem.Hood;
+import frc.robot.subsystems.shooterSystem.TopRoller;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,7 +27,7 @@ public class RobotContainer {
   private final IntakePivot m_IntakePivot = new IntakePivot();
   private final Spindexer m_Spindexer = new Spindexer();
   private final Flywheel m_Flywheel = new Flywheel();
-  private final Hood m_Hood = new Hood();
+  private final TopRoller m_Hood = new TopRoller();
   private final Feeder m_Feeder = new Feeder();
   private final Swerve m_Swerve = new Swerve();
 
@@ -36,12 +37,16 @@ public class RobotContainer {
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
   private final CommandXboxController m_operatorController =
       new CommandXboxController(OperatorConstants.kOperatorControllerPort);
+  private final CommandXboxController m_testController =
+      new CommandXboxController(3);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     m_pdh.setSwitchableChannel(true);
     m_Autos = new Autos(m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_Hood, m_Feeder, m_Swerve);
-    Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_Hood, m_Feeder, m_Swerve);
+    Bindings.configureBindings(m_driverController, m_operatorController, m_testController, m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_Hood, m_Feeder, m_Swerve);
+
+    DriverStation.silenceJoystickConnectionWarning(true);
 
     // Set default swerve drive command
     m_Swerve.setDefaultCommand(
