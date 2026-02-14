@@ -32,6 +32,10 @@ public class Flywheel extends SubsystemBase {
 
   @SuppressWarnings("deprecation")
   public Flywheel() {
+    SmartDashboard.putNumber("Flywheel P", MotorConstants.kShooterP);
+    SmartDashboard.putNumber("Flywheel I", MotorConstants.kShooterI);
+    SmartDashboard.putNumber("Flywheel D", MotorConstants.kShooterD);
+    SmartDashboard.putNumber("Flywheel FF", MotorConstants.kShooterFF);
     m_FlywheelMotor1 = new SparkFlex(MotorConstants.kShooterMotor1CanID, MotorType.kBrushless);
     m_FlywheelMotor2 = new SparkFlex(MotorConstants.kShooterMotor2CanID, MotorType.kBrushless);
 
