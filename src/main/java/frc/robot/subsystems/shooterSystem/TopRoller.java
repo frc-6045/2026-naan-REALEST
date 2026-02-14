@@ -1,7 +1,7 @@
 package frc.robot.subsystems.shooterSystem;
 
-import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -22,6 +22,7 @@ public class TopRoller extends SubsystemBase {
   private final SparkFlex m_Motor;
   private final SparkFlexConfig m_rollerConfig = new SparkFlexConfig();
   private final SparkClosedLoopController m_PIDController;
+  private final RelativeEncoder m_Encoder;
 
   // Track last PID values to detect changes
   private double m_lastP = MotorConstants.kRollerP;
@@ -36,7 +37,8 @@ public class TopRoller extends SubsystemBase {
     updateHoodMotorSettings();
     m_Motor.configure(m_rollerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
-    // Get PID controllers for velocity control
+    // Get encoder and PID controller references
+    m_Encoder = m_Motor.getEncoder();
     m_PIDController = m_Motor.getClosedLoopController();
 
     // Initialize SmartDashboard target RPM input (editable in Elastic)
@@ -63,6 +65,10 @@ public class TopRoller extends SubsystemBase {
         .idleMode(IdleMode.kBrake)
         .inverted(true)
         .smartCurrentLimit(MotorConstants.kHoodCurrentLimit);
+    // Configure encoder - velocity is already in RPM for brushless motors
+    m_rollerConfig.encoder
+        .velocityConversionFactor(1.0)  // 1:1, no gearing - raw motor RPM
+        .positionConversionFactor(1.0);
     m_rollerConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(MotorConstants.kRollerP)
@@ -105,7 +111,7 @@ public class TopRoller extends SubsystemBase {
 
   // Get current flywheel velocity in RPM
   public double getRPM() {
-    return m_Motor.getEncoder().getVelocity();
+    return m_Encoder.getVelocity();
   }
 
   // Check if flywheel is at target speed (within tolerance)
