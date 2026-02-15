@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.Directions;
@@ -99,6 +100,8 @@ public class Bindings {
 
         // Spindexer CCW
         m_operatorController.y().whileTrue(new RunSpindexer(spindexer, -MotorConstants.kSpindexerSpeed));
+
+        //m_operatorController.a().onTrue(new InstantCommand(()->{System.out.println(LimelightHelpers.getTY(Constants.LIMELIGHT));}));
         
 
         /*============================*/

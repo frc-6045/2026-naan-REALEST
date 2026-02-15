@@ -9,6 +9,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.TopRoller;
+import frc.robot.subsystems.shooterSystem.Vision;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.shooterSystem.Spindexer;
@@ -30,6 +31,7 @@ public class RobotContainer {
   private final TopRoller m_Hood = new TopRoller();
   private final Feeder m_Feeder = new Feeder();
   private final Swerve m_Swerve = new Swerve();
+  private final Vision m_Vision = new Vision();
 
   private final PowerDistribution m_pdh = new PowerDistribution(1, ModuleType.kRev);
 
