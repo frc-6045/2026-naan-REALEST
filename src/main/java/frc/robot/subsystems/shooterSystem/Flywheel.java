@@ -67,7 +67,9 @@ public class Flywheel extends SubsystemBase {
   public void updateMotorSettings(SparkFlex motor) {
     config
         .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(MotorConstants.kShooterCurrentLimit);
+        .smartCurrentLimit(MotorConstants.kShooterCurrentLimit)
+        .openLoopRampRate(.167)
+        .closedLoopRampRate(.167);
     config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(MotorConstants.kShooterP)

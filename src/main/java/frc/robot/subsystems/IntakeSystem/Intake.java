@@ -34,7 +34,8 @@ public class Intake extends SubsystemBase {
    public void updateMotorSettings(SparkFlex motor) {
     config
         .idleMode(IdleMode.kCoast)
-        .smartCurrentLimit(MotorConstants.kIntakeCurrentLimit);
+        .smartCurrentLimit(MotorConstants.kIntakeCurrentLimit)
+        .inverted(true);
     config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
   }
@@ -65,7 +66,7 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     // Apply rate-limited speed to motor each cycle for smooth ramp-up/ramp-down
-    //m_IntakeMotor.set(m_TargetSpeed);
+    m_IntakeMotor.set(m_TargetSpeed);
     SmartDashboard.putNumber("Intake speed", m_TargetSpeed);
     SmartDashboard.putNumber("Intake Current (A)", getCurrent());
   }

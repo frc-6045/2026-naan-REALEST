@@ -11,7 +11,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.Directions;
 import frc.robot.Constants.MotorConstants;
+import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.RunIntake;
+import frc.robot.commands.IntakeCommands.RunIntakePivot;
+import frc.robot.commands.IntakeCommands.StowIntake;
 import frc.robot.commands.ShootFeedCommands.HoodOpenLoop;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.ShootFeedCommands.RunFeeder;
@@ -44,7 +47,7 @@ public class Bindings {
 
         // Intake rollers
         m_driverController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
-      //  m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
+        m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
 
         // Auto-aim and auto-shoot (driver retains left stick translational control)
         // m_driverController.rightTrigger(0.5).whileTrue(
@@ -60,8 +63,8 @@ public class Bindings {
         /*============================*/
 
         // Intake rollers
-        //m_operatorController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
-        //m_operatorController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
+        m_operatorController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
+        m_operatorController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
 //QUINN
         m_operatorController.leftTrigger(0.05).whileTrue(
             Commands.runEnd(
@@ -84,10 +87,11 @@ public class Bindings {
         m_operatorController.x().whileTrue(new RunFeeder(feeder, Directions.IN));
 
         // Deploy intake (disabled - uncomment when intake pivot is ready)
-        // m_operatorController.a().onTrue(new DeployIntake(intakePivot));
-
+        //m_operatorController.a().onTrue(new DeployIntake(intakePivot));
+        m_operatorController.a().whileTrue(new RunIntakePivot(intakePivot, Directions.IN));
         // Stow intake (disabled - uncomment when intake pivot is ready)
-        // m_operatorController.b().onTrue(new StowIntake(intakePivot));
+        //m_operatorController.b().onTrue(new StowIntake(intakePivot));
+        m_operatorController.b().whileTrue(new RunIntakePivot(intakePivot, Directions.OUT));
 
         // Hood open loop up
         m_operatorController.pov(0).whileTrue(new HoodOpenLoop(topRoller, () -> MotorConstants.kHoodSpeed));
