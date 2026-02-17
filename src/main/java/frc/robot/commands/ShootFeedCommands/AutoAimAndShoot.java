@@ -43,6 +43,7 @@ public class AutoAimAndShoot extends Command {
     private final PIDController m_aimPID;
 
     private double m_lastTargetRPM = MotorConstants.kShooterTargetRPM;
+    private double m_lastTargetRollerRPM = MotorConstants.kRollerTargetRPM;
     private boolean m_feeding = false;
 
     public AutoAimAndShoot(
@@ -122,6 +123,7 @@ public class AutoAimAndShoot extends Command {
             double targetRollerRPM = ShootingLookupTable.getRollerRPM(compensatedDistance);
             double targetRPM = ShootingLookupTable.getFlywheelRPM(compensatedDistance);
             m_lastTargetRPM = targetRPM;
+            m_lastTargetRollerRPM = targetRollerRPM;
 
             m_topRoller.setRPM(targetRollerRPM);
             m_flywheel.setTargetRPM(targetRPM);
@@ -175,9 +177,10 @@ public class AutoAimAndShoot extends Command {
             SmartDashboard.putNumber("VComp Radial V (m/s)", compensation.radialVelocityMps);
             SmartDashboard.putNumber("VComp Robot Speed (m/s)", robotSpeed);
         } else {
-            // No valid target: drive with zero rotation, keep flywheel spinning at last RPM
+            // No valid target: drive with zero rotation, keep motors spinning at last RPM
             m_swerve.drive(translation, 0.0, true);
             m_flywheel.setTargetRPM(m_lastTargetRPM);
+            m_topRoller.setRPM(m_lastTargetRollerRPM);
             m_feeder.stopFeederMotor();
             m_spindexer.stopSpindexerMotor();
             m_feeding = false;
