@@ -32,7 +32,7 @@ public class AutoAimPrepare extends Command {
 
         // Filter to only track scoring target AprilTags
         LimelightHelpers.SetFiducialIDFiltersOverride(
-                LimelightConstants.kLimelightName, LimelightConstants.kTargetAprilTagIDs);
+                LimelightConstants.kLimelightName, LimelightConstants.getTargetAprilTagIDs());
 
         SmartDashboard.putBoolean("AutoAimPrep Active", true);
     }

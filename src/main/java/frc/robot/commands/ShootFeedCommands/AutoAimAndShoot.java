@@ -71,7 +71,7 @@ public class AutoAimAndShoot extends Command {
 
         // Filter to only track scoring target AprilTags
         LimelightHelpers.SetFiducialIDFiltersOverride(
-                LimelightConstants.kLimelightName, LimelightConstants.kTargetAprilTagIDs);
+                LimelightConstants.kLimelightName, LimelightConstants.getTargetAprilTagIDs());
 
         m_aimPID.reset();
         m_feeding = false;

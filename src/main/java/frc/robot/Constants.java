@@ -123,14 +123,19 @@ public final class Constants {
     public static final double kTargetHeightMeters = 44.25 * 0.0254; // ~1.124m
 
     // HUB AprilTag IDs -- all four faces of each HUB, 2 tags per face
-    public static final int[] kTargetAprilTagIDs =
-      (DriverStation.getAlliance().get() == DriverStation.Alliance.Red)
-        ? new int[] {2, 5, 8, 9, 10, 11}
-        : new int[] {18, 21, 24, 25, 26, 27};
+    private static final int[] kRedAprilTagIDs = {2, 5, 8, 9, 10, 11};
+    private static final int[] kBlueAprilTagIDs = {18, 21, 24, 25, 26, 27};
+
+    /** Get the valid target AprilTag IDs for the current alliance. */
+    public static int[] getTargetAprilTagIDs() {
+      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
+          ? kRedAprilTagIDs
+          : kBlueAprilTagIDs;
+    }
 
     /** Check if a detected AprilTag ID is in our valid scoring target list. */
     public static boolean isValidTagID(int id) {
-      for (int validID : kTargetAprilTagIDs) {
+      for (int validID : getTargetAprilTagIDs()) {
         if (id == validID) {
           return true;
         }
