@@ -93,7 +93,7 @@ public final class Constants {
     // TODO: Tune this value based on desired shot distance and trajectory
     public static final double kShooterTargetRPM = 1450.0; // Target shooter wheel speed in RPM
     public static final double kRollerTargetRPM = 2700; // Target shooter wheel speed in RPM
-    public static final double kShooterRPMTolerance = 100.0; // Acceptable RPM tolerance before feeding
+    public static final double kShooterRPMTolerance = 200.0; // Acceptable RPM tolerance before feeding
 
   }
 
@@ -150,7 +150,7 @@ public final class Constants {
     public static final double kAimP = 0.15; // Proportional gain
     public static final double kAimI = 0.0; // Integral gain
     public static final double kAimD = 0.01; // Derivative gain
-    public static final double kAimToleranceDegrees = 2.0; // Acceptable aim error (degrees)
+    public static final double kAimToleranceDegrees = 10.0; // Acceptable aim error (degrees)
     public static final double kMaxAutoRotationRadPerSec = 3.0; // Max rotation speed during auto-aim (rad/s)
   }
 
