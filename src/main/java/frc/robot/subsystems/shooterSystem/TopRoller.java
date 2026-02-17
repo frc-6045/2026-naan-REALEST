@@ -117,17 +117,15 @@ public class TopRoller extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Roller/Target RPM", targetRPM);
   }
 
-  // Get current flywheel velocity in RPM
+  // Get current roller velocity in RPM
   public double getRPM() {
-    // if (m_Motor.getEncoder().getVelocity()!=0)
-    // System.out.println(m_Motor.getEncoder().getVelocity());
     return m_Encoder.getVelocity();
   }
 
-  // Check if flywheel is at target speed (within tolerance)
+  // Check if roller is at target speed (within tolerance)
   public boolean isAtTargetSpeed(double targetRPM) {
     double currentVelocity = getRPM();
-    return Math.abs(currentVelocity - targetRPM) < MotorConstants.kShooterRPMTolerance;
+    return Math.abs(currentVelocity - targetRPM) < MotorConstants.kRollerRPMTolerance;
   }
 
   @Override

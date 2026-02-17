@@ -20,6 +20,7 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
+    public static final int kTestControllerPort = 3;
   }
   
   public static class ControllerConstants {
@@ -94,6 +95,7 @@ public final class Constants {
     public static final double kShooterTargetRPM = 1450.0; // Target shooter wheel speed in RPM
     public static final double kRollerTargetRPM = 2700; // Target shooter wheel speed in RPM
     public static final double kShooterRPMTolerance = 200.0; // Acceptable RPM tolerance before feeding
+    public static final double kRollerRPMTolerance = 200.0; // Acceptable roller RPM tolerance before feeding
 
   }
 
