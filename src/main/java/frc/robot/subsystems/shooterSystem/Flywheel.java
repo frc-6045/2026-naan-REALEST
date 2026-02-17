@@ -59,6 +59,8 @@ public class Flywheel extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/D", MotorConstants.kShooterD);
     SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/FF", MotorConstants.kShooterFF);
     SmartDashboard.putString("Subsystem: Flywheel/PIDF/Status", "OK");
+    SmartDashboard.putNumber("Subsystem: Flywheel/Current1 (A)", 0);
+    SmartDashboard.putNumber("Subsystem: Flywheel/Current2 (A)", 0);
   }
 
   /**
@@ -127,9 +129,11 @@ public class Flywheel extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Subsystem: Flywheel/Current1 (A)", m_FlywheelMotor1.getOutputCurrent());
+    SmartDashboard.putNumber("Subsystem: Flywheel/Current2 (A)", m_FlywheelMotor2.getOutputCurrent());
     SmartDashboard.putNumber("Subsystem: Flywheel/Velocity (RPM)", getRPM());
-    SmartDashboard.putNumber("Subsystem: Flywheel/Motor 1 Velocity", m_FlywheelMotor1.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Velocity", m_FlywheelMotor2.getEncoder().getVelocity());
+    // SmartDashboard.putNumber("Subsystem: Flywheel/Motor 1 Velocity", m_FlywheelMotor1.getEncoder().getVelocity());
+    // SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Velocity", m_FlywheelMotor2.getEncoder().getVelocity());
 
     // Live PID tuning - check if values changed on SmartDashboard
     double tunedP = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/P", MotorConstants.kShooterP);

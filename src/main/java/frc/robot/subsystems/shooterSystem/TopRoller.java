@@ -47,7 +47,7 @@ public class TopRoller extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Roller/Speed", 0);
     SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", 0);
     SmartDashboard.putNumber("Subsystem: Roller/Debug/Encoder Position", 0);
-    SmartDashboard.putNumber("Subsystem: Roller/Debug/Output Current (A)", 0);
+    SmartDashboard.putNumber("Subsystem: Roller/Current (A)", 0);
     SmartDashboard.putNumber("Subsystem: Roller/Debug/Applied Output", 0);
     SmartDashboard.putNumber("Subsystem: Roller/Debug/Motor Temp (C)", 0);
     SmartDashboard.putNumber("Subsystem: Roller/Debug/Faults", 0);
@@ -133,10 +133,10 @@ public class TopRoller extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", getRPM());
+    SmartDashboard.putNumber("Subsystem: Roller/Current (A)", m_Motor.getOutputCurrent());
 
     // Diagnostics - remove after debugging
     SmartDashboard.putNumber("Subsystem: Roller/Debug/Encoder Position", m_Encoder.getPosition());
-    SmartDashboard.putNumber("Subsystem: Roller/Debug/Output Current (A)", m_Motor.getOutputCurrent());
     SmartDashboard.putNumber("Subsystem: Roller/Debug/Applied Output", m_Motor.getAppliedOutput());
     SmartDashboard.putNumber("Subsystem: Roller/Debug/Motor Temp (C)", m_Motor.getMotorTemperature());
     SmartDashboard.putNumber("Subsystem: Roller/Debug/Faults", m_Motor.getFaults().rawBits);

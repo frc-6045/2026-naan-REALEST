@@ -58,7 +58,7 @@ public final class Constants {
     public static final int kIntakePivotCurrentLimit = 40;
     public static final int kShooterCurrentLimit = 40;
     public static final int kHoodCurrentLimit = 40;
-    public static final int kSpindexerCurrentLimit = 40;
+    public static final int kSpindexerCurrentLimit = 60;
 
     // Hood encoder offset (rotations, adjust based on physical zero position)
     // TODO: Calibrate this value with the hood at its zero/home position
