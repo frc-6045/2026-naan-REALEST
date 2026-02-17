@@ -9,7 +9,6 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.TopRoller;
-import frc.robot.subsystems.shooterSystem.Vision;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.shooterSystem.Spindexer;
@@ -32,8 +31,6 @@ public class RobotContainer {
   private final TopRoller m_TopRoller = new TopRoller();
   private final Feeder m_Feeder = new Feeder();
   private final Swerve m_Swerve = new Swerve();
-  private final Vision m_Vision = new Vision();
-
   private final PowerDistribution m_pdh = new PowerDistribution(1, ModuleType.kRev);
 
   private final CommandXboxController m_driverController =
@@ -45,7 +42,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    CommandScheduler.getInstance().registerSubsystem(m_Vision);
     m_pdh.setSwitchableChannel(true);
     m_Autos = new Autos(m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve);
     Bindings.configureBindings(m_driverController, m_operatorController, m_testController, m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve);
