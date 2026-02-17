@@ -35,7 +35,9 @@ public class Intake extends SubsystemBase {
     config
         .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(MotorConstants.kIntakeCurrentLimit)
-        .inverted(true);
+        .inverted(true)
+        .openLoopRampRate(.167)
+        .closedLoopRampRate(.167);
     config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
   }
@@ -67,8 +69,8 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     // Apply rate-limited speed to motor each cycle for smooth ramp-up/ramp-down
     m_IntakeMotor.set(m_TargetSpeed);
-    SmartDashboard.putNumber("Intake speed", m_TargetSpeed);
-    SmartDashboard.putNumber("Intake Current (A)", getCurrent());
+    SmartDashboard.putNumber("Intake/Intake speed", m_TargetSpeed);
+    SmartDashboard.putNumber("Intake/Intake Current (A)", getCurrent());
   }
 
   @Override

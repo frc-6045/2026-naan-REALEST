@@ -105,9 +105,7 @@ public class Bindings {
         // Spindexer CCW
         m_operatorController.y().whileTrue(new RunSpindexer(spindexer, -MotorConstants.kSpindexerSpeed));
 
-        //m_operatorController.a().onTrue(new InstantCommand(()->{System.out.println(LimelightHelpers.getTY(Constants.LIMELIGHT));}));
         
-
         /*============================*/
         /*       Test Bindings        */
         /*============================*/

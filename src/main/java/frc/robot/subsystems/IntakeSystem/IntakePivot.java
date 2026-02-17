@@ -32,7 +32,9 @@ public class IntakePivot extends SubsystemBase {
    public void updateMotorSettings(SparkFlex motor) {
     config
         .idleMode(IdleMode.kCoast)
-        .smartCurrentLimit(MotorConstants.kIntakeCurrentLimit);
+        .smartCurrentLimit(MotorConstants.kIntakeCurrentLimit)
+        .openLoopRampRate(.167)
+        .closedLoopRampRate(.167);
     config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
   }
@@ -64,8 +66,8 @@ public class IntakePivot extends SubsystemBase {
   public void periodic() {
     double limitedSpeed = m_RampLimiter.calculate(m_TargetSpeed);
     m_IntakeDeployMotor.set(limitedSpeed);
-    SmartDashboard.putNumber("Intake pivot speed", limitedSpeed);
-    SmartDashboard.putNumber("Intake pivot current (A)", getCurrent());
+    SmartDashboard.putNumber("Intake/Intake pivot speed", limitedSpeed);
+    SmartDashboard.putNumber("Intake/Intake pivot current (A)", getCurrent());
   }
 
   @Override

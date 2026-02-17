@@ -53,12 +53,12 @@ public final class Constants {
     public static final double kSpindexerMotorMaximumSpeed = 1;
 
     // Motor Current Limits (Amps)
-    public static final int kFeederCurrentLimit = 40;
-    public static final int kIntakeCurrentLimit = 50;
-    public static final int kIntakePivotCurrentLimit = 60;
-    public static final int kShooterCurrentLimit = 67;
-    public static final int kHoodCurrentLimit = 60;
-    public static final int kSpindexerCurrentLimit = 67;
+    public static final int kFeederCurrentLimit = 30;
+    public static final int kIntakeCurrentLimit = 40;
+    public static final int kIntakePivotCurrentLimit = 40;
+    public static final int kShooterCurrentLimit = 40;
+    public static final int kHoodCurrentLimit = 40;
+    public static final int kSpindexerCurrentLimit = 40;
 
     // Hood encoder offset (rotations, adjust based on physical zero position)
     // TODO: Calibrate this value with the hood at its zero/home position
@@ -67,7 +67,7 @@ public final class Constants {
     public static final double kHoodLowerLimit = 75; 
 
     // Current Spike Detection Thresholds (Amps)
-    public static final double kIntakeCurrentSpikeThreshold = 56.7; // Current threshold to detect stow/deploy complete
+    public static final double kIntakeCurrentSpikeThreshold = 40; // Current threshold to detect stow/deploy complete
 
     // Default speeds
     public static final double kIntakeStowSpeed = -.3; // Speed for stowing intake
@@ -91,7 +91,7 @@ public final class Constants {
     public static final double kRollerP = 0.0003; // Proportional gain
     public static final double kRollerI = 0.0; // Integral gain
     public static final double kRollerD = 0.0; // Derivative gain
-    public static final double kRollerFF = 0.00189; // Feed-forward gain (velocity feed-forward)
+    public static final double kRollerFF = 0.001976; // Feed-forward gain (velocity feed-forward)
     public static final double kRollerIZone = 400.0; // I term only active within this RPM error range
 
     // Shooter Target Speed (RPM)
@@ -121,7 +121,7 @@ public final class Constants {
   }
 
   public static class LimelightConstants {
-    public static final String kLimelightName = "limelight"; // NetworkTables name
+    public static final String kLimelightName = "limelight-sabre"; // NetworkTables name
     public static final int kAprilTagPipeline = 0; // Pipeline index for AprilTag detection
 
     // Limelight mounting configuration (relative to robot center)

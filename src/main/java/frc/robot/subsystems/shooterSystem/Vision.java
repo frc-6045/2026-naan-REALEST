@@ -1,5 +1,7 @@
 package frc.robot.subsystems.shooterSystem;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -26,8 +28,8 @@ public class Vision extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("LL: Distance from Target", getDistanceFromClosestTarget());
-        SmartDashboard.putNumber("LL: TX", LimelightHelpers.getTX(limelight));
-        SmartDashboard.putNumber("LL: TY", LimelightHelpers.getTY(limelight));
+        SmartDashboard.putNumber("Limelight/Distance from Target", getDistanceFromClosestTarget());
+        SmartDashboard.putNumber("Limelight/TX", LimelightHelpers.getTX(limelight));
+        SmartDashboard.putNumber("Limelight/TY", LimelightHelpers.getTY(limelight));
     }
 }

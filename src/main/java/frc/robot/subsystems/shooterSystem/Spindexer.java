@@ -29,7 +29,9 @@ public class Spindexer extends SubsystemBase {
    public void updateMotorSettings(SparkFlex motor) {
     config
         .idleMode(IdleMode.kCoast)
-        .smartCurrentLimit(MotorConstants.kSpindexerCurrentLimit);
+        .smartCurrentLimit(MotorConstants.kSpindexerCurrentLimit)
+        .openLoopRampRate(.167)
+        .closedLoopRampRate(.167);
     config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
   }
@@ -46,12 +48,12 @@ public class Spindexer extends SubsystemBase {
     }
 
     m_SpindexerMotor.set(speed);
-    SmartDashboard.putNumber("Spindexer speed", speed);
+    SmartDashboard.putNumber("Spindexer/Spindexer speed", speed);
   }
 
   public void stopSpindexerMotor() {
     m_SpindexerMotor.stopMotor();
-    SmartDashboard.putNumber("Spindexer speed", 0);
+    SmartDashboard.putNumber("Spindexer/Spindexer speed", 0);
   }
 
   public double getRPM() {
@@ -64,8 +66,8 @@ public class Spindexer extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Spindexer Current (A)", getCurrent());
-    SmartDashboard.putNumber("Spindexer Velocity (RPM)", getRPM());
+    SmartDashboard.putNumber("Spindexer/Spindexer Current (A)", getCurrent());
+    SmartDashboard.putNumber("Spindexer/Spindexer Velocity (RPM)", getRPM());
   }
 
   @Override

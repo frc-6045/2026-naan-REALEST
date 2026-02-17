@@ -30,7 +30,9 @@ public class Feeder extends SubsystemBase {
     config
         .inverted(true)
         .idleMode(IdleMode.kCoast)
-        .smartCurrentLimit(MotorConstants.kFeederCurrentLimit);
+        .smartCurrentLimit(MotorConstants.kFeederCurrentLimit)
+        .openLoopRampRate(.167)
+        .closedLoopRampRate(.167);
     config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
   }
@@ -47,12 +49,12 @@ public class Feeder extends SubsystemBase {
     }
 
     m_FeederMotor.set(speed);
-    SmartDashboard.putNumber("Feeder speed", speed);
+    SmartDashboard.putNumber("Feeder/Feeder speed", speed);
   }
 
   public void stopFeederMotor() {
     m_FeederMotor.stopMotor();
-    SmartDashboard.putNumber("Feeder speed", 0);
+    SmartDashboard.putNumber("Feeder/Feeder speed", 0);
   }
 
   public double getCurrent() {
@@ -61,7 +63,7 @@ public class Feeder extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Feeder Current (A)", getCurrent());
+    SmartDashboard.putNumber("Feeder/Feeder Current (A)", getCurrent());
   }
 
   @Override
