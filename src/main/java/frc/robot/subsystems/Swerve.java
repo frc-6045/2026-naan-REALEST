@@ -153,7 +153,7 @@ public class Swerve extends SubsystemBase {
      * @param fieldRelative Whether to drive field-relative
      */
     public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
-        //m_swerveDrive.drive(translation, rotation, fieldRelative, false);
+        m_swerveDrive.drive(translation, rotation, fieldRelative, false);
     }
 
     /**
