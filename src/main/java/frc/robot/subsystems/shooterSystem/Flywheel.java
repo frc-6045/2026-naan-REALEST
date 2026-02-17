@@ -106,7 +106,7 @@ public class Flywheel extends SubsystemBase {
   public void setTargetRPM(double targetRPM) {
     m_FlywheelPIDController1.setReference(targetRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     m_FlywheelPIDController2.setReference(targetRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    SmartDashboard.putNumber("Flywheel/ Target RPM", targetRPM);
+    SmartDashboard.putNumber("Flywheel/Target RPM", targetRPM);
   }
 
   // Get current flywheel velocity in RPM
