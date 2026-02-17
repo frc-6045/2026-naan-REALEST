@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 
+@SuppressWarnings({"deprecation","removal"})
 public class TopRoller extends SubsystemBase {
   private final SparkFlex m_Motor;
   private final SparkFlexConfig m_rollerConfig = new SparkFlexConfig();
@@ -30,7 +31,6 @@ public class TopRoller extends SubsystemBase {
   private double m_lastD = MotorConstants.kRollerD;
   private double m_lastFF = MotorConstants.kRollerFF;
 
-  @SuppressWarnings("deprecation")
   public TopRoller() {
     m_Motor = new SparkFlex(MotorConstants.kTopRollerMotorCanID, MotorType.kBrushless);
 

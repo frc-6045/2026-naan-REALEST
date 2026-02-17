@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 
+@SuppressWarnings({"deprecation","removal"})
 public class Flywheel extends SubsystemBase {
   private final SparkFlex m_FlywheelMotor1;
   private final SparkFlex m_FlywheelMotor2;
@@ -30,7 +31,6 @@ public class Flywheel extends SubsystemBase {
   private double m_lastD = MotorConstants.kShooterD;
   private double m_lastFF = MotorConstants.kShooterFF;
 
-  @SuppressWarnings("deprecation")
   public Flywheel() {
     m_FlywheelMotor1 = new SparkFlex(MotorConstants.kShooterMotor1CanID, MotorType.kBrushless);
     m_FlywheelMotor2 = new SparkFlex(MotorConstants.kShooterMotor2CanID, MotorType.kBrushless);
