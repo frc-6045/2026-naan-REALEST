@@ -15,7 +15,7 @@ import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.RunIntake;
 import frc.robot.commands.IntakeCommands.RunIntakePivot;
 import frc.robot.commands.IntakeCommands.StowIntake;
-import frc.robot.commands.ShootFeedCommands.HoodOpenLoop;
+import frc.robot.commands.ShootFeedCommands.TopRollerOpenLoop;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.ShootFeedCommands.RunFeeder;
 import frc.robot.commands.SpindexerCommands.RunSpindexer;
@@ -93,11 +93,11 @@ public class Bindings {
         //m_operatorController.b().onTrue(new StowIntake(intakePivot));
         m_operatorController.b().whileTrue(new RunIntakePivot(intakePivot, Directions.OUT));
 
-        // Hood open loop up
-        m_operatorController.pov(0).whileTrue(new HoodOpenLoop(topRoller, () -> MotorConstants.kHoodSpeed));
+        // Top roller open loop up
+        m_operatorController.pov(0).whileTrue(new TopRollerOpenLoop(topRoller, () -> MotorConstants.kTopRollerSpeed));
 
-        // Hood open loop down
-        m_operatorController.pov(180).whileTrue(new HoodOpenLoop(topRoller, () -> -MotorConstants.kHoodSpeed));
+        // Top roller open loop down
+        m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, () -> -MotorConstants.kTopRollerSpeed));
 
         // Spindexer CW (NORMAL)
         m_operatorController.pov(90).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerSpeed));

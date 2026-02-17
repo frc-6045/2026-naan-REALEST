@@ -8,22 +8,22 @@ import frc.robot.Constants.ControllerConstants;
 import frc.robot.subsystems.shooterSystem.TopRoller;
 
 /**
- * Open-loop control command for the shooter hood.
- * Allows manual control of hood angle via joystick or other input.
+ * Open-loop control command for the top roller.
+ * Allows manual control of top roller speed via joystick or other input.
  */
-public class HoodOpenLoop extends Command {
-  private final TopRoller m_Hood;
+public class TopRollerOpenLoop extends Command {
+  private final TopRoller m_TopRoller;
   private final DoubleSupplier m_SpeedSupplier;
 
   /**
-   * Creates a new HoodOpenLoop command.
-   * @param hood The hood subsystem
+   * Creates a new TopRollerOpenLoop command.
+   * @param topRoller The top roller subsystem
    * @param speedSupplier Supplier for the desired speed (-1.0 to 1.0)
    */
-  public HoodOpenLoop(TopRoller hood, DoubleSupplier speedSupplier) {
-    m_Hood = hood;
+  public TopRollerOpenLoop(TopRoller topRoller, DoubleSupplier speedSupplier) {
+    m_TopRoller = topRoller;
     m_SpeedSupplier = speedSupplier;
-    addRequirements(hood);
+    addRequirements(topRoller);
   }
 
   @Override
@@ -32,12 +32,12 @@ public class HoodOpenLoop extends Command {
   @Override
   public void execute() {
     double speed = MathUtil.applyDeadband(m_SpeedSupplier.getAsDouble(), ControllerConstants.kDeadband);
-    m_Hood.setHoodSpeed(speed);
+    m_TopRoller.setTopRollerSpeed(speed);
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_Hood.stopRollerMotor();
+    m_TopRoller.stopRollerMotor();
   }
 
   @Override

@@ -27,13 +27,13 @@ import frc.robot.subsystems.shooterSystem.Spindexer;
  * When active (driver holds RT):
  * - Reads Limelight for target AprilTag
  * - Auto-rotates toward target (driver retains translational control)
- * - Adjusts hood angle and flywheel RPM based on distance
- * - Auto-feeds when all conditions are met (aimed, hood ready, flywheel ready)
+ * - Adjusts top roller and flywheel RPM based on distance
+ * - Auto-feeds when all conditions are met (aimed, top roller ready, flywheel ready)
  */
 public class AutoAimAndShoot extends Command {
     private final Swerve m_swerve;
     private final Flywheel m_flywheel;
-    private final TopRoller m_hood;
+    private final TopRoller m_topRoller;
     private final Feeder m_feeder;
     private final Spindexer m_spindexer;
 
@@ -46,11 +46,11 @@ public class AutoAimAndShoot extends Command {
     private boolean m_feeding = false;
 
     public AutoAimAndShoot(
-            Swerve swerve, Flywheel flywheel, TopRoller hood, Feeder feeder, Spindexer spindexer,
+            Swerve swerve, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
             DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier) {
         m_swerve = swerve;
         m_flywheel = flywheel;
-        m_hood = hood;
+        m_topRoller = topRoller;
         m_feeder = feeder;
         m_spindexer = spindexer;
         m_translationXSupplier = translationXSupplier;
@@ -60,7 +60,7 @@ public class AutoAimAndShoot extends Command {
         m_aimPID.setTolerance(AimConstants.kAimToleranceDegrees);
         m_aimPID.setSetpoint(0.0); // Target: zero tx offset
 
-        addRequirements(swerve, flywheel, hood, feeder, spindexer);
+        addRequirements(swerve, flywheel, topRoller, feeder, spindexer);
     }
 
     @Override
@@ -113,18 +113,18 @@ public class AutoAimAndShoot extends Command {
             ShotCompensation.CompensationResult compensation =
                     ShotCompensation.calculate(fieldVelocity, headingDeg, tx, distance);
 
-            // Use compensated distance for hood/RPM lookups, clamped to valid range
+            // Use compensated distance for RPM lookups, clamped to valid range
             double compensatedDistance = MathUtil.clamp(compensation.adjustedDistanceMeters,
                     ShootingConstants.kMinShootingDistanceMeters,
                     ShootingConstants.kMaxShootingDistanceMeters);
 
-            // Look up hood angle and RPM from compensated distance
-            double targetHoodAngle = ShootingLookupTable.getHoodAngle(compensatedDistance);
+            // Look up roller and flywheel RPM from compensated distance
+            double targetRollerRPM = ShootingLookupTable.getRollerRPM(compensatedDistance);
             double targetRPM = ShootingLookupTable.getFlywheelRPM(compensatedDistance);
             m_lastTargetRPM = targetRPM;
 
-            m_hood.setHoodAngle(targetHoodAngle);
-            m_flywheel.setFlywheelVelocity(targetRPM);
+            m_topRoller.setRPM(targetRollerRPM);
+            m_flywheel.setTargetRPM(targetRPM);
 
             // Calculate auto-rotation from aim PID (tx -> rad/s)
             // Setpoint is the aim lead angle (0 when stationary, offset when moving)
@@ -139,9 +139,9 @@ public class AutoAimAndShoot extends Command {
 
             // Check if all conditions are met (aimed = reached lead angle, not necessarily centered)
             boolean aimed = Math.abs(tx - aimSetpoint) < AimConstants.kAimToleranceDegrees;
-            boolean hoodReady = m_hood.isAtTargetAngle(targetHoodAngle);
+            boolean topRollerReady = m_topRoller.isAtTargetSpeed(targetRollerRPM);
             boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
-            boolean readyToFire = aimed && hoodReady && flywheelReady;
+            boolean readyToFire = aimed && topRollerReady && flywheelReady;
 
             if (readyToFire) {
                 // Auto-feed
@@ -156,10 +156,10 @@ public class AutoAimAndShoot extends Command {
 
             // Telemetry
             SmartDashboard.putNumber("AutoAim Distance", distance);
-            SmartDashboard.putNumber("AutoAim Target Hood", targetHoodAngle);
+            SmartDashboard.putNumber("AutoAim Target Roller RPM", targetRollerRPM);
             SmartDashboard.putNumber("AutoAim Target RPM", targetRPM);
             SmartDashboard.putBoolean("AutoAim Aimed", aimed);
-            SmartDashboard.putBoolean("AutoAim HoodReady", hoodReady);
+            SmartDashboard.putBoolean("AutoAim TopRollerReady", topRollerReady);
             SmartDashboard.putBoolean("AutoAim FlywheelReady", flywheelReady);
             SmartDashboard.putBoolean("AutoAim ReadyToFire", readyToFire);
 
@@ -177,7 +177,7 @@ public class AutoAimAndShoot extends Command {
         } else {
             // No valid target: drive with zero rotation, keep flywheel spinning at last RPM
             m_swerve.drive(translation, 0.0, true);
-            m_flywheel.setFlywheelVelocity(m_lastTargetRPM);
+            m_flywheel.setTargetRPM(m_lastTargetRPM);
             m_feeder.stopFeederMotor();
             m_spindexer.stopSpindexerMotor();
             m_feeding = false;
@@ -197,7 +197,7 @@ public class AutoAimAndShoot extends Command {
     @Override
     public void end(boolean interrupted) {
         m_flywheel.stopFlywheelMotor();
-        m_hood.stopRollerMotor();
+        m_topRoller.stopRollerMotor();
         m_feeder.stopFeederMotor();
         m_spindexer.stopSpindexerMotor();
         // Swerve default command auto-resumes

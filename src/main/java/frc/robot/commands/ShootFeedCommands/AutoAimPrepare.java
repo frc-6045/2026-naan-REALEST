@@ -12,17 +12,17 @@ import frc.robot.subsystems.shooterSystem.TopRoller;
 
 /**
  * Lightweight auto-aim prep command for autonomous use.
- * Spins flywheel and sets hood angle based on Limelight distance.
+ * Spins flywheel and sets top roller RPM based on Limelight distance.
  * Does NOT require Swerve, so it can run alongside PathPlanner paths.
  */
 public class AutoAimPrepare extends Command {
     private final Flywheel m_flywheel;
-    private final TopRoller m_hood;
+    private final TopRoller m_topRoller;
 
-    public AutoAimPrepare(Flywheel flywheel, TopRoller hood) {
+    public AutoAimPrepare(Flywheel flywheel, TopRoller topRoller) {
         m_flywheel = flywheel;
-        m_hood = hood;
-        addRequirements(flywheel, hood);
+        m_topRoller = topRoller;
+        addRequirements(flywheel, topRoller);
     }
 
     @Override
@@ -57,14 +57,14 @@ public class AutoAimPrepare extends Command {
                     ShootingConstants.kMinShootingDistanceMeters,
                     ShootingConstants.kMaxShootingDistanceMeters);
 
-            double targetHoodAngle = ShootingLookupTable.getHoodAngle(distance);
+            double targetRollerRPM = ShootingLookupTable.getRollerRPM(distance);
             double targetRPM = ShootingLookupTable.getFlywheelRPM(distance);
 
-            m_hood.setHoodAngle(targetHoodAngle);
-            m_flywheel.setFlywheelVelocity(targetRPM);
+            m_topRoller.setRPM(targetRollerRPM);
+            m_flywheel.setTargetRPM(targetRPM);
 
             SmartDashboard.putNumber("AutoAimPrep Distance", distance);
-            SmartDashboard.putNumber("AutoAimPrep Target Hood", targetHoodAngle);
+            SmartDashboard.putNumber("AutoAimPrep Target Roller RPM", targetRollerRPM);
             SmartDashboard.putNumber("AutoAimPrep Target RPM", targetRPM);
             SmartDashboard.putBoolean("AutoAimPrep HasTarget", true);
         } else {
@@ -75,7 +75,7 @@ public class AutoAimPrepare extends Command {
     @Override
     public void end(boolean interrupted) {
         m_flywheel.stopFlywheelMotor();
-        m_hood.stopRollerMotor();
+        m_topRoller.stopRollerMotor();
         SmartDashboard.putBoolean("AutoAimPrep Active", false);
     }
 

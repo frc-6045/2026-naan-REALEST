@@ -40,7 +40,7 @@ public final class Constants {
 
     public static final int kShooterMotor1CanID = 14;
     public static final int kShooterMotor2CanID = 15;
-    public static final int kHoodMotorCanID = 16;
+    public static final int kTopRollerMotorCanID = 16;
 
     public static final int kSpindexerMotorCanID = 17;
 
@@ -49,7 +49,7 @@ public final class Constants {
     public static final double kIntakeMotorMaximumSpeed = 1;
     public static final double kIntakePivotMotorMaximumSpeed = .2567;
     public static final double kShooterMotorMaximumSpeed = 1;
-    public static final double kHoodMotorMaximumSpeed = 1;
+    public static final double kTopRollerMotorMaximumSpeed = 1;
     public static final double kSpindexerMotorMaximumSpeed = 1;
 
     // Motor Current Limits (Amps)
@@ -57,14 +57,9 @@ public final class Constants {
     public static final int kIntakeCurrentLimit = 40;
     public static final int kIntakePivotCurrentLimit = 40;
     public static final int kShooterCurrentLimit = 40;
-    public static final int kHoodCurrentLimit = 40;
+    public static final int kTopRollerCurrentLimit = 40;
     public static final int kSpindexerCurrentLimit = 60;
 
-    // Hood encoder offset (rotations, adjust based on physical zero position)
-    // TODO: Calibrate this value with the hood at its zero/home position
-    public static final double kHoodEncoderOffset = 0;
-    public static final double kHoodUpperLimit = 330;
-    public static final double kHoodLowerLimit = 75; 
 
     // Current Spike Detection Thresholds (Amps)
     public static final double kIntakeCurrentSpikeThreshold = 40; // Current threshold to detect stow/deploy complete
@@ -78,7 +73,7 @@ public final class Constants {
     
     public static final double kFeederSpeed = 1; // Speed to feed ball into shooter
     public static final double kSpindexerSpeed = 1; // Speed to index balls from intake to feeder
-    public static final double kHoodSpeed = .5;
+    public static final double kTopRollerSpeed = .5;
 
     // Shooter PID Constants (for velocity control in RPM)
     // TODO: Tune these values empirically on the robot
@@ -100,12 +95,6 @@ public final class Constants {
     public static final double kRollerTargetRPM = 2700; // Target shooter wheel speed in RPM
     public static final double kShooterRPMTolerance = 100.0; // Acceptable RPM tolerance before feeding
 
-    // Hood PID Constants (for position control in degrees via absolute encoder)
-    // TODO: Tune these values empirically on the robot
-    public static final double kHoodP = 0.02; // Proportional gain
-    public static final double kHoodI = 0.0; // Integral gain
-    public static final double kHoodD = 0.001; // Derivative gain
-    public static final double kHoodAngleTolerance = 2.0; // Degrees of acceptable error
   }
 
   public static class PositionConstants {

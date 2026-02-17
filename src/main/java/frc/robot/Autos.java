@@ -44,7 +44,7 @@ public class Autos {
    * ADD AUTO TO AUTO CHOOSER
    * autoChooser.addOption("exampleAutoName", AutoBuilder.buildAuto("NameOfAutoInPathplanner"));
    */
-  public Autos(Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller hood, Feeder feeder, Swerve swerve) {
+  public Autos(Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve) {
     // PathPlanner AutoBuilder is configured in Swerve subsystem
 
     // --- Register NamedCommands for PathPlanner ---
@@ -90,14 +90,14 @@ public class Autos {
 
     // Auto-aim commands (Limelight-based shooting for autonomous)
 
-    // // Prep only -- spins flywheel + sets hood while PathPlanner drives
-    // NamedCommands.registerCommand("autoAim", new AutoAimPrepare(flywheel, hood).asProxy());
+    // // Prep only -- spins flywheel + sets top roller while PathPlanner drives
+    // NamedCommands.registerCommand("autoAim", new AutoAimPrepare(flywheel, topRoller).asProxy());
 
     // // Full stop-aim-shoot -- stops driving, rotates to target, fires, ends after feeding
     // NamedCommands.registerCommand("autoAimAndShoot", Commands.defer(() -> {
     //   Timer feedTimer = new Timer();
     //   AutoAimAndShoot cmd = new AutoAimAndShoot(
-    //       swerve, flywheel, hood, feeder, spindexer, () -> 0.0, () -> 0.0);
+    //       swerve, flywheel, topRoller, feeder, spindexer, () -> 0.0, () -> 0.0);
 
     //   return cmd.until(() -> {
     //     if (cmd.isFeedingActive()) {
@@ -109,12 +109,12 @@ public class Autos {
     //     return false;
     //   }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
     //     .withTimeout(ShootingConstants.kAutoShootTimeoutSec);
-    // }, Set.of(swerve, flywheel, hood, feeder, spindexer)).asProxy());
+    // }, Set.of(swerve, flywheel, topRoller, feeder, spindexer)).asProxy());
 
-    // // Cancel prep -- stops flywheel and hood
+    // // Cancel prep -- stops flywheel and top roller
     NamedCommands.registerCommand("stopAim", new ParallelCommandGroup(
       new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel),
-      new InstantCommand(() -> hood.stopRollerMotor(), hood)
+      new InstantCommand(() -> topRoller.stopRollerMotor(), topRoller)
     ).asProxy());
 
     // --- Auto Chooser ---

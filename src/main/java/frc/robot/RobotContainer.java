@@ -29,7 +29,7 @@ public class RobotContainer {
   private final IntakePivot m_IntakePivot = new IntakePivot();
   private final Spindexer m_Spindexer = new Spindexer();
   private final Flywheel m_Flywheel = new Flywheel();
-  private final TopRoller m_Hood = new TopRoller();
+  private final TopRoller m_TopRoller = new TopRoller();
   private final Feeder m_Feeder = new Feeder();
   private final Swerve m_Swerve = new Swerve();
   private final Vision m_Vision = new Vision();
@@ -47,8 +47,8 @@ public class RobotContainer {
   public RobotContainer() {
     CommandScheduler.getInstance().registerSubsystem(m_Vision);
     m_pdh.setSwitchableChannel(true);
-    m_Autos = new Autos(m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_Hood, m_Feeder, m_Swerve);
-    Bindings.configureBindings(m_driverController, m_operatorController, m_testController, m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_Hood, m_Feeder, m_Swerve);
+    m_Autos = new Autos(m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve);
+    Bindings.configureBindings(m_driverController, m_operatorController, m_testController, m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve);
 
     DriverStation.silenceJoystickConnectionWarning(true);
 

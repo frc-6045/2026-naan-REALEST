@@ -32,9 +32,9 @@ public class TopRoller extends SubsystemBase {
 
   @SuppressWarnings("deprecation")
   public TopRoller() {
-    m_Motor = new SparkFlex(MotorConstants.kHoodMotorCanID, MotorType.kBrushless);
+    m_Motor = new SparkFlex(MotorConstants.kTopRollerMotorCanID, MotorType.kBrushless);
 
-    updateHoodMotorSettings();
+    updateTopRollerMotorSettings();
     m_Motor.configure(m_rollerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     // Get encoder and PID controller references
@@ -67,11 +67,11 @@ public class TopRoller extends SubsystemBase {
     return SmartDashboard.getNumber("Subsystem: Roller/Target RPM Input", MotorConstants.kRollerTargetRPM);
   }
 
-  public void updateHoodMotorSettings() {
+  public void updateTopRollerMotorSettings() {
     m_rollerConfig
         .idleMode(IdleMode.kBrake)
         .inverted(true)
-        .smartCurrentLimit(MotorConstants.kHoodCurrentLimit)
+        .smartCurrentLimit(MotorConstants.kTopRollerCurrentLimit)
         .openLoopRampRate(.167)
         .closedLoopRampRate(.167);
     // Configure encoder - velocity is already in RPM for brushless motors
@@ -88,12 +88,12 @@ public class TopRoller extends SubsystemBase {
   }
 
   /**
-   * Set the hood motor speed with clamping and soft limit warnings.
+   * Set the top roller motor speed with clamping and soft limit warnings.
    * @param speed Desired speed (-1.0 to 1.0)
    */
-  public void setHoodSpeed(double speed) {
+  public void setTopRollerSpeed(double speed) {
     double requestedSpeed = speed;
-    speed = MathUtil.clamp(speed, -MotorConstants.kHoodMotorMaximumSpeed, MotorConstants.kHoodMotorMaximumSpeed);
+    speed = MathUtil.clamp(speed, -MotorConstants.kTopRollerMotorMaximumSpeed, MotorConstants.kTopRollerMotorMaximumSpeed);
 
     if (Math.abs(requestedSpeed) > Math.abs(speed)) {
       String warning = String.format("Roller speed clamped: requested %.2f, limited to %.2f",
@@ -105,7 +105,7 @@ public class TopRoller extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Roller/Speed", speed);
   }
 
-  /** Stop the hood motor and report zero speed to dashboard. */
+  /** Stop the top roller motor and report zero speed to dashboard. */
   public void stopRollerMotor() {
     m_Motor.stopMotor();
     SmartDashboard.putNumber("Subsystem: Roller/Speed", 0);
