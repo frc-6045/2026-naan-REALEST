@@ -12,8 +12,8 @@ import frc.robot.subsystems.shooterSystem.TopRoller;
  * Allows manual control of top roller speed via joystick or other input.
  */
 public class TopRollerOpenLoop extends Command {
-  private final TopRoller m_TopRoller;
-  private final DoubleSupplier m_SpeedSupplier;
+  private final TopRoller m_topRoller;
+  private final DoubleSupplier m_speedSupplier;
 
   /**
    * Creates a new TopRollerOpenLoop command.
@@ -21,23 +21,20 @@ public class TopRollerOpenLoop extends Command {
    * @param speedSupplier Supplier for the desired speed (-1.0 to 1.0)
    */
   public TopRollerOpenLoop(TopRoller topRoller, DoubleSupplier speedSupplier) {
-    m_TopRoller = topRoller;
-    m_SpeedSupplier = speedSupplier;
+    m_topRoller = topRoller;
+    m_speedSupplier = speedSupplier;
     addRequirements(topRoller);
   }
 
   @Override
-  public void initialize() {}
-
-  @Override
   public void execute() {
-    double speed = MathUtil.applyDeadband(m_SpeedSupplier.getAsDouble(), ControllerConstants.kDeadband);
-    m_TopRoller.setTopRollerSpeed(speed);
+    double speed = MathUtil.applyDeadband(m_speedSupplier.getAsDouble(), ControllerConstants.kDeadband);
+    m_topRoller.setTopRollerSpeed(speed);
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_TopRoller.stopRollerMotor();
+    m_topRoller.stopRollerMotor();
   }
 
   @Override

@@ -79,5 +79,4 @@ public class AutoAimPrepare extends Command {
     public boolean isFinished() {
         return false; // Runs until interrupted
     }
-
 }

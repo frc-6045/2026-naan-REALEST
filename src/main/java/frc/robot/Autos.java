@@ -4,10 +4,10 @@
 
 package frc.robot;
 
+import java.util.Set;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
-import java.util.Set;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -25,17 +25,17 @@ import frc.robot.commands.ShootFeedCommands.AutoAimAndShoot;
 import frc.robot.commands.ShootFeedCommands.AutoAimPrepare;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.SpindexerCommands.StopSpindexer;
-import frc.robot.subsystems.shooterSystem.Feeder;
-import frc.robot.subsystems.shooterSystem.Flywheel;
-import frc.robot.subsystems.shooterSystem.TopRoller;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
-import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.shooterSystem.Feeder;
+import frc.robot.subsystems.shooterSystem.Flywheel;
+import frc.robot.subsystems.shooterSystem.Spindexer;
+import frc.robot.subsystems.shooterSystem.TopRoller;
 
 public class Autos {
 
-    private SendableChooser<Command> autoChooser;
+    private final SendableChooser<Command> m_autoChooser;
 
   /**
    * TO REGISTER A COMMAND IN PATHPLANNER
@@ -44,7 +44,7 @@ public class Autos {
    * PID stuff (untimed commmands) should use .asProxy();
    *
    * ADD AUTO TO AUTO CHOOSER
-   * autoChooser.addOption("exampleAutoName", AutoBuilder.buildAuto("NameOfAutoInPathplanner"));
+   * m_autoChooser.addOption("exampleAutoName", AutoBuilder.buildAuto("NameOfAutoInPathplanner"));
    */
   public Autos(Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve) {
     // PathPlanner AutoBuilder is configured in Swerve subsystem
@@ -121,17 +121,17 @@ public class Autos {
 
     // --- Auto Chooser ---
 
-    autoChooser = new SendableChooser<>();
-    autoChooser.setDefaultOption("None", null);
+    m_autoChooser = new SendableChooser<>();
+    m_autoChooser.setDefaultOption("None", null);
 
     // Add autos to chooser
-    autoChooser.addOption("normal auto", AutoBuilder.buildAuto("halfauto"));
-    autoChooser.addOption("quarter-field auto", AutoBuilder.buildAuto("quarterauto"));
+    m_autoChooser.addOption("normal auto", AutoBuilder.buildAuto("halfauto"));
+    m_autoChooser.addOption("quarter-field auto", AutoBuilder.buildAuto("quarterauto"));
 
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
 
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    return m_autoChooser.getSelected();
   }
 }

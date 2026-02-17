@@ -16,28 +16,28 @@ import frc.robot.Constants.MotorConstants;
 
 public class Feeder extends SubsystemBase {
   private final SparkFlex m_FeederMotor;
-  SparkFlexConfig config = new SparkFlexConfig();
+  private final SparkFlexConfig m_config = new SparkFlexConfig();
 
   @SuppressWarnings("deprecation")
   public Feeder() {
     m_FeederMotor = new SparkFlex(MotorConstants.kFeederMotorCanID, MotorType.kBrushless);
 
-    updateMotorSettings(m_FeederMotor);
-    m_FeederMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    updateMotorSettings();
+    m_FeederMotor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     // Initialize SmartDashboard values
     SmartDashboard.putNumber("Subsystem: Feeder/Speed", 0);
     SmartDashboard.putNumber("Subsystem: Feeder/Current (A)", 0);
   }
 
-   public void updateMotorSettings(SparkFlex motor) {
-    config
+  private void updateMotorSettings() {
+    m_config
         .inverted(true)
         .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(MotorConstants.kFeederCurrentLimit)
-        .openLoopRampRate(.167)
-        .closedLoopRampRate(.167);
-    config.closedLoop
+        .openLoopRampRate(0.167)
+        .closedLoopRampRate(0.167);
+    m_config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
   }
 
@@ -68,7 +68,4 @@ public class Feeder extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Feeder/Current (A)", getCurrent());
   }
-
-  @Override
-  public void simulationPeriodic() {}
 }

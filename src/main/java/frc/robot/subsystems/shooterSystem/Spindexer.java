@@ -16,14 +16,14 @@ import frc.robot.Constants.MotorConstants;
 
 public class Spindexer extends SubsystemBase {
   private final SparkFlex m_SpindexerMotor;
-  SparkFlexConfig config = new SparkFlexConfig();
+  private final SparkFlexConfig m_config = new SparkFlexConfig();
 
   @SuppressWarnings("deprecation")
   public Spindexer() {
     m_SpindexerMotor = new SparkFlex(MotorConstants.kSpindexerMotorCanID, MotorType.kBrushless);
 
-    updateMotorSettings(m_SpindexerMotor);
-    m_SpindexerMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    updateMotorSettings();
+    m_SpindexerMotor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     // Initialize SmartDashboard values
     SmartDashboard.putNumber("Subsystem: Spindexer/Speed", 0);
@@ -31,13 +31,13 @@ public class Spindexer extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Spindexer/Velocity (RPM)", 0);
   }
 
-   public void updateMotorSettings(SparkFlex motor) {
-    config
+  private void updateMotorSettings() {
+    m_config
         .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(MotorConstants.kSpindexerCurrentLimit)
-        .openLoopRampRate(.167)
-        .closedLoopRampRate(.167);
-    config.closedLoop
+        .openLoopRampRate(0.167)
+        .closedLoopRampRate(0.167);
+    m_config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
   }
 
@@ -73,7 +73,4 @@ public class Spindexer extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Spindexer/Current (A)", getCurrent());
     SmartDashboard.putNumber("Subsystem: Spindexer/Velocity (RPM)", getRPM());
   }
-
-  @Override
-  public void simulationPeriodic() {}
 }

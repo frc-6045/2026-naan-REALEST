@@ -22,7 +22,7 @@ public class Flywheel extends SubsystemBase {
   private final SparkFlex m_FlywheelMotor2;
   private final SparkClosedLoopController m_FlywheelPIDController1;
   private final SparkClosedLoopController m_FlywheelPIDController2;
-  SparkFlexConfig config = new SparkFlexConfig();
+  private final SparkFlexConfig m_config = new SparkFlexConfig();
 
   // Track last PID values to detect changes
   private double m_lastP = MotorConstants.kShooterP;
@@ -35,13 +35,13 @@ public class Flywheel extends SubsystemBase {
     m_FlywheelMotor1 = new SparkFlex(MotorConstants.kShooterMotor1CanID, MotorType.kBrushless);
     m_FlywheelMotor2 = new SparkFlex(MotorConstants.kShooterMotor2CanID, MotorType.kBrushless);
 
-    updateMotorSettings(m_FlywheelMotor1);
-    config.inverted(false);
-    m_FlywheelMotor1.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    updateMotorSettings();
+    m_config.inverted(false);
+    m_FlywheelMotor1.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
-    updateMotorSettings(m_FlywheelMotor2);
-    config.inverted(true);
-    m_FlywheelMotor2.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    updateMotorSettings();
+    m_config.inverted(true);
+    m_FlywheelMotor2.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     // Get PID controllers for velocity control
     m_FlywheelPIDController1 = m_FlywheelMotor1.getClosedLoopController();
@@ -72,13 +72,13 @@ public class Flywheel extends SubsystemBase {
     return SmartDashboard.getNumber("Subsystem: Flywheel/Target RPM Input", MotorConstants.kShooterTargetRPM);
   }
 
-  public void updateMotorSettings(SparkFlex motor) {
-    config
+  private void updateMotorSettings() {
+    m_config
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(MotorConstants.kShooterCurrentLimit)
-        .openLoopRampRate(.167)
-        .closedLoopRampRate(.167);
-    config.closedLoop
+        .openLoopRampRate(0.167)
+        .closedLoopRampRate(0.167);
+    m_config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(MotorConstants.kShooterP)
         .i(MotorConstants.kShooterI)
@@ -108,20 +108,16 @@ public class Flywheel extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Flywheel/Speed", 0);
   }
 
-  // PID Velocity Control Methods
   public void setTargetRPM(double targetRPM) {
     m_FlywheelPIDController1.setReference(targetRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     m_FlywheelPIDController2.setReference(targetRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     SmartDashboard.putNumber("Subsystem: Flywheel/Target RPM", targetRPM);
   }
 
-  // Get current flywheel velocity in RPM
   public double getRPM() {
-    // Average the velocity of both motors
     return (m_FlywheelMotor1.getEncoder().getVelocity() + m_FlywheelMotor2.getEncoder().getVelocity()) / 2.0;
   }
 
-  // Check if flywheel is at target speed (within tolerance)
   public boolean isAtTargetSpeed(double targetRPM) {
     double currentVelocity = getRPM();
     return Math.abs(currentVelocity - targetRPM) < MotorConstants.kShooterRPMTolerance;
@@ -141,18 +137,17 @@ public class Flywheel extends SubsystemBase {
     double tunedD = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/D", MotorConstants.kShooterD);
     double tunedFF = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/FF", MotorConstants.kShooterFF);
 
-    // If any PID value changed, update motor controllers
     if (tunedP != m_lastP || tunedI != m_lastI || tunedD != m_lastD || tunedFF != m_lastFF) {
-      config.closedLoop
+      m_config.closedLoop
           .p(tunedP)
           .i(tunedI)
           .d(tunedD)
           .velocityFF(tunedFF);
 
-      config.inverted(false);
-      m_FlywheelMotor1.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-      config.inverted(true);
-      m_FlywheelMotor2.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+      m_config.inverted(false);
+      m_FlywheelMotor1.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+      m_config.inverted(true);
+      m_FlywheelMotor2.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
       m_lastP = tunedP;
       m_lastI = tunedI;
@@ -164,7 +159,4 @@ public class Flywheel extends SubsystemBase {
       SmartDashboard.putString("Subsystem: Flywheel/PIDF/Status", "OK");
     }
   }
-
-  @Override
-  public void simulationPeriodic() {}
 }

@@ -18,9 +18,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-
 
 public class RobotContainer {
   private Autos m_Autos;
@@ -51,13 +49,12 @@ public class RobotContainer {
     // Set default swerve drive command
     m_Swerve.setDefaultCommand(
         m_Swerve.driveCommand(
-            () -> -MathUtil.applyDeadband(m_driverController.getLeftY()+m_operatorController.getLeftY(), ControllerConstants.kDeadband),
-            () -> -MathUtil.applyDeadband(m_driverController.getLeftX()+m_operatorController.getLeftX(), ControllerConstants.kDeadband),
-            () -> -MathUtil.applyDeadband(m_driverController.getRightX()+m_operatorController.getRightX(), ControllerConstants.kDeadband)
+            () -> -MathUtil.applyDeadband(m_driverController.getLeftY() + m_operatorController.getLeftY(), ControllerConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(m_driverController.getLeftX() + m_operatorController.getLeftX(), ControllerConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(m_driverController.getRightX() + m_operatorController.getRightX(), ControllerConstants.kDeadband)
         )
     );
   }
-
 
   public Command getAutonomousCommand() {
     return m_Autos.getAutonomousCommand();
