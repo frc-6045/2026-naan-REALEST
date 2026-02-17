@@ -24,6 +24,10 @@ public class Feeder extends SubsystemBase {
 
     updateMotorSettings(m_FeederMotor);
     m_FeederMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+
+    // Initialize SmartDashboard values
+    SmartDashboard.putNumber("Subsystem: Feeder/Speed", 0);
+    SmartDashboard.putNumber("Subsystem: Feeder/Current (A)", 0);
   }
 
    public void updateMotorSettings(SparkFlex motor) {
@@ -45,16 +49,15 @@ public class Feeder extends SubsystemBase {
       String warning = String.format("Feeder speed clamped: requested %.2f, limited to %.2f",
                                      requestedSpeed, speed);
       DriverStation.reportWarning(warning, false);
-      SmartDashboard.putString("Feeder Warning", warning);
     }
 
     m_FeederMotor.set(speed);
-    SmartDashboard.putNumber("Feeder/Feeder speed", speed);
+    SmartDashboard.putNumber("Subsystem: Feeder/Speed", speed);
   }
 
   public void stopFeederMotor() {
     m_FeederMotor.stopMotor();
-    SmartDashboard.putNumber("Feeder/Feeder speed", 0);
+    SmartDashboard.putNumber("Subsystem: Feeder/Speed", 0);
   }
 
   public double getCurrent() {
@@ -63,7 +66,7 @@ public class Feeder extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Feeder/Feeder Current (A)", getCurrent());
+    SmartDashboard.putNumber("Subsystem: Feeder/Current (A)", getCurrent());
   }
 
   @Override

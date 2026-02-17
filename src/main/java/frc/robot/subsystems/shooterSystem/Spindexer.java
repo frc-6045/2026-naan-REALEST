@@ -24,6 +24,11 @@ public class Spindexer extends SubsystemBase {
 
     updateMotorSettings(m_SpindexerMotor);
     m_SpindexerMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+
+    // Initialize SmartDashboard values
+    SmartDashboard.putNumber("Subsystem: Spindexer/Speed", 0);
+    SmartDashboard.putNumber("Subsystem: Spindexer/Current (A)", 0);
+    SmartDashboard.putNumber("Subsystem: Spindexer/Velocity (RPM)", 0);
   }
 
    public void updateMotorSettings(SparkFlex motor) {
@@ -44,16 +49,15 @@ public class Spindexer extends SubsystemBase {
       String warning = String.format("Spindexer speed clamped: requested %.2f, limited to %.2f",
                                      requestedSpeed, speed);
       DriverStation.reportWarning(warning, false);
-      SmartDashboard.putString("Spindexer Warning", warning);
     }
 
     m_SpindexerMotor.set(speed);
-    SmartDashboard.putNumber("Spindexer/Spindexer speed", speed);
+    SmartDashboard.putNumber("Subsystem: Spindexer/Speed", speed);
   }
 
   public void stopSpindexerMotor() {
     m_SpindexerMotor.stopMotor();
-    SmartDashboard.putNumber("Spindexer/Spindexer speed", 0);
+    SmartDashboard.putNumber("Subsystem: Spindexer/Speed", 0);
   }
 
   public double getRPM() {
@@ -66,8 +70,8 @@ public class Spindexer extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Spindexer/Spindexer Current (A)", getCurrent());
-    SmartDashboard.putNumber("Spindexer/Spindexer Velocity (RPM)", getRPM());
+    SmartDashboard.putNumber("Subsystem: Spindexer/Current (A)", getCurrent());
+    SmartDashboard.putNumber("Subsystem: Spindexer/Velocity (RPM)", getRPM());
   }
 
   @Override

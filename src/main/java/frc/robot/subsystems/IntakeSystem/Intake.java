@@ -25,10 +25,13 @@ public class Intake extends SubsystemBase {
   @SuppressWarnings("deprecation")
   public Intake() {
     m_IntakeMotor = new SparkFlex(MotorConstants.kIntakeMotorCanID, MotorType.kBrushless);
-    
 
     updateMotorSettings(m_IntakeMotor);
     m_IntakeMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+
+    // Initialize SmartDashboard values
+    SmartDashboard.putNumber("Subsystem: Intake/Speed", 0);
+    SmartDashboard.putNumber("Subsystem: Intake/Current (A)", 0);
   }
 
    public void updateMotorSettings(SparkFlex motor) {
@@ -51,7 +54,6 @@ public class Intake extends SubsystemBase {
       String warning = String.format("Intake speed clamped: requested %.2f, limited to %.2f",
                                      requestedSpeed, speed);
       DriverStation.reportWarning(warning, false);
-      SmartDashboard.putString("Intake Warning", warning);
     }
 
     m_TargetSpeed = speed;
@@ -69,8 +71,8 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     // Apply rate-limited speed to motor each cycle for smooth ramp-up/ramp-down
     m_IntakeMotor.set(m_TargetSpeed);
-    SmartDashboard.putNumber("Intake/Intake speed", m_TargetSpeed);
-    SmartDashboard.putNumber("Intake/Intake Current (A)", getCurrent());
+    SmartDashboard.putNumber("Subsystem: Intake/Speed", m_TargetSpeed);
+    SmartDashboard.putNumber("Subsystem: Intake/Current (A)", getCurrent());
   }
 
   @Override

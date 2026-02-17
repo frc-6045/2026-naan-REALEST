@@ -32,10 +32,6 @@ public class Flywheel extends SubsystemBase {
 
   @SuppressWarnings("deprecation")
   public Flywheel() {
-    SmartDashboard.putNumber("Flywheel/PIDF/P", MotorConstants.kShooterP);
-    SmartDashboard.putNumber("Flywheel/PIDF/I", MotorConstants.kShooterI);
-    SmartDashboard.putNumber("Flywheel/PIDF/D", MotorConstants.kShooterD);
-    SmartDashboard.putNumber("Flywheel/PIDF/FF", MotorConstants.kShooterFF);
     m_FlywheelMotor1 = new SparkFlex(MotorConstants.kShooterMotor1CanID, MotorType.kBrushless);
     m_FlywheelMotor2 = new SparkFlex(MotorConstants.kShooterMotor2CanID, MotorType.kBrushless);
 
@@ -51,8 +47,18 @@ public class Flywheel extends SubsystemBase {
     m_FlywheelPIDController1 = m_FlywheelMotor1.getClosedLoopController();
     m_FlywheelPIDController2 = m_FlywheelMotor2.getClosedLoopController();
 
-    // Initialize SmartDashboard target RPM input (editable in Elastic)
-    SmartDashboard.putNumber("Flywheel/Target RPM Input", MotorConstants.kShooterTargetRPM);
+    // Initialize SmartDashboard values
+    SmartDashboard.putNumber("Subsystem: Flywheel/Target RPM Input", MotorConstants.kShooterTargetRPM);
+    SmartDashboard.putNumber("Subsystem: Flywheel/Target RPM", 0);
+    SmartDashboard.putNumber("Subsystem: Flywheel/Speed", 0);
+    SmartDashboard.putNumber("Subsystem: Flywheel/Velocity (RPM)", 0);
+    SmartDashboard.putNumber("Subsystem: Flywheel/Motor 1 Velocity", 0);
+    SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Velocity", 0);
+    SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/P", MotorConstants.kShooterP);
+    SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/I", MotorConstants.kShooterI);
+    SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/D", MotorConstants.kShooterD);
+    SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/FF", MotorConstants.kShooterFF);
+    SmartDashboard.putString("Subsystem: Flywheel/PIDF/Status", "OK");
   }
 
   /**
@@ -61,7 +67,7 @@ public class Flywheel extends SubsystemBase {
    * @return The target RPM set in SmartDashboard
    */
   public double getTargetRPMFromDashboard() {
-    return SmartDashboard.getNumber("Flywheel/Target RPM Input", MotorConstants.kShooterTargetRPM);
+    return SmartDashboard.getNumber("Subsystem: Flywheel/Target RPM Input", MotorConstants.kShooterTargetRPM);
   }
 
   public void updateMotorSettings(SparkFlex motor) {
@@ -81,32 +87,30 @@ public class Flywheel extends SubsystemBase {
 
   public void setSpeed(double speed) {
     double requestedSpeed = speed;
-    SmartDashboard.putNumber("Flywheel requested speed", speed);
     speed = MathUtil.clamp(speed, -MotorConstants.kShooterMotorMaximumSpeed, MotorConstants.kShooterMotorMaximumSpeed);
 
     if (Math.abs(requestedSpeed) > Math.abs(speed)) {
       String warning = String.format("Flywheel speed clamped: requested %.2f, limited to %.2f",
                                      requestedSpeed, speed);
       DriverStation.reportWarning(warning, false);
-      SmartDashboard.putString("Flywheel Warning", warning);
     }
 
     m_FlywheelMotor1.set(speed);
     m_FlywheelMotor2.set(speed);
-    SmartDashboard.putNumber("Flywheel/Flywheel speed", speed);
+    SmartDashboard.putNumber("Subsystem: Flywheel/Speed", speed);
   }
 
   public void stopFlywheelMotor() {
     m_FlywheelMotor1.stopMotor();
     m_FlywheelMotor2.stopMotor();
-    SmartDashboard.putNumber("Flywheel/Flywheel speed", 0);
+    SmartDashboard.putNumber("Subsystem: Flywheel/Speed", 0);
   }
 
   // PID Velocity Control Methods
   public void setTargetRPM(double targetRPM) {
     m_FlywheelPIDController1.setReference(targetRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     m_FlywheelPIDController2.setReference(targetRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    SmartDashboard.putNumber("Flywheel/Target RPM", targetRPM);
+    SmartDashboard.putNumber("Subsystem: Flywheel/Target RPM", targetRPM);
   }
 
   // Get current flywheel velocity in RPM
@@ -123,15 +127,15 @@ public class Flywheel extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Flywheel/Flywheel Velocity (RPM)", getRPM());
-    SmartDashboard.putNumber("Flywheel/Motor 1 Velocity", m_FlywheelMotor1.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Flywheel/Motor 2 Velocity", m_FlywheelMotor2.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Subsystem: Flywheel/Velocity (RPM)", getRPM());
+    SmartDashboard.putNumber("Subsystem: Flywheel/Motor 1 Velocity", m_FlywheelMotor1.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Velocity", m_FlywheelMotor2.getEncoder().getVelocity());
 
     // Live PID tuning - check if values changed on SmartDashboard
-    double tunedP = SmartDashboard.getNumber("Flywheel/PIDF/P", MotorConstants.kShooterP);
-    double tunedI = SmartDashboard.getNumber("Flywheel/PIDF/I", MotorConstants.kShooterI);
-    double tunedD = SmartDashboard.getNumber("Flywheel/PIDF/D", MotorConstants.kShooterD);
-    double tunedFF = SmartDashboard.getNumber("Flywheel/PIDF/FF", MotorConstants.kShooterFF);
+    double tunedP = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/P", MotorConstants.kShooterP);
+    double tunedI = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/I", MotorConstants.kShooterI);
+    double tunedD = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/D", MotorConstants.kShooterD);
+    double tunedFF = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/FF", MotorConstants.kShooterFF);
 
     // If any PID value changed, update motor controllers
     if (tunedP != m_lastP || tunedI != m_lastI || tunedD != m_lastD || tunedFF != m_lastFF) {
@@ -151,9 +155,9 @@ public class Flywheel extends SubsystemBase {
       m_lastD = tunedD;
       m_lastFF = tunedFF;
 
-      SmartDashboard.putString("Flywheel/PIDF/PID Status", "Updated!");
+      SmartDashboard.putString("Subsystem: Flywheel/PIDF/Status", "Updated!");
     } else {
-      SmartDashboard.putString("Flywheel/PIDF/PID Status", "OK");
+      SmartDashboard.putString("Subsystem: Flywheel/PIDF/Status", "OK");
     }
   }
 

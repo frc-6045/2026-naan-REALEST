@@ -27,6 +27,10 @@ public class IntakePivot extends SubsystemBase {
 
     updateMotorSettings(m_IntakeDeployMotor);
     m_IntakeDeployMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+
+    // Initialize SmartDashboard values
+    SmartDashboard.putNumber("Subsystem: Intake Pivot/Speed", 0);
+    SmartDashboard.putNumber("Subsystem: Intake Pivot/Current (A)", 0);
   }
 
    public void updateMotorSettings(SparkFlex motor) {
@@ -48,7 +52,6 @@ public class IntakePivot extends SubsystemBase {
       String warning = String.format("Intake pivot speed clamped: requested %.2f, limited to %.2f",
                                      requestedSpeed, speed);
       DriverStation.reportWarning(warning, false);
-      SmartDashboard.putString("Intake pivot Warning", warning);
     }
 
     m_TargetSpeed = speed;
@@ -66,8 +69,8 @@ public class IntakePivot extends SubsystemBase {
   public void periodic() {
     double limitedSpeed = m_RampLimiter.calculate(m_TargetSpeed);
     m_IntakeDeployMotor.set(limitedSpeed);
-    SmartDashboard.putNumber("Intake/Intake pivot speed", limitedSpeed);
-    SmartDashboard.putNumber("Intake/Intake pivot current (A)", getCurrent());
+    SmartDashboard.putNumber("Subsystem: Intake Pivot/Speed", limitedSpeed);
+    SmartDashboard.putNumber("Subsystem: Intake Pivot/Current (A)", getCurrent());
   }
 
   @Override

@@ -41,14 +41,21 @@ public class TopRoller extends SubsystemBase {
     m_Encoder = m_Motor.getEncoder();
     m_PIDController = m_Motor.getClosedLoopController();
 
-    // Initialize SmartDashboard target RPM input (editable in Elastic)
-    SmartDashboard.putNumber("Roller/Target RPM Input", MotorConstants.kRollerTargetRPM);
-
-    // Initialize SmartDashboard PID tuning values
-    SmartDashboard.putNumber("Roller/PIDF/P", MotorConstants.kRollerP);
-    SmartDashboard.putNumber("Roller/PIDF/I", MotorConstants.kRollerI);
-    SmartDashboard.putNumber("Roller/PIDF/D", MotorConstants.kRollerD);
-    SmartDashboard.putNumber("Roller/PIDF/FF", MotorConstants.kRollerFF);
+    // Initialize SmartDashboard values
+    SmartDashboard.putNumber("Subsystem: Roller/Target RPM Input", MotorConstants.kRollerTargetRPM);
+    SmartDashboard.putNumber("Subsystem: Roller/Target RPM", 0);
+    SmartDashboard.putNumber("Subsystem: Roller/Speed", 0);
+    SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", 0);
+    SmartDashboard.putNumber("Subsystem: Roller/Debug/Encoder Position", 0);
+    SmartDashboard.putNumber("Subsystem: Roller/Debug/Output Current (A)", 0);
+    SmartDashboard.putNumber("Subsystem: Roller/Debug/Applied Output", 0);
+    SmartDashboard.putNumber("Subsystem: Roller/Debug/Motor Temp (C)", 0);
+    SmartDashboard.putNumber("Subsystem: Roller/Debug/Faults", 0);
+    SmartDashboard.putNumber("Subsystem: Roller/PIDF/P", MotorConstants.kRollerP);
+    SmartDashboard.putNumber("Subsystem: Roller/PIDF/I", MotorConstants.kRollerI);
+    SmartDashboard.putNumber("Subsystem: Roller/PIDF/D", MotorConstants.kRollerD);
+    SmartDashboard.putNumber("Subsystem: Roller/PIDF/FF", MotorConstants.kRollerFF);
+    SmartDashboard.putString("Subsystem: Roller/PIDF/Status", "OK");
   }
 
   /**
@@ -57,7 +64,7 @@ public class TopRoller extends SubsystemBase {
    * @return The target RPM set in SmartDashboard
    */
   public double getTargetRPMFromDashboard() {
-    return SmartDashboard.getNumber("Roller/Target RPM Input", MotorConstants.kRollerTargetRPM);
+    return SmartDashboard.getNumber("Subsystem: Roller/Target RPM Input", MotorConstants.kRollerTargetRPM);
   }
 
   public void updateHoodMotorSettings() {
@@ -92,23 +99,22 @@ public class TopRoller extends SubsystemBase {
       String warning = String.format("Roller speed clamped: requested %.2f, limited to %.2f",
                                      requestedSpeed, speed);
       DriverStation.reportWarning(warning, false);
-      SmartDashboard.putString("Roller Warning", warning);
     }
 
     m_Motor.set(speed);
-    SmartDashboard.putNumber("Roller/Roller speed", speed);
+    SmartDashboard.putNumber("Subsystem: Roller/Speed", speed);
   }
 
   /** Stop the hood motor and report zero speed to dashboard. */
   public void stopRollerMotor() {
     m_Motor.stopMotor();
-    SmartDashboard.putNumber("Roller/Roller speed", 0);
+    SmartDashboard.putNumber("Subsystem: Roller/Speed", 0);
   }
 
   // PID Velocity Control Methods
   public void setRPM(double targetRPM) {
     m_PIDController.setReference(targetRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    SmartDashboard.putNumber("Roller/Target RPM", targetRPM);
+    SmartDashboard.putNumber("Subsystem: Roller/Target RPM", targetRPM);
   }
 
   // Get current flywheel velocity in RPM
@@ -126,20 +132,20 @@ public class TopRoller extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Roller/Roller Velocity (RPM)", getRPM());
+    SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", getRPM());
 
     // Diagnostics - remove after debugging
-    SmartDashboard.putNumber("Roller/Debug/Encoder Position", m_Encoder.getPosition());
-    SmartDashboard.putNumber("Roller/Debug/Output Current (A)", m_Motor.getOutputCurrent());
-    SmartDashboard.putNumber("Roller/Debug/Applied Output", m_Motor.getAppliedOutput());
-    SmartDashboard.putNumber("Roller/Debug/Motor Temp (C)", m_Motor.getMotorTemperature());
-    SmartDashboard.putNumber("Roller/Debug/Faults", m_Motor.getFaults().rawBits);
+    SmartDashboard.putNumber("Subsystem: Roller/Debug/Encoder Position", m_Encoder.getPosition());
+    SmartDashboard.putNumber("Subsystem: Roller/Debug/Output Current (A)", m_Motor.getOutputCurrent());
+    SmartDashboard.putNumber("Subsystem: Roller/Debug/Applied Output", m_Motor.getAppliedOutput());
+    SmartDashboard.putNumber("Subsystem: Roller/Debug/Motor Temp (C)", m_Motor.getMotorTemperature());
+    SmartDashboard.putNumber("Subsystem: Roller/Debug/Faults", m_Motor.getFaults().rawBits);
 
     // Live PID tuning - check if values changed on SmartDashboard
-    double tunedP = SmartDashboard.getNumber("Roller/PIDF/P", MotorConstants.kRollerP);
-    double tunedI = SmartDashboard.getNumber("Roller/PIDF/I", MotorConstants.kRollerI);
-    double tunedD = SmartDashboard.getNumber("Roller/PIDF/D", MotorConstants.kRollerD);
-    double tunedFF = SmartDashboard.getNumber("Roller/PIDF/FF", MotorConstants.kRollerFF);
+    double tunedP = SmartDashboard.getNumber("Subsystem: Roller/PIDF/P", MotorConstants.kRollerP);
+    double tunedI = SmartDashboard.getNumber("Subsystem: Roller/PIDF/I", MotorConstants.kRollerI);
+    double tunedD = SmartDashboard.getNumber("Subsystem: Roller/PIDF/D", MotorConstants.kRollerD);
+    double tunedFF = SmartDashboard.getNumber("Subsystem: Roller/PIDF/FF", MotorConstants.kRollerFF);
 
     // If any PID value changed, update motor controller
     if (tunedP != m_lastP || tunedI != m_lastI || tunedD != m_lastD || tunedFF != m_lastFF) {
@@ -156,9 +162,9 @@ public class TopRoller extends SubsystemBase {
       m_lastD = tunedD;
       m_lastFF = tunedFF;
 
-      SmartDashboard.putString("Roller/PIDF/PID Status", "Updated!");
+      SmartDashboard.putString("Subsystem: Roller/PIDF/Status", "Updated!");
     } else {
-      SmartDashboard.putString("Roller/PIDF/PID Status", "OK");
+      SmartDashboard.putString("Subsystem: Roller/PIDF/Status", "OK");
     }
   }
 
