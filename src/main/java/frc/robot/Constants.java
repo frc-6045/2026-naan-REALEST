@@ -147,9 +147,9 @@ public final class Constants {
   public static class AimConstants {
     // Rotation PID gains for auto-aim
     // TODO: Tune these values empirically on the robot
-    public static final double kAimP = 0.05; // Proportional gain
+    public static final double kAimP = 0.15; // Proportional gain
     public static final double kAimI = 0.0; // Integral gain
-    public static final double kAimD = 0.005; // Derivative gain
+    public static final double kAimD = 0.01; // Derivative gain
     public static final double kAimToleranceDegrees = 2.0; // Acceptable aim error (degrees)
     public static final double kMaxAutoRotationRadPerSec = 3.0; // Max rotation speed during auto-aim (rad/s)
   }
