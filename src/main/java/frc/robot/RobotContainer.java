@@ -9,7 +9,6 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.TopRoller;
-import frc.robot.subsystems.shooterSystem.Vision;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.shooterSystem.Spindexer;
@@ -19,9 +18,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-
 
 public class RobotContainer {
   private Autos m_Autos;
@@ -32,8 +29,6 @@ public class RobotContainer {
   private final TopRoller m_TopRoller = new TopRoller();
   private final Feeder m_Feeder = new Feeder();
   private final Swerve m_Swerve = new Swerve();
-  private final Vision m_Vision = new Vision();
-
   private final PowerDistribution m_pdh = new PowerDistribution(1, ModuleType.kRev);
 
   private final CommandXboxController m_driverController =
@@ -41,11 +36,10 @@ public class RobotContainer {
   private final CommandXboxController m_operatorController =
       new CommandXboxController(OperatorConstants.kOperatorControllerPort);
   private final CommandXboxController m_testController =
-      new CommandXboxController(3);
+      new CommandXboxController(OperatorConstants.kTestControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    CommandScheduler.getInstance().registerSubsystem(m_Vision);
     m_pdh.setSwitchableChannel(true);
     m_Autos = new Autos(m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve);
     Bindings.configureBindings(m_driverController, m_operatorController, m_testController, m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve);
@@ -55,13 +49,12 @@ public class RobotContainer {
     // Set default swerve drive command
     m_Swerve.setDefaultCommand(
         m_Swerve.driveCommand(
-            () -> -MathUtil.applyDeadband(m_driverController.getLeftY()+m_operatorController.getLeftY(), ControllerConstants.kDeadband),
-            () -> -MathUtil.applyDeadband(m_driverController.getLeftX()+m_operatorController.getLeftX(), ControllerConstants.kDeadband),
-            () -> -MathUtil.applyDeadband(m_driverController.getRightX()+m_operatorController.getRightX(), ControllerConstants.kDeadband)
+            () -> -MathUtil.applyDeadband(m_driverController.getLeftY() + m_operatorController.getLeftY(), ControllerConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(m_driverController.getLeftX() + m_operatorController.getLeftX(), ControllerConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(m_driverController.getRightX() + m_operatorController.getRightX(), ControllerConstants.kDeadband)
         )
     );
   }
-
 
   public Command getAutonomousCommand() {
     return m_Autos.getAutonomousCommand();

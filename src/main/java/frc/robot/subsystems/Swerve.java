@@ -51,7 +51,7 @@ public class Swerve extends SubsystemBase {
         m_swerveDrive.setHeadingCorrection(false);
         m_swerveDrive.setCosineCompensator(false);
         m_swerveDrive.setAngularVelocityCompensation(true, true, 0.1);
-        m_swerveDrive.setModuleEncoderAutoSynchronize(true, 1); // TODO: orignially false, testign stuff
+        m_swerveDrive.setModuleEncoderAutoSynchronize(true, 1);
 
         // Setup PathPlanner
         setupPathPlanner();
@@ -157,24 +157,6 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Drive the robot with field-oriented ChassisSpeeds.
-     *
-     * @param velocity ChassisSpeeds object representing the desired field-relative velocities
-     */
-    public void driveFieldOriented(ChassisSpeeds velocity) {
-       // m_swerveDrive.driveFieldOriented(velocity);
-    }
-
-    /**
-     * Drive the robot with robot-oriented ChassisSpeeds.
-     *
-     * @param velocity ChassisSpeeds object representing the desired robot-relative velocities
-     */
-    public void drive(ChassisSpeeds velocity) {
-       // m_swerveDrive.drive(velocity);
-    }
-
-    /**
      * Set the chassis speeds directly.
      *
      * @param chassisSpeeds Desired chassis speeds
@@ -270,7 +252,7 @@ public class Swerve extends SubsystemBase {
     /**
      * Zeros the gyro and resets odometry to face the correct direction based on alliance.
      * Red alliance faces 180 degrees, blue alliance faces 0 degrees.
- //programmer lead    */
+     */
     public void zeroGyroWithAlliance() {
         if (isRedAlliance()) {
             zeroGyro();
@@ -279,7 +261,7 @@ public class Swerve extends SubsystemBase {
             zeroGyro();
         }
     }
-//programmer lead
+
     /**
      * Locks the swerve modules in an X pattern to prevent movement.
      */
@@ -317,6 +299,5 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {
         // Telemetry is handled by YAGSL's SwerveDriveTelemetry when verbosity is HIGH
-       // System.out.println("Yaw(deg): " + m_swerveDrive.getYaw().getDegrees());
     }
 }

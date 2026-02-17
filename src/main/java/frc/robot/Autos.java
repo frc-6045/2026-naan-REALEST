@@ -4,10 +4,10 @@
 
 package frc.robot;
 
+import java.util.Set;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
-import java.util.Set;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -21,19 +21,21 @@ import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
 import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.StowIntake;
+import frc.robot.commands.ShootFeedCommands.AutoAimAndShoot;
+import frc.robot.commands.ShootFeedCommands.AutoAimPrepare;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.SpindexerCommands.StopSpindexer;
-import frc.robot.subsystems.shooterSystem.Feeder;
-import frc.robot.subsystems.shooterSystem.Flywheel;
-import frc.robot.subsystems.shooterSystem.TopRoller;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
-import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.shooterSystem.Feeder;
+import frc.robot.subsystems.shooterSystem.Flywheel;
+import frc.robot.subsystems.shooterSystem.Spindexer;
+import frc.robot.subsystems.shooterSystem.TopRoller;
 
 public class Autos {
 
-    private SendableChooser<Command> autoChooser;
+    private final SendableChooser<Command> m_autoChooser;
 
   /**
    * TO REGISTER A COMMAND IN PATHPLANNER
@@ -42,7 +44,7 @@ public class Autos {
    * PID stuff (untimed commmands) should use .asProxy();
    *
    * ADD AUTO TO AUTO CHOOSER
-   * autoChooser.addOption("exampleAutoName", AutoBuilder.buildAuto("NameOfAutoInPathplanner"));
+   * m_autoChooser.addOption("exampleAutoName", AutoBuilder.buildAuto("NameOfAutoInPathplanner"));
    */
   public Autos(Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve) {
     // PathPlanner AutoBuilder is configured in Swerve subsystem
@@ -60,7 +62,7 @@ public class Autos {
     NamedCommands.registerCommand("stopSpindexer", new StopSpindexer(spindexer));
 
     // Flywheel commands
-    // NamedCommands.registerCommand("spinUpShooter", new RevShooter(flywheel).asProxy());
+    NamedCommands.registerCommand("spinUpShooter", new RevShooter(flywheel, topRoller).asProxy());
     NamedCommands.registerCommand("stopShooter", new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel));
 
     // Feeder commands
@@ -76,10 +78,10 @@ public class Autos {
       )
     ));
 
-    // NamedCommands.registerCommand("shoot", new SequentialCommandGroup(
-    //   new RevShooter(flywheel).until(() -> flywheel.isAtTargetSpeed(MotorConstants.kShooterTargetRPM)),
-    //   new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederSpeed), feeder)
-    // ).asProxy());
+    NamedCommands.registerCommand("shoot", new SequentialCommandGroup(
+      new RevShooter(flywheel, topRoller).until(() -> flywheel.isAtTargetSpeed(MotorConstants.kShooterTargetRPM)),
+      new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederSpeed), feeder)
+    ).asProxy());
 
     NamedCommands.registerCommand("stopAll", new ParallelCommandGroup(
       new InstantCommand(() -> intake.stopIntakeMotor(), intake),
@@ -90,28 +92,28 @@ public class Autos {
 
     // Auto-aim commands (Limelight-based shooting for autonomous)
 
-    // // Prep only -- spins flywheel + sets top roller while PathPlanner drives
-    // NamedCommands.registerCommand("autoAim", new AutoAimPrepare(flywheel, topRoller).asProxy());
+    // Prep only -- spins flywheel + sets top roller while PathPlanner drives
+    NamedCommands.registerCommand("autoAim", new AutoAimPrepare(flywheel, topRoller).asProxy());
 
-    // // Full stop-aim-shoot -- stops driving, rotates to target, fires, ends after feeding
-    // NamedCommands.registerCommand("autoAimAndShoot", Commands.defer(() -> {
-    //   Timer feedTimer = new Timer();
-    //   AutoAimAndShoot cmd = new AutoAimAndShoot(
-    //       swerve, flywheel, topRoller, feeder, spindexer, () -> 0.0, () -> 0.0);
+    // Full stop-aim-shoot -- stops driving, rotates to target, fires, ends after feeding
+    NamedCommands.registerCommand("autoAimAndShoot", Commands.defer(() -> {
+      Timer feedTimer = new Timer();
+      AutoAimAndShoot cmd = new AutoAimAndShoot(
+          swerve, flywheel, topRoller, feeder, spindexer, () -> 0.0, () -> 0.0);
 
-    //   return cmd.until(() -> {
-    //     if (cmd.isFeedingActive()) {
-    //       if (!feedTimer.isRunning()) {
-    //         feedTimer.start();
-    //       }
-    //       return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
-    //     }
-    //     return false;
-    //   }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
-    //     .withTimeout(ShootingConstants.kAutoShootTimeoutSec);
-    // }, Set.of(swerve, flywheel, topRoller, feeder, spindexer)).asProxy());
+      return cmd.until(() -> {
+        if (cmd.isFeedingActive()) {
+          if (!feedTimer.isRunning()) {
+            feedTimer.start();
+          }
+          return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
+        }
+        return false;
+      }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
+        .withTimeout(ShootingConstants.kAutoShootTimeoutSec);
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer)).asProxy());
 
-    // // Cancel prep -- stops flywheel and top roller
+    // Cancel prep -- stops flywheel and top roller
     NamedCommands.registerCommand("stopAim", new ParallelCommandGroup(
       new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel),
       new InstantCommand(() -> topRoller.stopRollerMotor(), topRoller)
@@ -119,17 +121,17 @@ public class Autos {
 
     // --- Auto Chooser ---
 
-    autoChooser = new SendableChooser<>();
-    autoChooser.setDefaultOption("None", null);
+    m_autoChooser = new SendableChooser<>();
+    m_autoChooser.setDefaultOption("None", null);
 
     // Add autos to chooser
-    autoChooser.addOption("normal auto", AutoBuilder.buildAuto("halfauto"));
-    autoChooser.addOption("quarter-field auto", AutoBuilder.buildAuto("quarterauto"));
+    m_autoChooser.addOption("normal auto", AutoBuilder.buildAuto("halfauto"));
+    m_autoChooser.addOption("quarter-field auto", AutoBuilder.buildAuto("quarterauto"));
 
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
 
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    return m_autoChooser.getSelected();
   }
 }

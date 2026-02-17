@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 
+@SuppressWarnings({"deprecation","removal"})
 public class TopRoller extends SubsystemBase {
   private final SparkFlex m_Motor;
   private final SparkFlexConfig m_rollerConfig = new SparkFlexConfig();
@@ -30,7 +31,6 @@ public class TopRoller extends SubsystemBase {
   private double m_lastD = MotorConstants.kRollerD;
   private double m_lastFF = MotorConstants.kRollerFF;
 
-  @SuppressWarnings("deprecation")
   public TopRoller() {
     m_Motor = new SparkFlex(MotorConstants.kTopRollerMotorCanID, MotorType.kBrushless);
 
@@ -72,9 +72,8 @@ public class TopRoller extends SubsystemBase {
         .idleMode(IdleMode.kBrake)
         .inverted(true)
         .smartCurrentLimit(MotorConstants.kTopRollerCurrentLimit)
-        .openLoopRampRate(.167)
-        .closedLoopRampRate(.167);
-    // Configure encoder - velocity is already in RPM for brushless motors
+        .openLoopRampRate(0.167)
+        .closedLoopRampRate(0.167);
     m_rollerConfig.encoder
         .velocityConversionFactor(1.0)  // 1:1, no gearing - raw motor RPM
         .positionConversionFactor(1.0);
@@ -111,23 +110,18 @@ public class TopRoller extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Roller/Speed", 0);
   }
 
-  // PID Velocity Control Methods
   public void setRPM(double targetRPM) {
     m_PIDController.setReference(targetRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     SmartDashboard.putNumber("Subsystem: Roller/Target RPM", targetRPM);
   }
 
-  // Get current flywheel velocity in RPM
   public double getRPM() {
-    // if (m_Motor.getEncoder().getVelocity()!=0)
-    // System.out.println(m_Motor.getEncoder().getVelocity());
     return m_Encoder.getVelocity();
   }
 
-  // Check if flywheel is at target speed (within tolerance)
   public boolean isAtTargetSpeed(double targetRPM) {
     double currentVelocity = getRPM();
-    return Math.abs(currentVelocity - targetRPM) < MotorConstants.kShooterRPMTolerance;
+    return Math.abs(currentVelocity - targetRPM) < MotorConstants.kRollerRPMTolerance;
   }
 
   @Override
@@ -135,19 +129,17 @@ public class TopRoller extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", getRPM());
     SmartDashboard.putNumber("Subsystem: Roller/Current (A)", m_Motor.getOutputCurrent());
 
-    // Diagnostics - remove after debugging
+    // TODO: Remove debug telemetry after testing
     SmartDashboard.putNumber("Subsystem: Roller/Debug/Encoder Position", m_Encoder.getPosition());
     SmartDashboard.putNumber("Subsystem: Roller/Debug/Applied Output", m_Motor.getAppliedOutput());
     SmartDashboard.putNumber("Subsystem: Roller/Debug/Motor Temp (C)", m_Motor.getMotorTemperature());
     SmartDashboard.putNumber("Subsystem: Roller/Debug/Faults", m_Motor.getFaults().rawBits);
 
-    // Live PID tuning - check if values changed on SmartDashboard
     double tunedP = SmartDashboard.getNumber("Subsystem: Roller/PIDF/P", MotorConstants.kRollerP);
     double tunedI = SmartDashboard.getNumber("Subsystem: Roller/PIDF/I", MotorConstants.kRollerI);
     double tunedD = SmartDashboard.getNumber("Subsystem: Roller/PIDF/D", MotorConstants.kRollerD);
     double tunedFF = SmartDashboard.getNumber("Subsystem: Roller/PIDF/FF", MotorConstants.kRollerFF);
 
-    // If any PID value changed, update motor controller
     if (tunedP != m_lastP || tunedI != m_lastI || tunedD != m_lastD || tunedFF != m_lastFF) {
       m_rollerConfig.closedLoop
           .p(tunedP)
@@ -167,7 +159,4 @@ public class TopRoller extends SubsystemBase {
       SmartDashboard.putString("Subsystem: Roller/PIDF/Status", "OK");
     }
   }
-
-  @Override
-  public void simulationPeriodic() {}
 }

@@ -17,7 +17,7 @@ import frc.robot.Constants.MotorConstants;
 
 public class IntakePivot extends SubsystemBase {
   private final SparkFlex m_IntakeDeployMotor;
-  SparkFlexConfig config = new SparkFlexConfig();
+  private final SparkFlexConfig m_config = new SparkFlexConfig();
   private final SlewRateLimiter m_RampLimiter = new SlewRateLimiter(MotorConstants.kIntakeRampRate);
   private double m_TargetSpeed = 0.0;
 
@@ -25,21 +25,21 @@ public class IntakePivot extends SubsystemBase {
   public IntakePivot() {
     m_IntakeDeployMotor = new SparkFlex(MotorConstants.kIntakeDeployMotorCanID, MotorType.kBrushless);
 
-    updateMotorSettings(m_IntakeDeployMotor);
-    m_IntakeDeployMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    updateMotorSettings();
+    m_IntakeDeployMotor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     // Initialize SmartDashboard values
     SmartDashboard.putNumber("Subsystem: Intake Pivot/Speed", 0);
     SmartDashboard.putNumber("Subsystem: Intake Pivot/Current (A)", 0);
   }
 
-   public void updateMotorSettings(SparkFlex motor) {
-    config
+  private void updateMotorSettings() {
+    m_config
         .idleMode(IdleMode.kCoast)
-        .smartCurrentLimit(MotorConstants.kIntakeCurrentLimit)
-        .openLoopRampRate(.167)
-        .closedLoopRampRate(.167);
-    config.closedLoop
+        .smartCurrentLimit(MotorConstants.kIntakePivotCurrentLimit)
+        .openLoopRampRate(0.167)
+        .closedLoopRampRate(0.167);
+    m_config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
   }
 
@@ -72,7 +72,4 @@ public class IntakePivot extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Intake Pivot/Speed", limitedSpeed);
     SmartDashboard.putNumber("Subsystem: Intake Pivot/Current (A)", getCurrent());
   }
-
-  @Override
-  public void simulationPeriodic() {}
 }

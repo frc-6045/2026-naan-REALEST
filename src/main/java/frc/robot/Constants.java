@@ -15,11 +15,10 @@ import edu.wpi.first.wpilibj.DriverStation;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final String LIMELIGHT = "limelight-sabre";
-  
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
+    public static final int kTestControllerPort = 3;
   }
   
   public static class ControllerConstants {
@@ -94,11 +93,7 @@ public final class Constants {
     public static final double kShooterTargetRPM = 1450.0; // Target shooter wheel speed in RPM
     public static final double kRollerTargetRPM = 2700; // Target shooter wheel speed in RPM
     public static final double kShooterRPMTolerance = 200.0; // Acceptable RPM tolerance before feeding
-
-  }
-
-  public static class PositionConstants {
-
+    public static final double kRollerRPMTolerance = 200.0; // Acceptable roller RPM tolerance before feeding
   }
 
   public static class SwerveConstants {
@@ -106,7 +101,6 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 4.5;
     // Maximum angular speed in radians per second
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI * 2;
-    // Joystick deadband for driving - use ControllerConstants.kDeadband instead
   }
 
   public static class LimelightConstants {
@@ -190,7 +184,7 @@ public final class Constants {
     public static final double kMaxDistanceAdjustmentMeters = 1.5;
   }
 
-  public static enum Directions {
+  public enum Directions {
     IN,
     OUT,
     TOGGLE
