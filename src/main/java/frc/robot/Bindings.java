@@ -16,6 +16,7 @@ import frc.robot.commands.IntakeCommands.RunIntake;
 import frc.robot.commands.IntakeCommands.RunIntakePivot;
 import frc.robot.commands.IntakeCommands.StowIntake;
 import frc.robot.commands.ShootFeedCommands.TopRollerOpenLoop;
+import frc.robot.commands.ShootFeedCommands.AutoAimAndShoot;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.ShootFeedCommands.RunFeeder;
 import frc.robot.commands.SpindexerCommands.RunSpindexer;
@@ -49,14 +50,14 @@ public class Bindings {
         m_driverController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
         m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
 
-        // Auto-aim and auto-shoot (driver retains left stick translational control)
-        // m_driverController.rightTrigger(0.5).whileTrue(
-        //     new AutoAimAndShoot(
-        //         swerve, flywheel, topRoller, feeder, spindexer,
-        //         () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
-        //         () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
-        //     )
-        // );
+         //Auto-aim and auto-shoot (driver retains left stick translational control)
+         m_driverController.rightTrigger(0.5).whileTrue(
+             new AutoAimAndShoot(
+                 swerve, flywheel, topRoller, feeder, spindexer,
+                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
+                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
+             )
+         );
 
         /*============================*/
         /*     Operator Bindings      */
