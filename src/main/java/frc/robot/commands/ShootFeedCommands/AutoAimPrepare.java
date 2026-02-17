@@ -30,10 +30,6 @@ public class AutoAimPrepare extends Command {
         // Set Limelight to AprilTag pipeline
         LimelightHelpers.setPipelineIndex(LimelightConstants.kLimelightName, LimelightConstants.kAprilTagPipeline);
 
-        // Filter to only track scoring target AprilTags
-        LimelightHelpers.SetFiducialIDFiltersOverride(
-                LimelightConstants.kLimelightName, LimelightConstants.getTargetAprilTagIDs());
-
         SmartDashboard.putBoolean("AutoAimPrep Active", true);
     }
 

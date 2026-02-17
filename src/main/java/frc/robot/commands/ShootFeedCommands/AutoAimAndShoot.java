@@ -69,10 +69,6 @@ public class AutoAimAndShoot extends Command {
         // Set Limelight to AprilTag pipeline
         LimelightHelpers.setPipelineIndex(LimelightConstants.kLimelightName, LimelightConstants.kAprilTagPipeline);
 
-        // Filter to only track scoring target AprilTags
-        LimelightHelpers.SetFiducialIDFiltersOverride(
-                LimelightConstants.kLimelightName, LimelightConstants.getTargetAprilTagIDs());
-
         m_aimPID.reset();
         m_feeding = false;
 
