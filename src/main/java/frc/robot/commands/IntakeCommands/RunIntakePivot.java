@@ -1,49 +1,36 @@
 package frc.robot.commands.IntakeCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.Constants.Directions;
 import frc.robot.Constants.MotorConstants;
 
 /**
- * Toggles the intake roller motor on/off for game piece collection.
- * This is separate from deploy/stow operations - use DeployIntake/StowIntake for those.
- *
- * IMPORTANT: Bind this command using onTrue(), NOT whileTrue()
- * Example: button.onTrue(new ToggleIntake(intake));
+ * Open-loop control for the intake pivot motor.
+ * Runs the pivot in the specified direction while the button is held,
+ * stops when released.
  */
 public class RunIntakePivot extends Command {
-    private final IntakePivot m_IntakeSubsystem;
-    private final Directions direction;
+    private final IntakePivot m_IntakePivot;
+    private final Directions m_direction;
 
-    public RunIntakePivot(IntakePivot intakeSubsystem, Directions direction) {
-        m_IntakeSubsystem = intakeSubsystem;
-        this.direction = direction;
-        addRequirements(m_IntakeSubsystem);
+    public RunIntakePivot(IntakePivot intakePivot, Directions direction) {
+        m_IntakePivot = intakePivot;
+        m_direction = direction;
+        addRequirements(m_IntakePivot);
     }
 
     @Override
     public void initialize() {
-        if (direction==Directions.IN) {
-            m_IntakeSubsystem.setSpeed(MotorConstants.kIntakeStowSpeed);
-        } else if (direction==Directions.OUT) {
-            m_IntakeSubsystem.setSpeed(MotorConstants.kIntakeDeploySpeed);
-        } else{
-            System.out.println("This is sus.");
+        if (m_direction == Directions.IN) {
+            m_IntakePivot.setSpeed(MotorConstants.kIntakeStowSpeed);
+        } else if (m_direction == Directions.OUT) {
+            m_IntakePivot.setSpeed(MotorConstants.kIntakeDeploySpeed);
         }
-        // // Check if intake roller is currently running (uses higher threshold to avoid detecting deploy/stow)
-        // if (m_IntakeSubsystem.isRollerRunning()) {
-        //     // If running, stop it
-        //     m_IntakeSubsystem.stopIntakeMotor();
-        // } else {
-        //     // If not running, start the roller at intake speed
-        //     m_IntakeSubsystem.setSpeed(MotorConstants.kIntakeRollerSpeed);
-        // }
     }
 
     @Override
     public void end(boolean interrupted) {
-        m_IntakeSubsystem.stopMotor();
+        m_IntakePivot.stopMotor();
     }
 }

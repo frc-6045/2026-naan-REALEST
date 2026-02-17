@@ -21,6 +21,8 @@ import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
 import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.StowIntake;
+import frc.robot.commands.ShootFeedCommands.AutoAimAndShoot;
+import frc.robot.commands.ShootFeedCommands.AutoAimPrepare;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.SpindexerCommands.StopSpindexer;
 import frc.robot.subsystems.shooterSystem.Feeder;
@@ -60,7 +62,7 @@ public class Autos {
     NamedCommands.registerCommand("stopSpindexer", new StopSpindexer(spindexer));
 
     // Flywheel commands
-    // NamedCommands.registerCommand("spinUpShooter", new RevShooter(flywheel).asProxy());
+    NamedCommands.registerCommand("spinUpShooter", new RevShooter(flywheel, topRoller).asProxy());
     NamedCommands.registerCommand("stopShooter", new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel));
 
     // Feeder commands
@@ -76,10 +78,10 @@ public class Autos {
       )
     ));
 
-    // NamedCommands.registerCommand("shoot", new SequentialCommandGroup(
-    //   new RevShooter(flywheel).until(() -> flywheel.isAtTargetSpeed(MotorConstants.kShooterTargetRPM)),
-    //   new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederSpeed), feeder)
-    // ).asProxy());
+    NamedCommands.registerCommand("shoot", new SequentialCommandGroup(
+      new RevShooter(flywheel, topRoller).until(() -> flywheel.isAtTargetSpeed(MotorConstants.kShooterTargetRPM)),
+      new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederSpeed), feeder)
+    ).asProxy());
 
     NamedCommands.registerCommand("stopAll", new ParallelCommandGroup(
       new InstantCommand(() -> intake.stopIntakeMotor(), intake),
@@ -90,28 +92,28 @@ public class Autos {
 
     // Auto-aim commands (Limelight-based shooting for autonomous)
 
-    // // Prep only -- spins flywheel + sets top roller while PathPlanner drives
-    // NamedCommands.registerCommand("autoAim", new AutoAimPrepare(flywheel, topRoller).asProxy());
+    // Prep only -- spins flywheel + sets top roller while PathPlanner drives
+    NamedCommands.registerCommand("autoAim", new AutoAimPrepare(flywheel, topRoller).asProxy());
 
-    // // Full stop-aim-shoot -- stops driving, rotates to target, fires, ends after feeding
-    // NamedCommands.registerCommand("autoAimAndShoot", Commands.defer(() -> {
-    //   Timer feedTimer = new Timer();
-    //   AutoAimAndShoot cmd = new AutoAimAndShoot(
-    //       swerve, flywheel, topRoller, feeder, spindexer, () -> 0.0, () -> 0.0);
+    // Full stop-aim-shoot -- stops driving, rotates to target, fires, ends after feeding
+    NamedCommands.registerCommand("autoAimAndShoot", Commands.defer(() -> {
+      Timer feedTimer = new Timer();
+      AutoAimAndShoot cmd = new AutoAimAndShoot(
+          swerve, flywheel, topRoller, feeder, spindexer, () -> 0.0, () -> 0.0);
 
-    //   return cmd.until(() -> {
-    //     if (cmd.isFeedingActive()) {
-    //       if (!feedTimer.isRunning()) {
-    //         feedTimer.start();
-    //       }
-    //       return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
-    //     }
-    //     return false;
-    //   }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
-    //     .withTimeout(ShootingConstants.kAutoShootTimeoutSec);
-    // }, Set.of(swerve, flywheel, topRoller, feeder, spindexer)).asProxy());
+      return cmd.until(() -> {
+        if (cmd.isFeedingActive()) {
+          if (!feedTimer.isRunning()) {
+            feedTimer.start();
+          }
+          return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
+        }
+        return false;
+      }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
+        .withTimeout(ShootingConstants.kAutoShootTimeoutSec);
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer)).asProxy());
 
-    // // Cancel prep -- stops flywheel and top roller
+    // Cancel prep -- stops flywheel and top roller
     NamedCommands.registerCommand("stopAim", new ParallelCommandGroup(
       new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel),
       new InstantCommand(() -> topRoller.stopRollerMotor(), topRoller)

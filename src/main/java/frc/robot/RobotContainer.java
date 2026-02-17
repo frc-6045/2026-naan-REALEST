@@ -38,7 +38,7 @@ public class RobotContainer {
   private final CommandXboxController m_operatorController =
       new CommandXboxController(OperatorConstants.kOperatorControllerPort);
   private final CommandXboxController m_testController =
-      new CommandXboxController(3);
+      new CommandXboxController(OperatorConstants.kTestControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

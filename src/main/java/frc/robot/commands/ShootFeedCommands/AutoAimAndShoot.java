@@ -152,6 +152,7 @@ public class AutoAimAndShoot extends Command {
                 m_feeding = false;
             }
 
+            // TODO: Disable verbose telemetry before competition events to reduce NetworkTables traffic
             // Telemetry
             SmartDashboard.putNumber("AutoAim Distance", distance);
             SmartDashboard.putNumber("AutoAim Target Roller RPM", targetRollerRPM);
