@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.Directions;
@@ -15,6 +16,7 @@ import frc.robot.commands.IntakeCommands.RunIntakePivot;
 import frc.robot.commands.ShootFeedCommands.AutoAimAndShoot;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.ShootFeedCommands.RunFeeder;
+import frc.robot.commands.ShootFeedCommands.ScanForTarget;
 import frc.robot.commands.ShootFeedCommands.TopRollerOpenLoop;
 import frc.robot.commands.SpindexerCommands.RunSpindexer;
 import frc.robot.subsystems.IntakeSystem.Intake;
@@ -48,13 +50,19 @@ public class Bindings {
         m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
 
         // Auto-aim and auto-shoot (driver retains left stick translational control)
-        m_driverController.rightTrigger(0.5).whileTrue(
-            new AutoAimAndShoot(
-                swerve, flywheel, topRoller, feeder, spindexer,
-                () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
-                () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
-            )
-        );
+        m_driverController.rightTrigger().whileTrue(new SequentialCommandGroup(new ScanForTarget(swerve, m_driverController),
+        new AutoAimAndShoot(
+            swerve, flywheel, topRoller, feeder, spindexer,
+            () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
+        )));
+        // m_driverController.rightTrigger(0.5).whileTrue(
+        //     new AutoAimAndShoot(
+        //         swerve, flywheel, topRoller, feeder, spindexer,
+        //         () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
+        //         () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
+        //     )
+        // );
 
         /*============================*/
         /*     Operator Bindings      */
