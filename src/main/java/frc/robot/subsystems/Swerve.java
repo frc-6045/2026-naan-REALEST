@@ -36,6 +36,12 @@ import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+
 public class Swerve extends SubsystemBase {
     private final SwerveDrive m_swerveDrive;
 
@@ -359,10 +365,20 @@ public class Swerve extends SubsystemBase {
 
             for (SwerveModule module : m_swerveDrive.getModules()) {
                 if (driveChanged) {
-                    module.setDrivePIDF(drivePID);
+                    module.getDriveMotor().configurePIDF(drivePID);
+                    ((SparkFlex) module.getDriveMotor().getMotor()).configure(
+                        new SparkFlexConfig().apply(new ClosedLoopConfig()
+                            .pidf(driveP, driveI, driveD, driveF)),
+                        ResetMode.kNoResetSafeParameters,
+                        PersistMode.kNoPersistParameters);
                 }
                 if (angleChanged) {
-                    module.setAnglePIDF(anglePID);
+                    module.getAngleMotor().configurePIDF(anglePID);
+                    ((SparkFlex) module.getAngleMotor().getMotor()).configure(
+                        new SparkFlexConfig().apply(new ClosedLoopConfig()
+                            .pidf(angleP, angleI, angleD, angleF)),
+                        ResetMode.kNoResetSafeParameters,
+                        PersistMode.kNoPersistParameters);
                 }
             }
 
