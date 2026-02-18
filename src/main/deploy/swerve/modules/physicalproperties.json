@@ -9,12 +9,12 @@
     }
   },
   "currentLimit": {
-    "drive": 60,
+    "drive": 40,
     "angle": 40
   },
   "rampRate": {
-    "drive": 0.25,
-    "angle": 0.25
+    "drive": 0.05,
+    "angle": 0.05
   },
   "optimalVoltage": 12
 }
