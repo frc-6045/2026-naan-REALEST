@@ -127,6 +127,7 @@ public class Autos {
     // Add autos to chooser
     m_autoChooser.addOption("normal auto", AutoBuilder.buildAuto("halfauto"));
     m_autoChooser.addOption("quarter-field auto", AutoBuilder.buildAuto("quarterauto"));
+    m_autoChooser.addOption("test square", AutoBuilder.buildAuto("drawsquare"));
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
