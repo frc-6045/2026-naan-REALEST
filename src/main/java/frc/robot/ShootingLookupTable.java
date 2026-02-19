@@ -21,6 +21,7 @@ public class ShootingLookupTable {
         m_rollerRPMMap.put(1.143, 1900.0);   // 45 inches
         m_rollerRPMMap.put(2.108, 4500.0);   // 83 inches
         m_rollerRPMMap.put(2.972, 4500.0);   // 117 inches
+        
 
         // Distance (meters) -> Flywheel RPM
         m_flywheelRPMMap.put(1.143, 2200.0);  // 45 inches
