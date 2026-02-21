@@ -106,8 +106,6 @@ public final class Constants {
   public static class LimelightConstants {
     public static final String kLimelightName = "limelight-sabre"; // NetworkTables name
     public static final int kAprilTagPipeline = 0; // Pipeline index for AprilTag detection
-    public static final int kLeftTagPipeline = 1; // Pipeline index for AprilTag detection
-    public static final int kCenterTagPipeline = 2; // Pipeline index for AprilTag detection
 
     // Limelight mounting configuration (relative to robot center)
     // TODO: Measure and update these values for your robot

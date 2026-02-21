@@ -48,7 +48,6 @@ public class AutoAimAndShoot extends Command {
     private boolean m_feeding = false;
     private Timer m_graceTimer = new Timer(); // Grace period timer before stopping feed
 
-    private boolean m_pipelineSet = false;
     private int m_lockedTagID = -1;  // -1 means no tag locked yet
 
     public AutoAimAndShoot(
@@ -78,7 +77,6 @@ public class AutoAimAndShoot extends Command {
         m_feeding = false;
         m_graceTimer.stop();
         m_graceTimer.reset();
-        m_pipelineSet = false;
         m_lockedTagID = -1;
         LimelightHelpers.setPriorityTagID(LimelightConstants.kLimelightName, -1);
 
@@ -89,29 +87,15 @@ public class AutoAimAndShoot extends Command {
     public void execute() {
         String ll = LimelightConstants.kLimelightName;
 
-        // Read tag ID first to determine which pipeline to use
+        // Read tag ID and lock onto first valid target to prevent oscillation
         double detectedID = LimelightHelpers.getFiducialID(ll);
 
-        if (!m_pipelineSet) {
-            // Switch pipeline based on detected tag (each pipeline has different crosshair offset)
-            if (detectedID==10||detectedID==26) {
-                LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kCenterTagPipeline);
-                m_pipelineSet = true;
-                m_lockedTagID = (int) detectedID;
-                LimelightHelpers.setPriorityTagID(ll, m_lockedTagID);
-            }
-            else if (detectedID==9||detectedID==25) {
-                LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kLeftTagPipeline);
-                m_pipelineSet = true;
-                m_lockedTagID = (int) detectedID;
-                LimelightHelpers.setPriorityTagID(ll, m_lockedTagID);
-            }
-            else {
-                LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kAprilTagPipeline);
-            }
+        if (m_lockedTagID == -1 && LimelightConstants.isValidTagID((int) detectedID)) {
+            m_lockedTagID = (int) detectedID;
+            LimelightHelpers.setPriorityTagID(ll, m_lockedTagID);
         }
 
-        // Now read Limelight targeting data from the correct pipeline
+        // Read Limelight targeting data
         boolean hasTarget = LimelightHelpers.getTV(ll);
         double tx = LimelightHelpers.getTX(ll);
         double ty = LimelightHelpers.getTY(ll);
@@ -125,6 +109,9 @@ public class AutoAimAndShoot extends Command {
         boolean validTarget = hasTarget && LimelightConstants.isValidTagID((int) detectedID);
 
         // Reject frames where detected tag doesn't match locked tag (prevents oscillation)
+        // This might not be necessary due to the Limelight setting the Priority Tag ID, but is an extra check.
+        // The benefit is whe can guarantee we'll prevent oscellation. The possible downside is if we lose the priority target we won't target an alternate.
+        // If Drive team hates that, we can remove this check. We _might_ see oscellation (depends on how much we trust Limelight firmware code), but should allow shooting at other targets if we lose priority.
         if (m_lockedTagID != -1 && (int) detectedID != m_lockedTagID) {
             validTarget = false;
         }
