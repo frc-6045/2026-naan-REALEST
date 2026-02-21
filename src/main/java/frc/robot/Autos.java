@@ -25,6 +25,7 @@ import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.StowIntake;
 import frc.robot.commands.ShootFeedCommands.AutoAimAndShoot;
 import frc.robot.commands.ShootFeedCommands.AutoAimPrepare;
+import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.SpindexerCommands.StopSpindexer;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
@@ -63,8 +64,12 @@ public class Autos {
     NamedCommands.registerCommand("stopSpindexer", new StopSpindexer(spindexer));
 
     // Flywheel commands
-    NamedCommands.registerCommand("spinUpShooter", new StartRevShooter(flywheel, topRoller));
-    NamedCommands.registerCommand("stopShooter", new StopShooter(flywheel, topRoller));
+    NamedCommands.registerCommand("spinUpShooter", new RevShooter(flywheel, topRoller).asProxy());
+    NamedCommands.registerCommand("stopShooter", 
+    new ParallelCommandGroup( 
+      new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel),
+      new InstantCommand(() -> topRoller.stopRollerMotor(), topRoller)
+    ));
 
     // Feeder commands
     NamedCommands.registerCommand("feed", new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederSpeed), feeder));
