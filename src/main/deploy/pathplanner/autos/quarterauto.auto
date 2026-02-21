@@ -17,6 +17,63 @@
           }
         },
         {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "parallel",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "feed"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "startSpindexer"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 4.0
+                }
+              },
+              {
+                "type": "parallel",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "stopSpindexer"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "stopFeeder"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "quarterpath1.5"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
