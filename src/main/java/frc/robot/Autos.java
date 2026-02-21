@@ -64,7 +64,7 @@ public class Autos {
     NamedCommands.registerCommand("stopSpindexer", new StopSpindexer(spindexer));
 
     // Flywheel commands
-    NamedCommands.registerCommand("spinUpShooter", new RevShooter(flywheel, topRoller).asProxy());
+    NamedCommands.registerCommand("spinUpShooter", new StartRevShooter(flywheel, topRoller));
     NamedCommands.registerCommand("stopShooter", 
     new ParallelCommandGroup( 
       new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel),
