@@ -2,6 +2,7 @@ package frc.robot.subsystems.IntakeSystem;
 
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -17,6 +18,7 @@ import frc.robot.Constants.MotorConstants;
 
 public class IntakePivot extends SubsystemBase {
   private final SparkFlex m_IntakeDeployMotor;
+  private final AbsoluteEncoder m_AbsoluteEncoder;
   private final SparkFlexConfig m_config = new SparkFlexConfig();
   private final SlewRateLimiter m_RampLimiter = new SlewRateLimiter(MotorConstants.kIntakeRampRate);
   private double m_TargetSpeed = 0.0;
@@ -24,6 +26,7 @@ public class IntakePivot extends SubsystemBase {
   @SuppressWarnings("deprecation")
   public IntakePivot() {
     m_IntakeDeployMotor = new SparkFlex(MotorConstants.kIntakeDeployMotorCanID, MotorType.kBrushless);
+    m_AbsoluteEncoder = m_IntakeDeployMotor.getAbsoluteEncoder();
 
     updateMotorSettings();
     m_IntakeDeployMotor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
@@ -65,11 +68,16 @@ public class IntakePivot extends SubsystemBase {
     return m_IntakeDeployMotor.getOutputCurrent();
   }
 
+  public double getAbsoluteEncoderReading() {
+    return m_AbsoluteEncoder.getPosition();
+  }
+
   @Override
   public void periodic() {
     double limitedSpeed = m_RampLimiter.calculate(m_TargetSpeed);
     m_IntakeDeployMotor.set(limitedSpeed);
     SmartDashboard.putNumber("Subsystem: Intake Pivot/Speed", limitedSpeed);
     SmartDashboard.putNumber("Subsystem: Intake Pivot/Current (A)", getCurrent());
+    SmartDashboard.putNumber("Subsystem: Intake Position", getAbsoluteEncoderReading());
   }
 }
