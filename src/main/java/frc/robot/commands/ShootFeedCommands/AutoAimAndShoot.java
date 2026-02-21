@@ -1,12 +1,12 @@
 package frc.robot.commands.ShootFeedCommands;
 
-import java.util.Timer;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.LimelightHelpers;
@@ -46,8 +46,7 @@ public class AutoAimAndShoot extends Command {
     private double m_lastTargetRPM = MotorConstants.kShooterTargetRPM;
     private double m_lastTargetRollerRPM = MotorConstants.kRollerTargetRPM;
     private boolean m_feeding = false;
-
-    //private Timer timer = new Timer();
+    private Timer m_graceTimer = new Timer(); // Grace period timer before stopping feed
 
     public AutoAimAndShoot(
             Swerve swerve, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
@@ -74,6 +73,8 @@ public class AutoAimAndShoot extends Command {
 
         m_aimPID.reset();
         m_feeding = false;
+        m_graceTimer.stop();
+        m_graceTimer.reset();
 
         SmartDashboard.putBoolean("AutoAim Active", true);
     }
@@ -82,11 +83,10 @@ public class AutoAimAndShoot extends Command {
     public void execute() {
         String ll = LimelightConstants.kLimelightName;
 
-        // Read Limelight data
-        boolean hasTarget = LimelightHelpers.getTV(ll);
-        double tx = LimelightHelpers.getTX(ll);
-        double ty = LimelightHelpers.getTY(ll);
+        // Read tag ID first to determine which pipeline to use
         double detectedID = LimelightHelpers.getFiducialID(ll);
+
+        // Switch pipeline based on detected tag (each pipeline has different crosshair offset)
         if (detectedID==10||detectedID==26) {
             LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kCenterTagPipeline);
         }
@@ -96,6 +96,11 @@ public class AutoAimAndShoot extends Command {
         else {
             LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kAprilTagPipeline);
         }
+
+        // Now read Limelight targeting data from the correct pipeline
+        boolean hasTarget = LimelightHelpers.getTV(ll);
+        double tx = LimelightHelpers.getTX(ll);
+        double ty = LimelightHelpers.getTY(ll);
 
         // Get driver translation input, scale to m/s
         double translationX = m_translationXSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
@@ -154,14 +159,34 @@ public class AutoAimAndShoot extends Command {
             boolean readyToFire = aimed && topRollerReady && flywheelReady;
 
             if (readyToFire) {
-                // Auto-feed
+                // Ready to fire: start/continue feeding and reset grace timer
                 m_feeder.setSpeed(MotorConstants.kFeederSpeed);
                 m_spindexer.setSpeed(MotorConstants.kSpindexerSpeed);
                 m_feeding = true;
+                m_graceTimer.stop();
+                m_graceTimer.reset();
             } else {
-                m_feeder.stopFeederMotor();
-                m_spindexer.stopSpindexerMotor();
-                m_feeding = false;
+                // Not ready: use grace period before stopping feed
+                if (m_feeding) {
+                    // We were feeding but now not ready - start grace timer if not already running
+                    if (!m_graceTimer.hasElapsed(ShootingConstants.kFeedingGracePeriodSec)) {
+                        if (!m_graceTimer.isRunning()) {
+                            m_graceTimer.start();
+                        }
+                        // Continue feeding during grace period
+                        m_feeder.setSpeed(MotorConstants.kFeederSpeed);
+                        m_spindexer.setSpeed(MotorConstants.kSpindexerSpeed);
+                    } else {
+                        // Grace period expired - stop feeding
+                        m_feeder.stopFeederMotor();
+                        m_spindexer.stopSpindexerMotor();
+                        m_feeding = false;
+                    }
+                } else {
+                    // Not feeding and not ready - don't start
+                    m_feeder.stopFeederMotor();
+                    m_spindexer.stopSpindexerMotor();
+                }
             }
 
             // TODO: Disable verbose telemetry before competition events to reduce NetworkTables traffic
@@ -193,6 +218,8 @@ public class AutoAimAndShoot extends Command {
             m_feeder.stopFeederMotor();
             m_spindexer.stopSpindexerMotor();
             m_feeding = false;
+            m_graceTimer.stop();
+            m_graceTimer.reset();
 
             SmartDashboard.putBoolean("AutoAim Aimed", false);
             SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
