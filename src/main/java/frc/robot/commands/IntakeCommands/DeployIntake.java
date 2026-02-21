@@ -33,8 +33,9 @@ public class DeployIntake extends Command {
     public boolean isFinished() {
         // Stop when current spike is detected (intake has reached mechanical limit)
         // OR when timeout is reached (safety)
-        return m_Intake.getCurrent() >= MotorConstants.kIntakeCurrentSpikeThreshold
-            || m_Timer.hasElapsed(MotorConstants.kIntakeDeployStowTimeout);
+        return 
+        //m_Intake.getCurrent() >= MotorConstants.kIntakeCurrentSpikeThreshold|| // TODO: Add encoder stuffs
+            m_Timer.hasElapsed(MotorConstants.kIntakeDeployTimeout);
     }
 
     @Override

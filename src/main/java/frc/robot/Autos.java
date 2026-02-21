@@ -19,11 +19,12 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
+import frc.robot.commands.AutoCommands.StartRevShooter;
+import frc.robot.commands.AutoCommands.StopShooter;
 import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.StowIntake;
 import frc.robot.commands.ShootFeedCommands.AutoAimAndShoot;
 import frc.robot.commands.ShootFeedCommands.AutoAimPrepare;
-import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.SpindexerCommands.StopSpindexer;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
@@ -62,8 +63,8 @@ public class Autos {
     NamedCommands.registerCommand("stopSpindexer", new StopSpindexer(spindexer));
 
     // Flywheel commands
-    NamedCommands.registerCommand("spinUpShooter", new RevShooter(flywheel, topRoller).asProxy());
-    NamedCommands.registerCommand("stopShooter", new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel));
+    NamedCommands.registerCommand("spinUpShooter", new StartRevShooter(flywheel, topRoller));
+    NamedCommands.registerCommand("stopShooter", new StopShooter(flywheel, topRoller));
 
     // Feeder commands
     NamedCommands.registerCommand("feed", new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederSpeed), feeder));
@@ -79,7 +80,8 @@ public class Autos {
     ));
 
     NamedCommands.registerCommand("shoot", new SequentialCommandGroup(
-      new RevShooter(flywheel, topRoller).until(() -> flywheel.isAtTargetSpeed(MotorConstants.kShooterTargetRPM)),
+      new StartRevShooter(flywheel, topRoller).until(() -> flywheel.isAtTargetSpeed(MotorConstants.kShooterTargetRPM)
+                                                         && topRoller.isAtTargetSpeed(MotorConstants.kRollerTargetRPM)),
       new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederSpeed), feeder)
     ).asProxy());
 
