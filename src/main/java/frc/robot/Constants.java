@@ -75,7 +75,6 @@ public final class Constants {
     public static final double kTopRollerSpeed = .5;
 
     // Shooter PID Constants (for velocity control in RPM)
-    // TODO: Tune these values empirically on the robot
     public static final double kShooterP = 0.0008; // Proportional gain
     public static final double kShooterI = 0.0; // Integral gain
     public static final double kShooterD = 0.02; // Derivative gain
@@ -89,7 +88,6 @@ public final class Constants {
     public static final double kRollerIZone = 400.0; // I term only active within this RPM error range
 
     // Shooter Target Speed (RPM)
-    // TODO: Tune this value based on desired shot distance and trajectory
     public static final double kShooterTargetRPM = 2200.0; // Target shooter wheel speed in RPM
     public static final double kRollerTargetRPM = 2400; // Target shooter wheel speed in RPM
     public static final double kShooterRPMTolerance = 400.0; // Acceptable RPM tolerance before feeding
@@ -108,7 +106,6 @@ public final class Constants {
     public static final int kAprilTagPipeline = 0; // Pipeline index for AprilTag detection
 
     // Limelight mounting configuration (relative to robot center)
-    // TODO: Measure and update these values for your robot
     public static final double kLimelightMountHeightMeters = 0.625475; // Height of lens from floor (meters)
     public static final double kLimelightMountAngleDegrees = 0.0; // Angle above horizontal (degrees)
 
@@ -142,7 +139,6 @@ public final class Constants {
 
   public static class AimConstants {
     // Rotation PID gains for auto-aim
-    // TODO: Tune these values empirically on the robot
     public static final double kAimP = 0.15; // Proportional gain
     public static final double kAimI = 0.0; // Integral gain
     public static final double kAimD = 0.01; // Derivative gain
@@ -152,7 +148,6 @@ public final class Constants {
 
   public static class ShootingConstants {
     // Valid shooting distance range (meters)
-    // TODO: Adjust based on robot capabilities
     public static final double kMinShootingDistanceMeters = 1.0;
     public static final double kMaxShootingDistanceMeters = 7.0;
 
@@ -167,7 +162,6 @@ public final class Constants {
     public static final boolean kEnableVelocityCompensation = true;
 
     // Horizontal ball exit speed in m/s
-    // TODO: Measure empirically (shoot at known distance, time flight)
     // Starting estimate: 4500 RPM, 4" wheel, ~50% efficiency ≈ 12 m/s
     public static final double kBallExitVelocityMps = 12.0;
 

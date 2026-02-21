@@ -129,12 +129,6 @@ public class TopRoller extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", getRPM());
     SmartDashboard.putNumber("Subsystem: Roller/Current (A)", m_Motor.getOutputCurrent());
 
-    // TODO: Remove debug telemetry after testing
-    SmartDashboard.putNumber("Subsystem: Roller/Debug/Encoder Position", m_Encoder.getPosition());
-    SmartDashboard.putNumber("Subsystem: Roller/Debug/Applied Output", m_Motor.getAppliedOutput());
-    SmartDashboard.putNumber("Subsystem: Roller/Debug/Motor Temp (C)", m_Motor.getMotorTemperature());
-    SmartDashboard.putNumber("Subsystem: Roller/Debug/Faults", m_Motor.getFaults().rawBits);
-
     double tunedP = SmartDashboard.getNumber("Subsystem: Roller/PIDF/P", MotorConstants.kRollerP);
     double tunedI = SmartDashboard.getNumber("Subsystem: Roller/PIDF/I", MotorConstants.kRollerI);
     double tunedD = SmartDashboard.getNumber("Subsystem: Roller/PIDF/D", MotorConstants.kRollerD);
