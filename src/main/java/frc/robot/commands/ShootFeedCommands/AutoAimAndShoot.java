@@ -48,6 +48,8 @@ public class AutoAimAndShoot extends Command {
     private boolean m_feeding = false;
     private Timer m_graceTimer = new Timer(); // Grace period timer before stopping feed
 
+    private boolean m_pipelineSet = false;
+
     public AutoAimAndShoot(
             Swerve swerve, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
             DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier) {
@@ -86,15 +88,19 @@ public class AutoAimAndShoot extends Command {
         // Read tag ID first to determine which pipeline to use
         double detectedID = LimelightHelpers.getFiducialID(ll);
 
-        // Switch pipeline based on detected tag (each pipeline has different crosshair offset)
-        if (detectedID==10||detectedID==26) {
-            LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kCenterTagPipeline);
-        }
-        else if (detectedID==9||detectedID==25) {
-            LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kLeftTagPipeline);
-        }
-        else {
-            LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kAprilTagPipeline);
+        if (!m_pipelineSet) {
+            // Switch pipeline based on detected tag (each pipeline has different crosshair offset)
+            if (detectedID==10||detectedID==26) {
+                LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kCenterTagPipeline);
+                m_pipelineSet = true;
+            }
+            else if (detectedID==9||detectedID==25) {
+                LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kLeftTagPipeline);
+                m_pipelineSet = true;
+            }
+            else {
+                LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kAprilTagPipeline);
+            }
         }
 
         // Now read Limelight targeting data from the correct pipeline
