@@ -1,12 +1,13 @@
 package frc.robot.commands.ShootFeedCommands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.Swerve;
@@ -18,7 +19,8 @@ import frc.robot.subsystems.Swerve;
  */
 public class ScanForTarget extends Command {
     private final Swerve m_Swerve;
-    private final CommandXboxController m_driverController;
+    private final DoubleSupplier m_translationXSupplier;
+    private final DoubleSupplier m_translationYSupplier;
 
     private static final double kScanAngleDegrees = 25.0;
     private static final double kTimeoutSeconds = 5.0;
@@ -34,9 +36,10 @@ public class ScanForTarget extends Command {
     private final String m_limelightName = Constants.LimelightConstants.kLimelightName;
     private final Timer m_timer = new Timer();
 
-    public ScanForTarget(Swerve swerve, CommandXboxController driverController) {
+    public ScanForTarget(Swerve swerve, DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier) {
         m_Swerve = swerve;
-        m_driverController = driverController;
+        m_translationXSupplier = translationXSupplier;
+        m_translationYSupplier = translationYSupplier;
 
         // Enable continuous input to handle the ±180° wraparound
         m_PID.enableContinuousInput(-180, 180);
@@ -67,8 +70,8 @@ public class ScanForTarget extends Command {
     public void execute() {
         double currentHeading = m_Swerve.getHeading().getDegrees();
         Translation2d translation = new Translation2d(
-                m_driverController.getLeftX(),
-                m_driverController.getLeftY());
+                m_translationXSupplier.getAsDouble(),
+                m_translationYSupplier.getAsDouble());
 
         double rotationOutput;
         if (m_scanPhase == 1) {

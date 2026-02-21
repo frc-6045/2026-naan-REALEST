@@ -67,7 +67,7 @@ public class TopRoller extends SubsystemBase {
     return SmartDashboard.getNumber("Subsystem: Roller/Target RPM Input", MotorConstants.kRollerTargetRPM);
   }
 
-  public void updateTopRollerMotorSettings() {
+  private void updateTopRollerMotorSettings() {
     m_rollerConfig
         .idleMode(IdleMode.kBrake)
         .inverted(true)
@@ -141,7 +141,7 @@ public class TopRoller extends SubsystemBase {
           .d(tunedD)
           .velocityFF(tunedFF);
 
-      m_Motor.configure(m_rollerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+      m_Motor.configure(m_rollerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
       m_lastP = tunedP;
       m_lastI = tunedI;

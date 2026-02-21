@@ -145,9 +145,9 @@ public class Flywheel extends SubsystemBase {
           .velocityFF(tunedFF);
 
       m_config.inverted(false);
-      m_FlywheelMotor1.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+      m_FlywheelMotor1.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
       m_config.inverted(true);
-      m_FlywheelMotor2.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+      m_FlywheelMotor2.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
       m_lastP = tunedP;
       m_lastI = tunedI;

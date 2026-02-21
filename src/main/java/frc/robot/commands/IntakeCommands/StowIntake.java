@@ -32,9 +32,8 @@ public class StowIntake extends Command {
     public boolean isFinished() {
         // Stop when current spike is detected (intake has reached mechanical limit)
         // OR when timeout is reached (safety)
-        return 
-            //m_Intake.getCurrent() >= MotorConstants.kIntakeCurrentSpikeThreshold|| \ // TODO: encoder thnig thing thing
-            m_Timer.hasElapsed(MotorConstants.kIntakeStowTimeout);
+        // TODO: Add encoder-based position detection
+        return m_Timer.hasElapsed(MotorConstants.kIntakeStowTimeout);
     }
 
     @Override

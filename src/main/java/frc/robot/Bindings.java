@@ -71,12 +71,15 @@ public class Bindings {
         );
 
         // Auto-aim and auto-shoot (driver retains left stick translational control)
-        m_driverController.rightTrigger().whileTrue(new SequentialCommandGroup(new ScanForTarget(swerve, m_driverController),
-        new AutoAimAndShoot(
-            swerve, flywheel, topRoller, feeder, spindexer,
-            () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
-            () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
-        )));
+        m_driverController.rightTrigger().whileTrue(new SequentialCommandGroup(
+            new ScanForTarget(swerve,
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)),
+            new AutoAimAndShoot(
+                swerve, flywheel, topRoller, feeder, spindexer,
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
+            )));
         // m_driverController.rightTrigger(0.5).whileTrue(
         //     new AutoAimAndShoot(
         //         swerve, flywheel, topRoller, feeder, spindexer,
