@@ -77,6 +77,7 @@ public class AutoAimAndShoot extends Command {
         m_feeding = false;
         m_graceTimer.stop();
         m_graceTimer.reset();
+        m_pipelineSet = false;
 
         SmartDashboard.putBoolean("AutoAim Active", true);
     }
