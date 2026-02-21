@@ -13,7 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "quarterpath1"
+            "pathName": "quarterpath0.5"
           }
         },
         {
@@ -49,12 +49,6 @@
                 "type": "named",
                 "data": {
                   "name": "stopIntake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "stowIntake"
                 }
               }
             ]
@@ -123,12 +117,6 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "deployIntake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
                   "name": "startIntakeRoller"
                 }
               }
@@ -149,12 +137,6 @@
                 "type": "named",
                 "data": {
                   "name": "stopIntake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "stowIntake"
                 }
               }
             ]

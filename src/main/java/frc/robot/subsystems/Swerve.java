@@ -23,18 +23,31 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SwerveConstants;
+import swervelib.SwerveModule;
 import swervelib.SwerveDrive;
 import swervelib.math.SwerveMath;
+import swervelib.parser.PIDFConfig;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+
 public class Swerve extends SubsystemBase {
     private final SwerveDrive m_swerveDrive;
+
+    // Track last PID values for live tuning
+    private double m_lastDriveP, m_lastDriveI, m_lastDriveD, m_lastDriveF;
+    private double m_lastAngleP, m_lastAngleI, m_lastAngleD, m_lastAngleF;
 
     public Swerve() {
         // Set telemetry verbosity before creating swerve drive
@@ -51,7 +64,37 @@ public class Swerve extends SubsystemBase {
         m_swerveDrive.setHeadingCorrection(false);
         m_swerveDrive.setCosineCompensator(false);
         m_swerveDrive.setAngularVelocityCompensation(true, true, 0.1);
-        m_swerveDrive.setModuleEncoderAutoSynchronize(true, 1); // TODO: orignially false, testign stuff
+        m_swerveDrive.setModuleEncoderAutoSynchronize(true, 1);
+
+        // Initialize PID tuning from first module
+        SwerveModule[] modules = m_swerveDrive.getModules();
+        if (modules.length > 0) {
+            PIDFConfig drivePID = modules[0].getDrivePIDF();
+            PIDFConfig anglePID = modules[0].getAnglePIDF();
+
+            m_lastDriveP = drivePID.p;
+            m_lastDriveI = drivePID.i;
+            m_lastDriveD = drivePID.d;
+            m_lastDriveF = drivePID.f;
+
+            m_lastAngleP = anglePID.p;
+            m_lastAngleI = anglePID.i;
+            m_lastAngleD = anglePID.d;
+            m_lastAngleF = anglePID.f;
+
+            // Initialize SmartDashboard with current values
+            SmartDashboard.putNumber("Swerve/Drive PID/P", m_lastDriveP);
+            SmartDashboard.putNumber("Swerve/Drive PID/I", m_lastDriveI);
+            SmartDashboard.putNumber("Swerve/Drive PID/D", m_lastDriveD);
+            SmartDashboard.putNumber("Swerve/Drive PID/F", m_lastDriveF);
+
+            SmartDashboard.putNumber("Swerve/Angle PID/P", m_lastAngleP);
+            SmartDashboard.putNumber("Swerve/Angle PID/I", m_lastAngleI);
+            SmartDashboard.putNumber("Swerve/Angle PID/D", m_lastAngleD);
+            SmartDashboard.putNumber("Swerve/Angle PID/F", m_lastAngleF);
+
+            SmartDashboard.putString("Swerve/PID/Status", "OK");
+        }
 
         // Setup PathPlanner
         setupPathPlanner();
@@ -153,25 +196,7 @@ public class Swerve extends SubsystemBase {
      * @param fieldRelative Whether to drive field-relative
      */
     public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
-        //m_swerveDrive.drive(translation, rotation, fieldRelative, false);
-    }
-
-    /**
-     * Drive the robot with field-oriented ChassisSpeeds.
-     *
-     * @param velocity ChassisSpeeds object representing the desired field-relative velocities
-     */
-    public void driveFieldOriented(ChassisSpeeds velocity) {
-       // m_swerveDrive.driveFieldOriented(velocity);
-    }
-
-    /**
-     * Drive the robot with robot-oriented ChassisSpeeds.
-     *
-     * @param velocity ChassisSpeeds object representing the desired robot-relative velocities
-     */
-    public void drive(ChassisSpeeds velocity) {
-       // m_swerveDrive.drive(velocity);
+        m_swerveDrive.drive(translation, rotation, fieldRelative, false);
     }
 
     /**
@@ -270,7 +295,7 @@ public class Swerve extends SubsystemBase {
     /**
      * Zeros the gyro and resets odometry to face the correct direction based on alliance.
      * Red alliance faces 180 degrees, blue alliance faces 0 degrees.
- //programmer lead    */
+     */
     public void zeroGyroWithAlliance() {
         if (isRedAlliance()) {
             zeroGyro();
@@ -279,7 +304,7 @@ public class Swerve extends SubsystemBase {
             zeroGyro();
         }
     }
-//programmer lead
+
     /**
      * Locks the swerve modules in an X pattern to prevent movement.
      */
@@ -317,6 +342,59 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {
         // Telemetry is handled by YAGSL's SwerveDriveTelemetry when verbosity is HIGH
-       // System.out.println("Yaw(deg): " + m_swerveDrive.getYaw().getDegrees());
+
+        // Live PID tuning - check if values changed on SmartDashboard
+        double driveP = SmartDashboard.getNumber("Swerve/Drive PID/P", m_lastDriveP);
+        double driveI = SmartDashboard.getNumber("Swerve/Drive PID/I", m_lastDriveI);
+        double driveD = SmartDashboard.getNumber("Swerve/Drive PID/D", m_lastDriveD);
+        double driveF = SmartDashboard.getNumber("Swerve/Drive PID/F", m_lastDriveF);
+
+        double angleP = SmartDashboard.getNumber("Swerve/Angle PID/P", m_lastAngleP);
+        double angleI = SmartDashboard.getNumber("Swerve/Angle PID/I", m_lastAngleI);
+        double angleD = SmartDashboard.getNumber("Swerve/Angle PID/D", m_lastAngleD);
+        double angleF = SmartDashboard.getNumber("Swerve/Angle PID/F", m_lastAngleF);
+
+        boolean driveChanged = driveP != m_lastDriveP || driveI != m_lastDriveI
+                            || driveD != m_lastDriveD || driveF != m_lastDriveF;
+        boolean angleChanged = angleP != m_lastAngleP || angleI != m_lastAngleI
+                            || angleD != m_lastAngleD || angleF != m_lastAngleF;
+
+        if (driveChanged || angleChanged) {
+            PIDFConfig drivePID = new PIDFConfig(driveP, driveI, driveD, driveF);
+            PIDFConfig anglePID = new PIDFConfig(angleP, angleI, angleD, angleF);
+
+            for (SwerveModule module : m_swerveDrive.getModules()) {
+                if (driveChanged) {
+                    module.getDriveMotor().configurePIDF(drivePID);
+                    ((SparkFlex) module.getDriveMotor().getMotor()).configure(
+                        new SparkFlexConfig().apply(new ClosedLoopConfig()
+                            .pidf(driveP, driveI, driveD, driveF)),
+                        ResetMode.kNoResetSafeParameters,
+                        PersistMode.kNoPersistParameters);
+                }
+                if (angleChanged) {
+                    module.getAngleMotor().configurePIDF(anglePID);
+                    ((SparkFlex) module.getAngleMotor().getMotor()).configure(
+                        new SparkFlexConfig().apply(new ClosedLoopConfig()
+                            .pidf(angleP, angleI, angleD, angleF)),
+                        ResetMode.kNoResetSafeParameters,
+                        PersistMode.kNoPersistParameters);
+                }
+            }
+
+            m_lastDriveP = driveP;
+            m_lastDriveI = driveI;
+            m_lastDriveD = driveD;
+            m_lastDriveF = driveF;
+
+            m_lastAngleP = angleP;
+            m_lastAngleI = angleI;
+            m_lastAngleD = angleD;
+            m_lastAngleF = angleF;
+
+            SmartDashboard.putString("Swerve/PID/Status", "Updated!");
+        } else {
+            SmartDashboard.putString("Swerve/PID/Status", "OK");
+        }
     }
 }
