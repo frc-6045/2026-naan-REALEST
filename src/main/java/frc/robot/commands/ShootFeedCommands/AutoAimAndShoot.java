@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.LimelightHelpers;
+import frc.robot.LimelightTargeting;
 import frc.robot.ShotCompensation;
 import frc.robot.ShootingLookupTable;
 import frc.robot.Constants.AimConstants;
@@ -46,9 +47,9 @@ public class AutoAimAndShoot extends Command {
     private double m_lastTargetRPM = MotorConstants.kShooterTargetRPM;
     private double m_lastTargetRollerRPM = MotorConstants.kRollerTargetRPM;
     private boolean m_feeding = false;
-    private Timer m_graceTimer = new Timer(); // Grace period timer before stopping feed
+    private final Timer m_graceTimer = new Timer();
 
-    private int m_lockedTagID = -1;  // -1 means no tag locked yet
+    private final LimelightTargeting.TagLockState m_tagLock = new LimelightTargeting.TagLockState();
 
     public AutoAimAndShoot(
             Swerve swerve, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
@@ -77,61 +78,26 @@ public class AutoAimAndShoot extends Command {
         m_feeding = false;
         m_graceTimer.stop();
         m_graceTimer.reset();
-        m_lockedTagID = -1;
-        LimelightHelpers.setPriorityTagID(LimelightConstants.kLimelightName, -1);
+        m_tagLock.reset();
 
         SmartDashboard.putBoolean("AutoAim Active", true);
     }
 
     @Override
     public void execute() {
-        String ll = LimelightConstants.kLimelightName;
-
-        // Read tag ID and lock onto first valid target to prevent oscillation
-        double detectedID = LimelightHelpers.getFiducialID(ll);
-
-        if (m_lockedTagID == -1 && LimelightConstants.isValidTagID((int) detectedID)) {
-            m_lockedTagID = (int) detectedID;
-            LimelightHelpers.setPriorityTagID(ll, m_lockedTagID);
-        }
-
-        // Read Limelight targeting data
-        boolean hasTarget = LimelightHelpers.getTV(ll);
-        double tx = LimelightHelpers.getTX(ll);
-        double ty = LimelightHelpers.getTY(ll);
+        LimelightTargeting.TargetingResult target = LimelightTargeting.acquireTarget(m_tagLock);
 
         // Get driver translation input, scale to m/s
         double translationX = m_translationXSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
         double translationY = m_translationYSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
         Translation2d translation = new Translation2d(translationX, translationY);
 
-        // Validate that detected tag is in our valid list
-        boolean validTarget = hasTarget && LimelightConstants.isValidTagID((int) detectedID);
-
-        // Reject frames where detected tag doesn't match locked tag (prevents oscillation)
-        // This might not be necessary due to the Limelight setting the Priority Tag ID, but is an extra check.
-        // The benefit is whe can guarantee we'll prevent oscellation. The possible downside is if we lose the priority target we won't target an alternate.
-        // If Drive team hates that, we can remove this check. We _might_ see oscellation (depends on how much we trust Limelight firmware code), but should allow shooting at other targets if we lose priority.
-        if (m_lockedTagID != -1 && (int) detectedID != m_lockedTagID) {
-            validTarget = false;
-        }
-
-        if (validTarget) {
-            // Calculate distance using trigonometry
-            double angleToTargetRad = Math.toRadians(LimelightConstants.kLimelightMountAngleDegrees + ty);
-            double distance = (LimelightConstants.kTargetHeightMeters - LimelightConstants.kLimelightMountHeightMeters)
-                    / Math.tan(angleToTargetRad);
-
-            // Clamp distance to valid range
-            distance = MathUtil.clamp(distance,
-                    ShootingConstants.kMinShootingDistanceMeters,
-                    ShootingConstants.kMaxShootingDistanceMeters);
-
+        if (target.hasValidTarget) {
             // Velocity compensation for shoot-while-moving
             ChassisSpeeds fieldVelocity = m_swerve.getFieldVelocity();
             double headingDeg = m_swerve.getHeading().getDegrees();
             ShotCompensation.CompensationResult compensation =
-                    ShotCompensation.calculate(fieldVelocity, headingDeg, tx, distance);
+                    ShotCompensation.calculate(fieldVelocity, headingDeg, target.txDegrees, target.distanceMeters);
 
             // Use compensated distance for RPM lookups, clamped to valid range
             double compensatedDistance = MathUtil.clamp(compensation.adjustedDistanceMeters,
@@ -150,7 +116,7 @@ public class AutoAimAndShoot extends Command {
             // Calculate auto-rotation from aim PID (tx -> rad/s)
             // Setpoint is the aim lead angle (0 when stationary, offset when moving)
             double aimSetpoint = compensation.aimLeadDegrees;
-            double aimOutput = m_aimPID.calculate(tx, aimSetpoint);
+            double aimOutput = m_aimPID.calculate(target.txDegrees, aimSetpoint);
             double rotationSpeed = MathUtil.clamp(aimOutput,
                     -AimConstants.kMaxAutoRotationRadPerSec,
                     AimConstants.kMaxAutoRotationRadPerSec);
@@ -159,45 +125,16 @@ public class AutoAimAndShoot extends Command {
             m_swerve.drive(translation, rotationSpeed, true);
 
             // Check if all conditions are met (aimed = reached lead angle, not necessarily centered)
-            boolean aimed = Math.abs(tx - aimSetpoint) < AimConstants.kAimToleranceDegrees;
+            boolean aimed = Math.abs(target.txDegrees - aimSetpoint) < AimConstants.kAimToleranceDegrees;
             boolean topRollerReady = m_topRoller.isAtTargetSpeed(targetRollerRPM);
             boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
             boolean readyToFire = aimed && topRollerReady && flywheelReady;
 
-            if (readyToFire) {
-                // Ready to fire: start/continue feeding and reset grace timer
-                m_feeder.setSpeed(MotorConstants.kFeederSpeed);
-                m_spindexer.setSpeed(MotorConstants.kSpindexerSpeed);
-                m_feeding = true;
-                m_graceTimer.stop();
-                m_graceTimer.reset();
-            } else {
-                // Not ready: use grace period before stopping feed
-                if (m_feeding) {
-                    // We were feeding but now not ready - start grace timer if not already running
-                    if (!m_graceTimer.hasElapsed(ShootingConstants.kFeedingGracePeriodSec)) {
-                        if (!m_graceTimer.isRunning()) {
-                            m_graceTimer.start();
-                        }
-                        // Continue feeding during grace period
-                        m_feeder.setSpeed(MotorConstants.kFeederSpeed);
-                        m_spindexer.setSpeed(MotorConstants.kSpindexerSpeed);
-                    } else {
-                        // Grace period expired - stop feeding
-                        m_feeder.stopFeederMotor();
-                        m_spindexer.stopSpindexerMotor();
-                        m_feeding = false;
-                    }
-                } else {
-                    // Not feeding and not ready - don't start
-                    m_feeder.stopFeederMotor();
-                    m_spindexer.stopSpindexerMotor();
-                }
-            }
+            updateFeedState(readyToFire);
 
             // TODO: Disable verbose telemetry before competition events to reduce NetworkTables traffic
             // Telemetry
-            SmartDashboard.putNumber("AutoAim Distance", distance);
+            SmartDashboard.putNumber("AutoAim Distance", target.distanceMeters);
             SmartDashboard.putNumber("AutoAim Target Roller RPM", targetRollerRPM);
             SmartDashboard.putNumber("AutoAim Target RPM", targetRPM);
             SmartDashboard.putBoolean("AutoAim Aimed", aimed);
@@ -211,7 +148,7 @@ public class AutoAimAndShoot extends Command {
             SmartDashboard.putBoolean("VComp Active", compensation.compensationActive);
             SmartDashboard.putNumber("VComp Aim Lead (deg)", compensation.aimLeadDegrees);
             SmartDashboard.putNumber("VComp Adjusted Dist", compensation.adjustedDistanceMeters);
-            SmartDashboard.putNumber("VComp Raw Dist", distance);
+            SmartDashboard.putNumber("VComp Raw Dist", target.distanceMeters);
             SmartDashboard.putNumber("VComp Flight Time (s)", compensation.flightTimeSec);
             SmartDashboard.putNumber("VComp Lateral V (m/s)", compensation.lateralVelocityMps);
             SmartDashboard.putNumber("VComp Radial V (m/s)", compensation.radialVelocityMps);
@@ -233,18 +170,18 @@ public class AutoAimAndShoot extends Command {
         }
 
         // Common telemetry
-        SmartDashboard.putBoolean("AutoAim HasTarget", validTarget);
-        SmartDashboard.putNumber("AutoAim TX", tx);
-        SmartDashboard.putNumber("AutoAim TY", ty);
+        SmartDashboard.putBoolean("AutoAim HasTarget", target.hasValidTarget);
+        SmartDashboard.putNumber("AutoAim TX", target.txDegrees);
+        SmartDashboard.putNumber("AutoAim TY", target.tyDegrees);
         SmartDashboard.putBoolean("AutoAim Feeding", m_feeding);
-        SmartDashboard.putNumber("AutoAim LockedTagID", m_lockedTagID);
-        SmartDashboard.putNumber("AutoAim DetectedID", detectedID);
+        SmartDashboard.putNumber("AutoAim LockedTagID", target.lockedTagID);
+        SmartDashboard.putNumber("AutoAim DetectedID", target.detectedTagID);
     }
 
     @Override
     public void end(boolean interrupted) {
         LimelightHelpers.setPipelineIndex(LimelightConstants.kLimelightName, LimelightConstants.kAprilTagPipeline);
-        LimelightHelpers.setPriorityTagID(LimelightConstants.kLimelightName, -1);
+        m_tagLock.reset();
         m_flywheel.stopFlywheelMotor();
         m_topRoller.stopRollerMotor();
         m_feeder.stopFeederMotor();
@@ -267,6 +204,37 @@ public class AutoAimAndShoot extends Command {
      */
     public boolean isFeedingActive() {
         return m_feeding;
+    }
+
+    /**
+     * Manage feeder state machine: feed when ready, grace period on brief aim loss, stop otherwise.
+     * Extracted to reduce nesting depth in execute().
+     */
+    private void updateFeedState(boolean readyToFire) {
+        if (readyToFire) {
+            m_feeder.setSpeed(MotorConstants.kFeederSpeed);
+            m_spindexer.setSpeed(MotorConstants.kSpindexerSpeed);
+            m_feeding = true;
+            m_graceTimer.stop();
+            m_graceTimer.reset();
+            return;
+        }
+
+        // Grace period: keep feeding briefly after aim loss to ride through momentary jitter
+        boolean withinGracePeriod = m_feeding
+                && !m_graceTimer.hasElapsed(ShootingConstants.kFeedingGracePeriodSec);
+
+        if (withinGracePeriod) {
+            if (!m_graceTimer.isRunning()) {
+                m_graceTimer.start();
+            }
+            m_feeder.setSpeed(MotorConstants.kFeederSpeed);
+            m_spindexer.setSpeed(MotorConstants.kSpindexerSpeed);
+        } else {
+            m_feeder.stopFeederMotor();
+            m_spindexer.stopSpindexerMotor();
+            m_feeding = false;
+        }
     }
 
     /** Zeros all velocity-compensation telemetry when no target is visible. */
