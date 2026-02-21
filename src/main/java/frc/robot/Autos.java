@@ -63,7 +63,11 @@ public class Autos {
 
     // Flywheel commands
     NamedCommands.registerCommand("spinUpShooter", new RevShooter(flywheel, topRoller).asProxy());
-    NamedCommands.registerCommand("stopShooter", new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel));
+    NamedCommands.registerCommand("stopShooter", 
+    new ParallelCommandGroup( 
+      new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel),
+      new InstantCommand(() -> topRoller.stopRollerMotor(), topRoller)
+    ));
 
     // Feeder commands
     NamedCommands.registerCommand("feed", new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederSpeed), feeder));
