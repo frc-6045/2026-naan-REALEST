@@ -1,5 +1,6 @@
 package frc.robot.commands.ShootFeedCommands;
 
+import java.util.Timer;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -46,6 +47,8 @@ public class AutoAimAndShoot extends Command {
     private double m_lastTargetRollerRPM = MotorConstants.kRollerTargetRPM;
     private boolean m_feeding = false;
 
+    //private Timer timer = new Timer();
+
     public AutoAimAndShoot(
             Swerve swerve, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
             DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier) {
@@ -59,7 +62,7 @@ public class AutoAimAndShoot extends Command {
 
         m_aimPID = new PIDController(AimConstants.kAimP, AimConstants.kAimI, AimConstants.kAimD);
         m_aimPID.setTolerance(AimConstants.kAimToleranceDegrees);
-        m_aimPID.setSetpoint(0.0); // Target: zero tx offset
+        m_aimPID.setSetpoint(0); // Target: zero tx offset
 
         addRequirements(swerve, flywheel, topRoller, feeder, spindexer);
     }
@@ -84,6 +87,15 @@ public class AutoAimAndShoot extends Command {
         double tx = LimelightHelpers.getTX(ll);
         double ty = LimelightHelpers.getTY(ll);
         double detectedID = LimelightHelpers.getFiducialID(ll);
+        if (detectedID==10||detectedID==26) {
+            LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kCenterTagPipeline);
+        }
+        else if (detectedID==9||detectedID==25) {
+            LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kLeftTagPipeline);
+        }
+        else {
+            LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kAprilTagPipeline);
+        }
 
         // Get driver translation input, scale to m/s
         double translationX = m_translationXSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
@@ -196,6 +208,7 @@ public class AutoAimAndShoot extends Command {
 
     @Override
     public void end(boolean interrupted) {
+        LimelightHelpers.setPipelineIndex(LimelightConstants.kLimelightName, LimelightConstants.kAprilTagPipeline);
         m_flywheel.stopFlywheelMotor();
         m_topRoller.stopRollerMotor();
         m_feeder.stopFeederMotor();
