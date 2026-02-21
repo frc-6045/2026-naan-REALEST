@@ -64,11 +64,11 @@ public final class Constants {
     public static final double kIntakeCurrentSpikeThreshold = 40; // Current threshold to detect stow/deploy complete
 
     // Default speeds
-    public static final double kIntakeStowSpeed = -.3; // Speed for stowing intake
-    public static final double kIntakeDeploySpeed = .3; // Speed for deploying intake
+    public static final double kIntakeStowSpeed = -.167; // Speed for stowing intake
+    public static final double kIntakeDeploySpeed = .167; // Speed for deploying intake
     public static final double kIntakeRollerSpeed = 1; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
     public static final double kIntakeRampRate = 3.14; // Max change in motor output per second (units/sec) - prevents harsh stops on chain
-    public static final double kIntakeDeployStowTimeout = 1; // Safety timeout for deploy/stow operations (seconds)
+    public static final double kIntakeDeployStowTimeout = .2; // Safety timeout for deploy/stow operations (seconds)
     
     public static final double kFeederSpeed = 1; // Speed to feed ball into shooter
     public static final double kSpindexerSpeed = 1; // Speed to index balls from intake to feeder
@@ -93,7 +93,7 @@ public final class Constants {
     public static final double kShooterTargetRPM = 2200.0; // Target shooter wheel speed in RPM
     public static final double kRollerTargetRPM = 2400; // Target shooter wheel speed in RPM
     public static final double kShooterRPMTolerance = 400.0; // Acceptable RPM tolerance before feeding
-    public static final double kRollerRPMTolerance = 400.0; // Acceptable roller RPM tolerance before feeding
+    public static final double kRollerRPMTolerance = 600.0; // Acceptable roller RPM tolerance before feeding
   }
 
   public static class SwerveConstants {
@@ -106,6 +106,8 @@ public final class Constants {
   public static class LimelightConstants {
     public static final String kLimelightName = "limelight-sabre"; // NetworkTables name
     public static final int kAprilTagPipeline = 0; // Pipeline index for AprilTag detection
+    public static final int kLeftTagPipeline = 1; // Pipeline index for AprilTag detection
+    public static final int kCenterTagPipeline = 2; // Pipeline index for AprilTag detection
 
     // Limelight mounting configuration (relative to robot center)
     // TODO: Measure and update these values for your robot
@@ -118,7 +120,9 @@ public final class Constants {
 
     // HUB AprilTag IDs -- all four faces of each HUB, 2 tags per face
     private static final int[] kRedAprilTagIDs = {2, 5, 8, 9, 10, 11};
+    //private static final int[] kRedAprilTagIDs = {10};
     private static final int[] kBlueAprilTagIDs = {18, 21, 24, 25, 26, 27};
+    //private static final int[] kBlueAprilTagIDs = {4};
 
     /** Get the valid target AprilTag IDs for the current alliance. */
     public static int[] getTargetAprilTagIDs() {
@@ -144,7 +148,7 @@ public final class Constants {
     public static final double kAimP = 0.15; // Proportional gain
     public static final double kAimI = 0.0; // Integral gain
     public static final double kAimD = 0.01; // Derivative gain
-    public static final double kAimToleranceDegrees = 2; // Acceptable aim error (degrees)
+    public static final double kAimToleranceDegrees = 1.067; // Acceptable aim error (degrees)
     public static final double kMaxAutoRotationRadPerSec = 3.0; // Max rotation speed during auto-aim (rad/s)
   }
 

@@ -49,6 +49,27 @@ public class Bindings {
         m_driverController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
         m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
 
+        m_driverController.rightTrigger(0.05).whileTrue(
+            Commands.runEnd(
+                () -> {
+                    double t = m_operatorController.getRightTriggerAxis();
+                    intake.setSpeed(t);
+                },
+                () -> intake.setSpeed(0.0),
+                intake
+            )
+        );
+        m_driverController.leftTrigger(0.05).whileTrue(
+            Commands.runEnd(
+                () -> {
+                    double t = -m_operatorController.getLeftTriggerAxis();
+                    intake.setSpeed(t);
+                },
+                () -> intake.setSpeed(0.0),
+                intake
+            )
+        );
+
         // Auto-aim and auto-shoot (driver retains left stick translational control)
         m_driverController.rightTrigger().whileTrue(new SequentialCommandGroup(new ScanForTarget(swerve, m_driverController),
         new AutoAimAndShoot(
@@ -98,8 +119,8 @@ public class Bindings {
         m_operatorController.b().whileTrue(new RunIntakePivot(intakePivot, Directions.OUT));
 
         // Top roller open loop up/down
-        m_operatorController.pov(0).whileTrue(new TopRollerOpenLoop(topRoller, () -> MotorConstants.kTopRollerSpeed));
-        m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, () -> -MotorConstants.kTopRollerSpeed));
+        // m_operatorController.pov(0).whileTrue(new TopRollerOpenLoop(topRoller, () -> MotorConstants.kTopRollerSpeed));
+        // m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, () -> -MotorConstants.kTopRollerSpeed));
 
         // Spindexer CW (normal direction)
         m_operatorController.pov(90).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerSpeed));

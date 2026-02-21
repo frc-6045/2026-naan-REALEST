@@ -18,15 +18,15 @@ public class ShootingLookupTable {
 
     static {
         // Distance (meters) -> Roller RPM
-        m_rollerRPMMap.put(1.143, 1900.0);   // 45 inches
-        m_rollerRPMMap.put(2.108, 4500.0);   // 83 inches
-        m_rollerRPMMap.put(2.972, 4500.0);   // 117 inches
+        m_rollerRPMMap.put(1.5748, 2450.0);   // these values are wrong45 inches
+        m_rollerRPMMap.put(3.1369, 2550.0);   // 83 inches
+        m_rollerRPMMap.put(90*0.0254, 2850.0);   // 117 inches
         
 
         // Distance (meters) -> Flywheel RPM
-        m_flywheelRPMMap.put(1.143, 2200.0);  // 45 inches
-        m_flywheelRPMMap.put(2.108, 1200.0);  // 83 inches
-        m_flywheelRPMMap.put(2.972, 1600.0);  // 117 inches
+        m_flywheelRPMMap.put(1.5748, 2200.0);  // 45 inches
+        m_flywheelRPMMap.put(3.1369, 2750.00);  // 83 inches
+        m_flywheelRPMMap.put(0.0254*90, 2500.0);  // 117 inches
     }
 
     /**
