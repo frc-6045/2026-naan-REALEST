@@ -54,11 +54,11 @@ public class Flywheel extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Flywheel/Velocity (RPM)", 0);
     SmartDashboard.putNumber("Subsystem: Flywheel/Motor 1 Velocity", 0);
     SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Velocity", 0);
-    SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/P", MotorConstants.kShooterP);
-    SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/I", MotorConstants.kShooterI);
-    SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/D", MotorConstants.kShooterD);
-    SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/FF", MotorConstants.kShooterFF);
-    SmartDashboard.putString("Subsystem: Flywheel/PIDF/Status", "OK");
+    // SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/P", MotorConstants.kShooterP);
+    // SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/I", MotorConstants.kShooterI);
+    // SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/D", MotorConstants.kShooterD);
+    // SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/FF", MotorConstants.kShooterFF);
+    // SmartDashboard.putString("Subsystem: Flywheel/PIDF/Status", "OK");
     SmartDashboard.putNumber("Subsystem: Flywheel/Current1 (A)", 0);
     SmartDashboard.putNumber("Subsystem: Flywheel/Current2 (A)", 0);
   }
