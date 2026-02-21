@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.LimelightHelpers;
 import frc.robot.ShootingLookupTable;
 import frc.robot.Constants.LimelightConstants;
+import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.TopRoller;
@@ -19,6 +20,10 @@ public class AutoAimPrepare extends Command {
     private final Flywheel m_flywheel;
     private final TopRoller m_topRoller;
 
+    private double m_lastTargetRPM = MotorConstants.kShooterTargetRPM;
+    private double m_lastTargetRollerRPM = MotorConstants.kRollerTargetRPM;
+    private int m_lockedTagID = -1;  // -1 means no tag locked yet
+
     public AutoAimPrepare(Flywheel flywheel, TopRoller topRoller) {
         m_flywheel = flywheel;
         m_topRoller = topRoller;
@@ -30,6 +35,9 @@ public class AutoAimPrepare extends Command {
         // Set Limelight to AprilTag pipeline
         LimelightHelpers.setPipelineIndex(LimelightConstants.kLimelightName, LimelightConstants.kAprilTagPipeline);
 
+        m_lockedTagID = -1;
+        LimelightHelpers.setPriorityTagID(LimelightConstants.kLimelightName, -1);
+
         SmartDashboard.putBoolean("AutoAimPrep Active", true);
     }
 
@@ -37,11 +45,23 @@ public class AutoAimPrepare extends Command {
     public void execute() {
         String ll = LimelightConstants.kLimelightName;
 
-        boolean hasTarget = LimelightHelpers.getTV(ll);
-        double ty = LimelightHelpers.getTY(ll);
+        // Read tag ID and lock onto first valid target to prevent oscillation
         double detectedID = LimelightHelpers.getFiducialID(ll);
 
+        if (m_lockedTagID == -1 && LimelightConstants.isValidTagID((int) detectedID)) {
+            m_lockedTagID = (int) detectedID;
+            LimelightHelpers.setPriorityTagID(ll, m_lockedTagID);
+        }
+
+        boolean hasTarget = LimelightHelpers.getTV(ll);
+        double ty = LimelightHelpers.getTY(ll);
+
         boolean validTarget = hasTarget && LimelightConstants.isValidTagID((int) detectedID);
+
+        // Reject frames where detected tag doesn't match locked tag (prevents oscillation)
+        if (m_lockedTagID != -1 && (int) detectedID != m_lockedTagID) {
+            validTarget = false;
+        }
 
         if (validTarget) {
             // Calculate distance using trigonometry (same as AutoAimAndShoot)
@@ -55,6 +75,8 @@ public class AutoAimPrepare extends Command {
 
             double targetRollerRPM = ShootingLookupTable.getRollerRPM(distance);
             double targetRPM = ShootingLookupTable.getFlywheelRPM(distance);
+            m_lastTargetRPM = targetRPM;
+            m_lastTargetRollerRPM = targetRollerRPM;
 
             m_topRoller.setRPM(targetRollerRPM);
             m_flywheel.setTargetRPM(targetRPM);
@@ -64,12 +86,19 @@ public class AutoAimPrepare extends Command {
             SmartDashboard.putNumber("AutoAimPrep Target RPM", targetRPM);
             SmartDashboard.putBoolean("AutoAimPrep HasTarget", true);
         } else {
+            // No valid target: keep motors spinning at last known RPM
+            m_flywheel.setTargetRPM(m_lastTargetRPM);
+            m_topRoller.setRPM(m_lastTargetRollerRPM);
             SmartDashboard.putBoolean("AutoAimPrep HasTarget", false);
         }
+
+        SmartDashboard.putNumber("AutoAimPrep LockedTagID", m_lockedTagID);
+        SmartDashboard.putNumber("AutoAimPrep DetectedID", detectedID);
     }
 
     @Override
     public void end(boolean interrupted) {
+        LimelightHelpers.setPriorityTagID(LimelightConstants.kLimelightName, -1);
         m_flywheel.stopFlywheelMotor();
         m_topRoller.stopRollerMotor();
         SmartDashboard.putBoolean("AutoAimPrep Active", false);
