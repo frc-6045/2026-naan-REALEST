@@ -49,6 +49,7 @@ public class AutoAimAndShoot extends Command {
     private Timer m_graceTimer = new Timer(); // Grace period timer before stopping feed
 
     private boolean m_pipelineSet = false;
+    private int m_lockedTagID = -1;  // -1 means no tag locked yet
 
     public AutoAimAndShoot(
             Swerve swerve, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
@@ -78,6 +79,8 @@ public class AutoAimAndShoot extends Command {
         m_graceTimer.stop();
         m_graceTimer.reset();
         m_pipelineSet = false;
+        m_lockedTagID = -1;
+        LimelightHelpers.setPriorityTagID(LimelightConstants.kLimelightName, -1);
 
         SmartDashboard.putBoolean("AutoAim Active", true);
     }
@@ -94,10 +97,14 @@ public class AutoAimAndShoot extends Command {
             if (detectedID==10||detectedID==26) {
                 LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kCenterTagPipeline);
                 m_pipelineSet = true;
+                m_lockedTagID = (int) detectedID;
+                LimelightHelpers.setPriorityTagID(ll, m_lockedTagID);
             }
             else if (detectedID==9||detectedID==25) {
                 LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kLeftTagPipeline);
                 m_pipelineSet = true;
+                m_lockedTagID = (int) detectedID;
+                LimelightHelpers.setPriorityTagID(ll, m_lockedTagID);
             }
             else {
                 LimelightHelpers.setPipelineIndex(ll, LimelightConstants.kAprilTagPipeline);
@@ -116,6 +123,11 @@ public class AutoAimAndShoot extends Command {
 
         // Validate that detected tag is in our valid list
         boolean validTarget = hasTarget && LimelightConstants.isValidTagID((int) detectedID);
+
+        // Reject frames where detected tag doesn't match locked tag (prevents oscillation)
+        if (m_lockedTagID != -1 && (int) detectedID != m_lockedTagID) {
+            validTarget = false;
+        }
 
         if (validTarget) {
             // Calculate distance using trigonometry
@@ -238,11 +250,14 @@ public class AutoAimAndShoot extends Command {
         SmartDashboard.putNumber("AutoAim TX", tx);
         SmartDashboard.putNumber("AutoAim TY", ty);
         SmartDashboard.putBoolean("AutoAim Feeding", m_feeding);
+        SmartDashboard.putNumber("AutoAim LockedTagID", m_lockedTagID);
+        SmartDashboard.putNumber("AutoAim DetectedID", detectedID);
     }
 
     @Override
     public void end(boolean interrupted) {
         LimelightHelpers.setPipelineIndex(LimelightConstants.kLimelightName, LimelightConstants.kAprilTagPipeline);
+        LimelightHelpers.setPriorityTagID(LimelightConstants.kLimelightName, -1);
         m_flywheel.stopFlywheelMotor();
         m_topRoller.stopRollerMotor();
         m_feeder.stopFeederMotor();
