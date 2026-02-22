@@ -52,12 +52,7 @@ public final class Constants {
     public static final double kSpindexerMotorMaximumSpeed = 1;
 
     // Motor Current Limits (Amps)
-    public static final int kFeederCurrentLimit = 30;
-    public static final int kIntakeCurrentLimit = 40;
     public static final int kIntakePivotCurrentLimit = 40;
-    public static final int kShooterCurrentLimit = 40;
-    public static final int kTopRollerCurrentLimit = 40;
-    public static final int kSpindexerCurrentLimit = 60;
 
 
     // Current Spike Detection Thresholds (Amps)
@@ -70,6 +65,7 @@ public final class Constants {
     public static final double kIntakeRampRate = 3.14; // Max change in motor output per second (units/sec) - prevents harsh stops on chain
     public static final double kIntakeStowTimeout = 1.2; // Safety timeout for deploy/stow operations (seconds)
     public static final double kIntakeDeployTimeout = .8; // Safety timeout for deploy/stow operations (seconds)
+    public static final double kRaiseIntakeHalfwayTimeout = 0.6; // for intake up halfway when shoot
     
     public static final double kFeederSpeed = 1; // Speed to feed ball into shooter
     public static final double kSpindexerSpeed = 1; // Speed to index balls from intake to feeder
