@@ -13,7 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "quarterpath0.5"
+            "pathName": "quarterpath1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "quarterpath1.5"
           }
         },
         {
