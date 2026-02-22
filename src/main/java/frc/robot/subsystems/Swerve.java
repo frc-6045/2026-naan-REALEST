@@ -15,11 +15,15 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -27,7 +31,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.Constants.VisionPoseConstants;
+import frc.robot.LimelightHelpers;
 import swervelib.SwerveModule;
 import swervelib.SwerveDrive;
 import swervelib.math.SwerveMath;
@@ -48,6 +55,10 @@ public class Swerve extends SubsystemBase {
     // Track last PID values for live tuning
     private double m_lastDriveP, m_lastDriveI, m_lastDriveD, m_lastDriveF;
     private double m_lastAngleP, m_lastAngleI, m_lastAngleD, m_lastAngleF;
+
+    // Vision pose correction telemetry
+    private boolean m_lastVisionAccepted = false;
+    private String m_lastVisionRejectReason = "No data yet";
 
     public Swerve() {
         // Set telemetry verbosity before creating swerve drive
@@ -339,8 +350,90 @@ public class Swerve extends SubsystemBase {
         return m_swerveDrive;
     }
 
+    /**
+     * Feeds Limelight MegaTag2 vision pose estimates into the YAGSL pose estimator.
+     * Runs every cycle to correct odometry drift (e.g., after crossing BUMPs).
+     */
+    private void updateVisionPose() {
+        String limelightName = LimelightConstants.kLimelightName;
+
+        // Feed gyro heading to Limelight for MegaTag2 (required before reading pose)
+        double headingDeg = getHeading().getDegrees();
+        double angularVelDegPerSec = Math.toDegrees(getRobotVelocity().omegaRadiansPerSecond);
+        LimelightHelpers.SetRobotOrientation(limelightName,
+            headingDeg, angularVelDegPerSec, 0, 0, 0, 0);
+
+        // Get MegaTag2 pose estimate (uses gyro-constrained solver)
+        LimelightHelpers.PoseEstimate mt2 =
+            LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+
+        // Null check
+        if (mt2 == null) {
+            m_lastVisionAccepted = false;
+            m_lastVisionRejectReason = "Null estimate";
+            return;
+        }
+
+        // Must see at least one tag
+        if (mt2.tagCount == 0) {
+            m_lastVisionAccepted = false;
+            m_lastVisionRejectReason = "No tags visible";
+            return;
+        }
+
+        // Reject if spinning too fast (MegaTag2 degrades with high angular velocity)
+        if (Math.abs(angularVelDegPerSec) > VisionPoseConstants.kMaxAngularVelocityDegPerSec) {
+            m_lastVisionAccepted = false;
+            m_lastVisionRejectReason = "Spinning too fast (" + (int) angularVelDegPerSec + " deg/s)";
+            return;
+        }
+
+        // Reject if tags are too far away
+        if (mt2.avgTagDist > VisionPoseConstants.kMaxTagDistanceMeters) {
+            m_lastVisionAccepted = false;
+            m_lastVisionRejectReason = "Tags too far (" + String.format("%.1f", mt2.avgTagDist) + " m)";
+            return;
+        }
+
+        // Reject poses outside field bounds (16.54m x 8.21m with margin)
+        double x = mt2.pose.getX();
+        double y = mt2.pose.getY();
+        if (x < -1.0 || x > 17.5 || y < -1.0 || y > 9.2) {
+            m_lastVisionAccepted = false;
+            m_lastVisionRejectReason = "Pose off field";
+            return;
+        }
+
+        // Calculate distance-scaled standard deviations (closer = more trust)
+        double xyStdDev = VisionPoseConstants.kBaseStdDevXY
+            + (mt2.avgTagDist * VisionPoseConstants.kStdDevScalePerMeter);
+
+        // Multi-tag bonus: 2+ tags visible halves the standard deviation
+        if (mt2.tagCount >= 2) {
+            xyStdDev /= VisionPoseConstants.kMultiTagDivisor;
+        }
+
+        Matrix<N3, N1> stdDevs = VecBuilder.fill(
+            xyStdDev,
+            xyStdDev,
+            VisionPoseConstants.kBaseStdDevTheta
+        );
+
+        // Feed into YAGSL pose estimator
+        m_swerveDrive.addVisionMeasurement(mt2.pose, mt2.timestampSeconds, stdDevs);
+
+        m_lastVisionAccepted = true;
+        m_lastVisionRejectReason = "Accepted (" + mt2.tagCount + " tags, "
+            + String.format("%.1f", mt2.avgTagDist) + " m, stdDev=" + String.format("%.2f", xyStdDev) + ")";
+    }
+
     @Override
     public void periodic() {
+        // Vision pose correction (fixes odometry drift after BUMP crossings)
+        updateVisionPose();
+        SmartDashboard.putBoolean("Vision/Accepted", m_lastVisionAccepted);
+        SmartDashboard.putString("Vision/Status", m_lastVisionRejectReason);
+
         // Telemetry is handled by YAGSL's SwerveDriveTelemetry when verbosity is HIGH
 
         // Live PID tuning - check if values changed on SmartDashboard

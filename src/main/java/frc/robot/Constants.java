@@ -138,6 +138,15 @@ public final class Constants {
     }
   }
 
+  public static class VisionPoseConstants {
+    public static final double kMaxAngularVelocityDegPerSec = 720.0; // Reject vision if spinning faster
+    public static final double kMaxTagDistanceMeters = 5.0;          // Reject tags beyond this range
+    public static final double kBaseStdDevXY = 0.5;                  // Base trust in meters (lower = trust more)
+    public static final double kBaseStdDevTheta = 9999999;           // Near-infinite: don't correct heading from vision
+    public static final double kStdDevScalePerMeter = 0.5;           // Trust decreases linearly with distance
+    public static final double kMultiTagDivisor = 2.0;               // 2+ tags visible = double the trust
+  }
+
   public static class AimConstants {
     // Rotation PID gains for auto-aim
     public static final double kAimP = 0.15; // Proportional gain
