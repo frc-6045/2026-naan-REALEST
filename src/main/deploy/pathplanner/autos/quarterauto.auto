@@ -5,31 +5,45 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "spinUpShooter"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "fakequarterpath1"
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "fakequarterpath1.5"
-          }
-        },
-        {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "parallel",
                 "data": {
-                  "name": "deployIntake"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "fakequarterpath1.5"
+                      }
+                    },
+                    {
+                      "type": "sequential",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 0.2
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "deployIntake"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -73,7 +87,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "autoAim"
+                  "name": "spinUpShooter"
                 }
               },
               {
@@ -94,7 +108,26 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 4.0
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "raiseIntakeHalfway"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 5.0
+                }
+              }
+            ]
           }
         },
         {
@@ -111,6 +144,12 @@
                 "type": "named",
                 "data": {
                   "name": "stopFeeder"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stopShooter"
                 }
               }
             ]
@@ -167,7 +206,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "autoAim"
+                  "name": "spinUpShooter"
                 }
               },
               {
