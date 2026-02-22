@@ -52,7 +52,12 @@ public final class Constants {
     public static final double kSpindexerMotorMaximumSpeed = 1;
 
     // Motor Current Limits (Amps)
+    public static final int kFeederCurrentLimit = 50;
+    public static final int kIntakeCurrentLimit = 50;
     public static final int kIntakePivotCurrentLimit = 40;
+    public static final int kShooterCurrentLimit = 60;
+    public static final int kTopRollerCurrentLimit = 60;
+    public static final int kSpindexerCurrentLimit = 80;
 
 
     // Current Spike Detection Thresholds (Amps)
