@@ -22,6 +22,7 @@ import frc.robot.Constants.ShootingConstants;
 import frc.robot.commands.AutoCommands.StartRevShooter;
 import frc.robot.commands.AutoCommands.StopShooter;
 import frc.robot.commands.IntakeCommands.DeployIntake;
+import frc.robot.commands.IntakeCommands.RaiseIntakeHalfway;
 import frc.robot.commands.IntakeCommands.StowIntake;
 import frc.robot.commands.ShootFeedCommands.AutoAimAndShoot;
 import frc.robot.commands.ShootFeedCommands.AutoAimPrepare;
@@ -56,6 +57,7 @@ public class Autos {
     // Intake commands
     NamedCommands.registerCommand("deployIntake", new DeployIntake(intakePivot));
     NamedCommands.registerCommand("stowIntake", new StowIntake(intakePivot));
+    NamedCommands.registerCommand("raiseIntakeHalfway", new RaiseIntakeHalfway(intakePivot));
     NamedCommands.registerCommand("startIntakeRoller", new InstantCommand(() -> intake.setSpeed(MotorConstants.kIntakeRollerSpeed), intake));
     NamedCommands.registerCommand("stopIntake", new InstantCommand(() -> intake.stopIntakeMotor(), intake));
 
