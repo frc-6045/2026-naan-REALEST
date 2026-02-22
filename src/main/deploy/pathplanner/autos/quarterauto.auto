@@ -13,13 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "quarterpath1"
+            "pathName": "fakequarterpath1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "quarterpath1.5"
+            "pathName": "fakequarterpath1.5"
           }
         },
         {
@@ -70,6 +70,12 @@
           "type": "parallel",
           "data": {
             "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "autoAim"
+                }
+              },
               {
                 "type": "named",
                 "data": {
@@ -158,6 +164,12 @@
           "type": "parallel",
           "data": {
             "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "autoAim"
+                }
+              },
               {
                 "type": "named",
                 "data": {
