@@ -1,6 +1,5 @@
 package frc.robot.commands.ShootFeedCommands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.LimelightHelpers;
 import frc.robot.LimelightTargeting;
@@ -35,8 +34,6 @@ public class AutoAimPrepare extends Command {
         LimelightHelpers.setPipelineIndex(LimelightConstants.kLimelightName, LimelightConstants.kAprilTagPipeline);
 
         m_tagLock.reset();
-
-        SmartDashboard.putBoolean("AutoAimPrep Active", true);
     }
 
     @Override
@@ -51,20 +48,11 @@ public class AutoAimPrepare extends Command {
 
             m_topRoller.setRPM(targetRollerRPM);
             m_flywheel.setTargetRPM(targetRPM);
-
-            SmartDashboard.putNumber("AutoAimPrep Distance", target.distanceMeters);
-            SmartDashboard.putNumber("AutoAimPrep Target Roller RPM", targetRollerRPM);
-            SmartDashboard.putNumber("AutoAimPrep Target RPM", targetRPM);
-            SmartDashboard.putBoolean("AutoAimPrep HasTarget", true);
         } else {
             // No valid target: keep motors spinning at last known RPM
             m_flywheel.setTargetRPM(m_lastTargetRPM);
             m_topRoller.setRPM(m_lastTargetRollerRPM);
-            SmartDashboard.putBoolean("AutoAimPrep HasTarget", false);
         }
-
-        SmartDashboard.putNumber("AutoAimPrep LockedTagID", target.lockedTagID);
-        SmartDashboard.putNumber("AutoAimPrep DetectedID", target.detectedTagID);
     }
 
     @Override
@@ -72,7 +60,6 @@ public class AutoAimPrepare extends Command {
         m_tagLock.reset();
         m_flywheel.stopFlywheelMotor();
         m_topRoller.stopRollerMotor();
-        SmartDashboard.putBoolean("AutoAimPrep Active", false);
     }
 
     @Override

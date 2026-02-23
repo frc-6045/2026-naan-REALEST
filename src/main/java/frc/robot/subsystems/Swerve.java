@@ -27,7 +27,6 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -92,19 +91,6 @@ public class Swerve extends SubsystemBase {
             m_lastAngleI = anglePID.i;
             m_lastAngleD = anglePID.d;
             m_lastAngleF = anglePID.f;
-
-            // Initialize SmartDashboard with current values
-            SmartDashboard.putNumber("Swerve/Drive PID/P", m_lastDriveP);
-            SmartDashboard.putNumber("Swerve/Drive PID/I", m_lastDriveI);
-            SmartDashboard.putNumber("Swerve/Drive PID/D", m_lastDriveD);
-            SmartDashboard.putNumber("Swerve/Drive PID/F", m_lastDriveF);
-
-            SmartDashboard.putNumber("Swerve/Angle PID/P", m_lastAngleP);
-            SmartDashboard.putNumber("Swerve/Angle PID/I", m_lastAngleI);
-            SmartDashboard.putNumber("Swerve/Angle PID/D", m_lastAngleD);
-            SmartDashboard.putNumber("Swerve/Angle PID/F", m_lastAngleF);
-
-            SmartDashboard.putString("Swerve/PID/Status", "OK");
         }
 
         // Setup PathPlanner
@@ -431,21 +417,8 @@ public class Swerve extends SubsystemBase {
     public void periodic() {
         // Vision pose correction (fixes odometry drift after BUMP crossings)
         updateVisionPose();
-        SmartDashboard.putBoolean("Vision/Accepted", m_lastVisionAccepted);
-        SmartDashboard.putString("Vision/Status", m_lastVisionRejectReason);
 
         // Telemetry is handled by YAGSL's SwerveDriveTelemetry when verbosity is HIGH
-
-        // Live PID tuning - check if values changed on SmartDashboard
-        double driveP = SmartDashboard.getNumber("Swerve/Drive PID/P", m_lastDriveP);
-        double driveI = SmartDashboard.getNumber("Swerve/Drive PID/I", m_lastDriveI);
-        double driveD = SmartDashboard.getNumber("Swerve/Drive PID/D", m_lastDriveD);
-        double driveF = SmartDashboard.getNumber("Swerve/Drive PID/F", m_lastDriveF);
-
-        double angleP = SmartDashboard.getNumber("Swerve/Angle PID/P", m_lastAngleP);
-        double angleI = SmartDashboard.getNumber("Swerve/Angle PID/I", m_lastAngleI);
-        double angleD = SmartDashboard.getNumber("Swerve/Angle PID/D", m_lastAngleD);
-        double angleF = SmartDashboard.getNumber("Swerve/Angle PID/F", m_lastAngleF);
 
         boolean driveChanged = driveP != m_lastDriveP || driveI != m_lastDriveI
                             || driveD != m_lastDriveD || driveF != m_lastDriveF;
@@ -484,10 +457,7 @@ public class Swerve extends SubsystemBase {
             m_lastAngleI = angleI;
             m_lastAngleD = angleD;
             m_lastAngleF = angleF;
-
-            SmartDashboard.putString("Swerve/PID/Status", "Updated!");
         } else {
-            SmartDashboard.putString("Swerve/PID/Status", "OK");
         }
     }
 }

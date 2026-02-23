@@ -46,16 +46,6 @@ public class TopRoller extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Roller/Target RPM", 0);
     SmartDashboard.putNumber("Subsystem: Roller/Speed", 0);
     SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", 0);
-    SmartDashboard.putNumber("Subsystem: Roller/Debug/Encoder Position", 0);
-    SmartDashboard.putNumber("Subsystem: Roller/Current (A)", 0);
-    SmartDashboard.putNumber("Subsystem: Roller/Debug/Applied Output", 0);
-    SmartDashboard.putNumber("Subsystem: Roller/Debug/Motor Temp (C)", 0);
-    SmartDashboard.putNumber("Subsystem: Roller/Debug/Faults", 0);
-    SmartDashboard.putNumber("Subsystem: Roller/PIDF/P", MotorConstants.kRollerP);
-    SmartDashboard.putNumber("Subsystem: Roller/PIDF/I", MotorConstants.kRollerI);
-    SmartDashboard.putNumber("Subsystem: Roller/PIDF/D", MotorConstants.kRollerD);
-    SmartDashboard.putNumber("Subsystem: Roller/PIDF/FF", MotorConstants.kRollerFF);
-    SmartDashboard.putString("Subsystem: Roller/PIDF/Status", "OK");
   }
 
   /**
@@ -127,12 +117,6 @@ public class TopRoller extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", getRPM());
-    SmartDashboard.putNumber("Subsystem: Roller/Current (A)", m_Motor.getOutputCurrent());
-
-    double tunedP = SmartDashboard.getNumber("Subsystem: Roller/PIDF/P", MotorConstants.kRollerP);
-    double tunedI = SmartDashboard.getNumber("Subsystem: Roller/PIDF/I", MotorConstants.kRollerI);
-    double tunedD = SmartDashboard.getNumber("Subsystem: Roller/PIDF/D", MotorConstants.kRollerD);
-    double tunedFF = SmartDashboard.getNumber("Subsystem: Roller/PIDF/FF", MotorConstants.kRollerFF);
 
     if (tunedP != m_lastP || tunedI != m_lastI || tunedD != m_lastD || tunedFF != m_lastFF) {
       m_rollerConfig.closedLoop
@@ -147,10 +131,7 @@ public class TopRoller extends SubsystemBase {
       m_lastI = tunedI;
       m_lastD = tunedD;
       m_lastFF = tunedFF;
-
-      SmartDashboard.putString("Subsystem: Roller/PIDF/Status", "Updated!");
     } else {
-      SmartDashboard.putString("Subsystem: Roller/PIDF/Status", "OK");
     }
   }
 }
