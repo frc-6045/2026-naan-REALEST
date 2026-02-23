@@ -391,7 +391,5 @@ public class Swerve extends SubsystemBase {
         updateVisionPose();
         SmartDashboard.putBoolean("Vision/Accepted", m_lastVisionAccepted);
         SmartDashboard.putString("Vision/Status", m_lastVisionRejectReason);
-
-        // Telemetry is handled by YAGSL's SwerveDriveTelemetry when verbosity is HIGH
     }
 }
