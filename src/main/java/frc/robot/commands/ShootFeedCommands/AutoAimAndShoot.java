@@ -210,8 +210,4 @@ public class AutoAimAndShoot extends Command {
             m_feeding = false;
         }
     }
-
-    /** Zeros all velocity-compensation telemetry when no target is visible. */
-    private void clearVCompTelemetry() {
-    }
 }
