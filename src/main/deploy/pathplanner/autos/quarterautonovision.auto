@@ -5,31 +5,45 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "spinUpShooter"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "quarterpath1"
+            "pathName": "fakequarterpath1novision"
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "quarterpath1.5"
-          }
-        },
-        {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "parallel",
                 "data": {
-                  "name": "deployIntake"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "fakequarterpath1.5novision"
+                      }
+                    },
+                    {
+                      "type": "sequential",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 0.2
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "deployIntake"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -44,7 +58,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "quarterpath2"
+            "pathName": "quarterpath2novision"
           }
         },
         {
@@ -63,13 +77,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "quarterpath3"
+            "pathName": "quarterpath3novision"
           }
         },
         {
           "type": "parallel",
           "data": {
             "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "spinUpShooter"
+                }
+              },
               {
                 "type": "named",
                 "data": {
@@ -88,7 +108,26 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 4.0
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "raiseIntakeHalfway"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 5.0
+                }
+              }
+            ]
           }
         },
         {
@@ -106,6 +145,12 @@
                 "data": {
                   "name": "stopFeeder"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stopShooter"
+                }
               }
             ]
           }
@@ -113,7 +158,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "quarterpath4"
+            "pathName": "quarterpath4novision"
           }
         },
         {
@@ -132,7 +177,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "quarterpath5"
+            "pathName": "quarterpath5novision"
           }
         },
         {
@@ -151,13 +196,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "quarterpath6"
+            "pathName": "quarterpath6novision"
           }
         },
         {
           "type": "parallel",
           "data": {
             "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "spinUpShooter"
+                }
+              },
               {
                 "type": "named",
                 "data": {
