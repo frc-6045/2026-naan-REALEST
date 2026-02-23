@@ -134,7 +134,6 @@ public class Autos {
     // Add autos to chooser
     m_autoChooser.addOption("normal auto", AutoBuilder.buildAuto("halfauto"));
     m_autoChooser.addOption("quarter-field auto", AutoBuilder.buildAuto("quarterauto"));
-    m_autoChooser.addOption("no vision quarter-field auto", AutoBuilder.buildAuto("quarterautonovision"));
     m_autoChooser.addOption("test square", AutoBuilder.buildAuto("drawsquare"));
     m_autoChooser.addOption("test commands", AutoBuilder.buildAuto("testcommands"));
 
