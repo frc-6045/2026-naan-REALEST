@@ -164,7 +164,6 @@ public class AutoAimAndShoot extends Command {
         m_feeder.stopFeederMotor();
         m_spindexer.stopSpindexerMotor();
         // Swerve default command auto-resumes
-
         SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
     }
 
@@ -210,5 +209,9 @@ public class AutoAimAndShoot extends Command {
             m_spindexer.stopSpindexerMotor();
             m_feeding = false;
         }
+    }
+
+    /** Zeros all velocity-compensation telemetry when no target is visible. */
+    private void clearVCompTelemetry() {
     }
 }

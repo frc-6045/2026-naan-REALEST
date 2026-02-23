@@ -27,7 +27,6 @@ public class Spindexer extends SubsystemBase {
 
     // Initialize SmartDashboard values
     SmartDashboard.putNumber("Subsystem: Spindexer/Speed", 0);
-    SmartDashboard.putNumber("Subsystem: Spindexer/Current (A)", 0);
     SmartDashboard.putNumber("Subsystem: Spindexer/Velocity (RPM)", 0);
   }
 
@@ -70,7 +69,6 @@ public class Spindexer extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Subsystem: Spindexer/Current (A)", getCurrent());
     SmartDashboard.putNumber("Subsystem: Spindexer/Velocity (RPM)", getRPM());
   }
 }

@@ -33,7 +33,6 @@ public class IntakePivot extends SubsystemBase {
 
     // Initialize SmartDashboard values
     SmartDashboard.putNumber("Subsystem: Intake Pivot/Speed", 0);
-    SmartDashboard.putNumber("Subsystem: Intake Pivot/Current (A)", 0);
   }
 
   private void updateMotorSettings() {
@@ -77,7 +76,6 @@ public class IntakePivot extends SubsystemBase {
     double limitedSpeed = m_RampLimiter.calculate(m_TargetSpeed);
     m_IntakeDeployMotor.set(limitedSpeed);
     SmartDashboard.putNumber("Subsystem: Intake Pivot/Speed", limitedSpeed);
-    SmartDashboard.putNumber("Subsystem: Intake Pivot/Current (A)", getCurrent());
     SmartDashboard.putNumber("Subsystem: Intake Position", getAbsoluteEncoderReading());
   }
 }
