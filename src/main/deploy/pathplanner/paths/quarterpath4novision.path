@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.443880171184022,
-        "y": 2.747603423680457
+        "x": -0.49,
+        "y": 2.778
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.413392367243654,
-        "y": 2.670397067106828
+        "x": 0.8061626248216838,
+        "y": 2.023038516405135
       },
       "isLocked": false,
       "linkedName": null
@@ -20,12 +20,12 @@
         "y": 2.100407841435185
       },
       "prevControl": {
-        "x": 5.578758915834522,
-        "y": 2.462952924393724
+        "x": 5.4630179449203515,
+        "y": 3.0356547231178523
       },
       "nextControl": {
-        "x": 7.095910307732432,
-        "y": 0.8762290635759873
+        "x": 6.676057725694444,
+        "y": 0.5821145109953705
       },
       "isLocked": false,
       "linkedName": null
@@ -46,8 +46,12 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.9978678038379597,
-      "rotationDegrees": -45.0
+      "waypointRelativePos": 0.22601279317697248,
+      "rotationDegrees": -135.0
+    },
+    {
+      "waypointRelativePos": 1.0959488272921176,
+      "rotationDegrees": -135.0
     }
   ],
   "constraintZones": [],
@@ -62,14 +66,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 3.0,
+    "velocity": 0.5,
     "rotation": 90.0
   },
   "reversed": false,
-  "folder": "quarterpaths",
+  "folder": "quarterpathsnovision",
   "idealStartingState": {
-    "velocity": 0.0,
-    "rotation": -45.0
+    "velocity": 0,
+    "rotation": -59.042
   },
   "useDefaultConstraints": true
 }
