@@ -130,7 +130,6 @@ public class AutoAimAndShoot extends Command {
 
             updateFeedState(readyToFire);
 
-            // TODO: Disable verbose telemetry before competition events to reduce NetworkTables traffic
             // Telemetry
             SmartDashboard.putBoolean("AutoAim Aimed", aimed);
             SmartDashboard.putBoolean("AutoAim TopRollerReady", topRollerReady);
@@ -153,7 +152,6 @@ public class AutoAimAndShoot extends Command {
 
             SmartDashboard.putBoolean("AutoAim Aimed", false);
             SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
-            clearVCompTelemetry();
         }
     }
 
@@ -211,9 +209,5 @@ public class AutoAimAndShoot extends Command {
             m_spindexer.stopSpindexerMotor();
             m_feeding = false;
         }
-    }
-
-    /** Zeros all velocity-compensation telemetry when no target is visible. */
-    private void clearVCompTelemetry() {
     }
 }
