@@ -352,16 +352,16 @@ public class Swerve extends SubsystemBase {
 
     /**
      * Feeds Limelight MegaTag2 vision pose estimates into the YAGSL pose estimator.
-     * Runs every cycle to correct odometry drift (e.g., after crossing BUMPs).
+     * Runs every cycle to correct odometry drift (e.g., after crossing bumps).
      */
     private void updateVisionPose() {
         String limelightName = LimelightConstants.kLimelightName;
 
-        // Feed gyro heading to Limelight for MegaTag2 (required before reading pose)
-        double headingDeg = getHeading().getDegrees();
+        // Feed pose estimator heading to Limelight for MegaTag2
+        double headingDeg = getPose().getRotation().getDegrees();
         double angularVelDegPerSec = Math.toDegrees(getRobotVelocity().omegaRadiansPerSecond);
         LimelightHelpers.SetRobotOrientation(limelightName,
-            headingDeg, angularVelDegPerSec, 0, 0, 0, 0);
+            headingDeg, 0, 0, 0, 0, 0);
 
         // Get MegaTag2 pose estimate (uses gyro-constrained solver)
         LimelightHelpers.PoseEstimate mt2 =
@@ -429,7 +429,7 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // Vision pose correction (fixes odometry drift after BUMP crossings)
+        // Vision pose correction (fixes odometry drift after bump crossings)
         updateVisionPose();
         SmartDashboard.putBoolean("Vision/Accepted", m_lastVisionAccepted);
         SmartDashboard.putString("Vision/Status", m_lastVisionRejectReason);

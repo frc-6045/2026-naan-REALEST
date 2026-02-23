@@ -140,7 +140,7 @@ public final class Constants {
   }
 
   public static class VisionPoseConstants {
-    public static final double kMaxAngularVelocityDegPerSec = 720.0; // Reject vision if spinning faster
+    public static final double kMaxAngularVelocityDegPerSec = 360.0; // Reject vision if spinning faster
     public static final double kMaxTagDistanceMeters = 5.0;          // Reject tags beyond this range
     public static final double kBaseStdDevXY = 0.5;                  // Base trust in meters (lower = trust more)
     public static final double kBaseStdDevTheta = 9999999;           // Near-infinite: don't correct heading from vision
