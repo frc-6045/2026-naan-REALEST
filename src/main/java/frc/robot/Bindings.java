@@ -125,6 +125,13 @@ public class Bindings {
         // m_operatorController.pov(0).whileTrue(new TopRollerOpenLoop(topRoller, () -> MotorConstants.kTopRollerSpeed));
         // m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, () -> -MotorConstants.kTopRollerSpeed));
 
+        //shoot while parked against the trench
+        m_operatorController.pov(180).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerSpeed));
+        m_operatorController.pov(180).whileTrue(new RunFeeder(feeder, Directions.IN));
+        m_operatorController.pov(180).whileTrue(new ShooterOpenLoop(shooter, 2440));
+        m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, 2725);
+        
+
         // Spindexer CW (normal direction)
         m_operatorController.pov(90).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerSpeed));
 
