@@ -20,11 +20,13 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
 import frc.robot.commands.AutoCommands.StartRevShooter;
+import frc.robot.commands.AutoCommands.StopShooter;
 import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.RaiseIntakeHalfway;
 import frc.robot.commands.IntakeCommands.StowIntake;
-import frc.robot.commands.ShootFeedCommands.AutoAimAndShoot;
-import frc.robot.commands.ShootFeedCommands.AutoAimPrepare;
+import frc.robot.commands.ShootFeedCommands.RevShooter;
+import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShoot;
+import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimPrepare;
 import frc.robot.commands.SpindexerCommands.StopSpindexer;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
@@ -100,7 +102,7 @@ public class Autos {
     // Auto-aim commands (Limelight-based shooting for autonomous)
 
     // Prep only -- spins flywheel + sets top roller while PathPlanner drives
-    NamedCommands.registerCommand("autoAim", new AutoAimPrepare(flywheel, topRoller).asProxy());
+    NamedCommands.registerCommand("autoAimPrepShooter", new AutoAimPrepare(flywheel, topRoller).asProxy());
 
     // Full stop-aim-shoot -- stops driving, rotates to target, fires, ends after feeding
     NamedCommands.registerCommand("autoAimAndShoot", Commands.defer(() -> {
@@ -134,7 +136,6 @@ public class Autos {
     // Add autos to chooser
     m_autoChooser.addOption("normal auto", AutoBuilder.buildAuto("halfauto"));
     m_autoChooser.addOption("quarter-field auto", AutoBuilder.buildAuto("quarterauto"));
-    m_autoChooser.addOption("no vision quarter-field auto", AutoBuilder.buildAuto("quarterautonovision"));
     m_autoChooser.addOption("test square", AutoBuilder.buildAuto("drawsquare"));
     m_autoChooser.addOption("test commands", AutoBuilder.buildAuto("testcommands"));
 

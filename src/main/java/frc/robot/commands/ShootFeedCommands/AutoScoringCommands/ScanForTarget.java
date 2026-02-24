@@ -1,4 +1,4 @@
-package frc.robot.commands.ShootFeedCommands;
+package frc.robot.commands.ShootFeedCommands.AutoScoringCommands;
 
 import java.util.function.DoubleSupplier;
 

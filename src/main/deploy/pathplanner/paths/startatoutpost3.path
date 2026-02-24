@@ -3,47 +3,35 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.852,
-        "y": 3.5
+        "x": 0.4420073784722227,
+        "y": 2.8592592592592596
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.112967189728957,
-        "y": 1.1820256776034253
+        "x": 0.4420073784722228,
+        "y": 3.976071731833746
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "outpost3"
     },
     {
       "anchor": {
-        "x": -0.49,
-        "y": 2.778073642730044
+        "x": 0.4420073784722227,
+        "y": 5.994064887152778
       },
       "prevControl": {
-        "x": 1.2184308131241082,
-        "y": 1.5831241084165475
+        "x": 0.44200737847222266,
+        "y": 4.7774427059532485
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "outpost4"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "startRevShooter",
-      "waypointRelativePos": 0.7352968019859819,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "autoAimPrepShooter"
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -54,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -72.7591953109752
+    "rotation": 89.61568527508447
   },
   "reversed": false,
-  "folder": "quarterpaths",
+  "folder": "start at outpost paths",
   "idealStartingState": {
-    "velocity": 3.0,
+    "velocity": 2.0,
     "rotation": 90.0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

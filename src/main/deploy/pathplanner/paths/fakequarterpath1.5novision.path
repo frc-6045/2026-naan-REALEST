@@ -52,7 +52,25 @@
   ],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "deployIntake",
+      "waypointRelativePos": 0.5315968165887847,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "deployIntake"
+        }
+      }
+    },
+    {
+      "name": "startIntakeRoller",
+      "waypointRelativePos": 0.6487113025700939,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -66,7 +84,7 @@
     "rotation": 90.0
   },
   "reversed": false,
-  "folder": "quarterpathsnovision",
+  "folder": "quarterpaths",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
