@@ -20,13 +20,12 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
 import frc.robot.commands.AutoCommands.StartRevShooter;
-import frc.robot.commands.AutoCommands.StopShooter;
 import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.RaiseIntakeHalfway;
 import frc.robot.commands.IntakeCommands.StowIntake;
-import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShoot;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimPrepare;
+import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimWhileDriving;
 import frc.robot.commands.SpindexerCommands.StopSpindexer;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
@@ -121,6 +120,12 @@ public class Autos {
       }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
         .withTimeout(ShootingConstants.kAutoShootTimeoutSec);
     }, Set.of(swerve, flywheel, topRoller, feeder, spindexer)).asProxy());
+
+    // Aim while driving -- overrides PathPlanner rotation to aim at target, spins up + feeds
+    NamedCommands.registerCommand("autoAimWhileDriving", Commands.defer(
+      () -> new AutoAimWhileDriving(swerve, flywheel, topRoller, feeder, spindexer)
+          .withTimeout(ShootingConstants.kAutoShootTimeoutSec),
+      Set.of(flywheel, topRoller, feeder, spindexer)).asProxy());
 
     // Cancel prep -- stops flywheel and top roller
     NamedCommands.registerCommand("stopAim", new ParallelCommandGroup(

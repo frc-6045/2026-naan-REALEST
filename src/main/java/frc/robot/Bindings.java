@@ -129,7 +129,7 @@ public class Bindings {
         m_operatorController.pov(180).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerSpeed));
         m_operatorController.pov(180).whileTrue(new RunFeeder(feeder, Directions.IN));
         m_operatorController.pov(180).whileTrue(new ShooterOpenLoop(shooter, 2440));
-        m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, 2725);
+        m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, 2725));
         
 
         // Spindexer CW (normal direction)
