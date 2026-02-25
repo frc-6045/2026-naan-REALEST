@@ -108,7 +108,7 @@ public final class Constants {
     public static final int kAprilTagPipeline = 0; // Pipeline index for AprilTag detection
 
     // Limelight mounting configuration (relative to robot center)
-    public static final double kLimelightMountHeightMeters = 0.625475; // Height of lens from floor (meters)
+    public static final double kLimelightMountHeightMeters = 0.0.64135; // Height of lens from floor (meters)
     public static final double kLimelightMountAngleDegrees = 0.0; // Angle above horizontal (degrees)
 
     // Target configuration
