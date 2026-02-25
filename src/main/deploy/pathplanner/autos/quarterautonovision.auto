@@ -48,6 +48,25 @@
                       "data": {
                         "waitTime": 1.0
                       }
+                    },
+                    {
+                      "type": "sequential",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 0.4
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "startIntakeRoller"
+                            }
+                          }
+                        ]
+                      }
                     }
                   ]
                 }
@@ -107,6 +126,12 @@
                 "data": {
                   "name": "startSpindexer"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "autoAimAndShoot"
+                }
               }
             ]
           }
@@ -157,6 +182,12 @@
                 "data": {
                   "name": "stopShooter"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stopAim"
+                }
               }
             ]
           }
@@ -165,100 +196,6 @@
           "type": "path",
           "data": {
             "pathName": "quarterpath4novision"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "startIntakeRoller"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "quarterpath5novision"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "stopIntake"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "quarterpath6novision"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "spinUpShooter"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "feed"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "startSpindexer"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 4.0
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "stopSpindexer"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "stopFeeder"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "stopShooter"
-                }
-              }
-            ]
           }
         }
       ]
