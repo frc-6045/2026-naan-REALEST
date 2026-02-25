@@ -68,25 +68,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "spinUpShooter"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "feed"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "startSpindexer"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "autoAimAndShoot"
+                  "name": "autoAimWhileDriving"
                 }
               }
             ]
@@ -121,24 +103,6 @@
           "type": "parallel",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "stopSpindexer"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "stopFeeder"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "stopShooter"
-                }
-              },
               {
                 "type": "named",
                 "data": {
