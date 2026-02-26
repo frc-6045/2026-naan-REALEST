@@ -27,6 +27,12 @@
           "data": {
             "pathName": "nobumppath3"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "nobumppath4"
+          }
         }
       ]
     }

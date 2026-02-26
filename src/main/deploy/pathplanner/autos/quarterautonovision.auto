@@ -23,6 +23,50 @@
                       "data": {
                         "pathName": "fakequarterpath1.5novision"
                       }
+                    },
+                    {
+                      "type": "sequential",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 0.2
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "deployIntake"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.0
+                      }
+                    },
+                    {
+                      "type": "sequential",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 0.4
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "startIntakeRoller"
+                            }
+                          }
+                        ]
+                      }
                     }
                   ]
                 }
@@ -68,7 +112,25 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "autoAimWhileDriving"
+                  "name": "spinUpShooter"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "feed"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "startSpindexer"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "autoAimAndShoot"
                 }
               }
             ]
@@ -103,6 +165,24 @@
           "type": "parallel",
           "data": {
             "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "stopSpindexer"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stopFeeder"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stopShooter"
+                }
+              },
               {
                 "type": "named",
                 "data": {
