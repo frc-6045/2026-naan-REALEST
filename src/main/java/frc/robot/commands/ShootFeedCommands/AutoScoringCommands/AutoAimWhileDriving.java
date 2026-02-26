@@ -108,13 +108,13 @@ public class AutoAimWhileDriving extends Command {
             updateFeedState(readyToFire);
 
             // Telemetry
-            SmartDashboard.putBoolean("AutoAimDrive/Aimed", aimed);
-            SmartDashboard.putBoolean("AutoAimDrive/TopRollerReady", topRollerReady);
-            SmartDashboard.putBoolean("AutoAimDrive/FlywheelReady", flywheelReady);
-            SmartDashboard.putBoolean("AutoAimDrive/ReadyToFire", readyToFire);
-            SmartDashboard.putBoolean("AutoAimDrive/OverrideActive", true);
-            SmartDashboard.putNumber("AutoAimDrive/Distance", compensatedDistance);
-            SmartDashboard.putNumber("AutoAimDrive/AimLead", compensation.aimLeadDegrees);
+            SmartDashboard.putBoolean("AutoAim Aimed", aimed);
+            SmartDashboard.putBoolean("AutoAim TopRollerReady", topRollerReady);
+            SmartDashboard.putBoolean("AutoAim FlywheelReady", flywheelReady);
+            SmartDashboard.putBoolean("AutoAim ReadyToFire", readyToFire);
+            SmartDashboard.putBoolean("AutoAim OverrideActive", true);
+            SmartDashboard.putNumber("AutoAim Distance", compensatedDistance);
+            SmartDashboard.putNumber("AutoAim AimLead", compensation.aimLeadDegrees);
         } else {
             // No valid target: keep motors spinning at last known RPM, stop feeding
             m_flywheel.setTargetRPM(m_lastTargetRPM);
@@ -125,9 +125,9 @@ public class AutoAimWhileDriving extends Command {
             m_graceTimer.stop();
             m_graceTimer.reset();
 
-            SmartDashboard.putBoolean("AutoAimDrive/Aimed", false);
-            SmartDashboard.putBoolean("AutoAimDrive/ReadyToFire", false);
-            SmartDashboard.putBoolean("AutoAimDrive/OverrideActive", false);
+            SmartDashboard.putBoolean("AutoAim Aimed", false);
+            SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
+            SmartDashboard.putBoolean("AutoAim OverrideActive", false);
         }
     }
 
@@ -142,8 +142,8 @@ public class AutoAimWhileDriving extends Command {
         m_feeder.stopFeederMotor();
         m_spindexer.stopSpindexerMotor();
 
-        SmartDashboard.putBoolean("AutoAimDrive/ReadyToFire", false);
-        SmartDashboard.putBoolean("AutoAimDrive/OverrideActive", false);
+        SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
+        SmartDashboard.putBoolean("AutoAim OverrideActive", false);
     }
 
     @Override
