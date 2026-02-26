@@ -30,7 +30,7 @@ public class Vision extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Limelight/Distance from Target", getDistanceFromClosestTarget());
-        SmartDashboard.putNumber("Limelight/TX", LimelightHelpers.getTfX(limelight));
+        SmartDashboard.putNumber("Limelight/TX", LimelightHelpers.getTX(limelight));
         SmartDashboard.putNumber("Limelight/TY", LimelightHelpers.getTY(limelight));
     }
 }

@@ -1,0 +1,37 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "nobumppath1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "nobumppath2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "autoAimAndShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "nobumppath3"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

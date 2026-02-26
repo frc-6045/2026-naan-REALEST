@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.602985749421297,
+        "x": 3.63796005706134,
         "y": 5.942429398148148
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.145803727301849,
-        "y": 5.942429398148148
+        "x": 2.8813212674176776,
+        "y": 5.9481029815214495
       },
       "isLocked": false,
       "linkedName": "nobump1"
     },
     {
       "anchor": {
-        "x": 0.42632646122685225,
+        "x": 0.4679885877318113,
         "y": 5.942429398148148
       },
       "prevControl": {
-        "x": 1.2033264612268524,
-        "y": 5.942429398148148
+        "x": 0.9372954164793712,
+        "y": 5.933681946613254
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,7 +31,30 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "deploy intake",
+      "waypointRelativePos": 0.4969615124915604,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "deployIntake"
+        }
+      }
+    },
+    {
+      "name": "run intake",
+      "waypointRelativePos": 0.7076299797434172,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "startIntakeRoller"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -45,7 +68,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": "no bump start at depot paths (bad!)",
+  "folder": " start at depot paths)",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

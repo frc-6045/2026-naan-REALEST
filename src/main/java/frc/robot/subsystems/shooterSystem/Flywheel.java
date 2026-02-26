@@ -119,26 +119,5 @@ public class Flywheel extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Flywheel/Velocity (RPM)", getRPM());
-
-    // Live PID tuning - check if values changed on SmartDashboard
-
-    if (tunedP != m_lastP || tunedI != m_lastI || tunedD != m_lastD || tunedFF != m_lastFF) {
-      m_config.closedLoop
-          .p(tunedP)
-          .i(tunedI)
-          .d(tunedD)
-          .velocityFF(tunedFF);
-
-      m_config.inverted(false);
-      m_FlywheelMotor1.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-      m_config.inverted(true);
-      m_FlywheelMotor2.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-
-      m_lastP = tunedP;
-      m_lastI = tunedI;
-      m_lastD = tunedD;
-      m_lastFF = tunedFF;
-    } else {
-    }
   }
 }

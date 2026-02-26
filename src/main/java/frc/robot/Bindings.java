@@ -15,6 +15,7 @@ import frc.robot.commands.IntakeCommands.RunIntake;
 import frc.robot.commands.IntakeCommands.RunIntakePivot;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.ShootFeedCommands.RunFeeder;
+import frc.robot.commands.ShootFeedCommands.ShooterOpenLoop;
 import frc.robot.commands.ShootFeedCommands.TopRollerOpenLoop;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShoot;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.ScanForTarget;
@@ -128,8 +129,8 @@ public class Bindings {
         //shoot while parked against the trench
         m_operatorController.pov(180).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerSpeed));
         m_operatorController.pov(180).whileTrue(new RunFeeder(feeder, Directions.IN));
-        m_operatorController.pov(180).whileTrue(new ShooterOpenLoop(shooter, 2440));
-        m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, 2725));
+        m_operatorController.pov(180).whileTrue(new ShooterOpenLoop(flywheel, () -> {return 2440;}));
+        m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, () -> {return 2725;}));
         
 
         // Spindexer CW (normal direction)

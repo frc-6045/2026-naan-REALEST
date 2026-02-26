@@ -117,21 +117,5 @@ public class TopRoller extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", getRPM());
-
-    if (tunedP != m_lastP || tunedI != m_lastI || tunedD != m_lastD || tunedFF != m_lastFF) {
-      m_rollerConfig.closedLoop
-          .p(tunedP)
-          .i(tunedI)
-          .d(tunedD)
-          .velocityFF(tunedFF);
-
-      m_Motor.configure(m_rollerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-
-      m_lastP = tunedP;
-      m_lastI = tunedI;
-      m_lastD = tunedD;
-      m_lastFF = tunedFF;
-    } else {
-    }
   }
 }
