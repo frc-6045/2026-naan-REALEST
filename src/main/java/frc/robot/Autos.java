@@ -143,6 +143,7 @@ public class Autos {
     m_autoChooser.addOption("quarter-field auto", AutoBuilder.buildAuto("quarterauto"));
     m_autoChooser.addOption("test square", AutoBuilder.buildAuto("drawsquare"));
     m_autoChooser.addOption("test commands", AutoBuilder.buildAuto("testcommands"));
+    m_autoChooser.addOption("test auto aim!!!!!!1", AutoBuilder.buildAuto("testAutoAimAndShoot"));
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
