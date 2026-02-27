@@ -88,9 +88,47 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "autoAimAndShoot"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "autoAimAndShoot"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.314
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "startStowIntake"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.5
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "stopStowIntake"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {
