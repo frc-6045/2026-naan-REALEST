@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 4.6730527817403695,
+        "x": 4.271954350927246,
         "y": 2.3335663338088444
       },
       "prevControl": {
-        "x": 3.8708559201141206,
-        "y": 2.955292439372325
+        "x": 3.534450784593438,
+        "y": 3.1616405135520687
       },
       "nextControl": {
-        "x": 4.870653737468501,
-        "y": 2.1804197951756485
+        "x": 4.4971777509792945,
+        "y": 2.080683919715316
       },
       "isLocked": false,
       "linkedName": null
@@ -36,8 +36,8 @@
         "y": 1.828958630527818
       },
       "prevControl": {
-        "x": 5.100028530670471,
-        "y": 2.1136091298145514
+        "x": 4.815378031383736,
+        "y": 1.7383880171184038
       },
       "nextControl": null,
       "isLocked": false,
@@ -55,18 +55,37 @@
   "eventMarkers": [
     {
       "name": "deployIntake",
-      "waypointRelativePos": 0.5206079727564101,
+      "waypointRelativePos": 0.067,
       "endWaypointRelativePos": null,
       "command": {
-        "type": "named",
+        "type": "sequential",
         "data": {
-          "name": "deployIntake"
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "startDeployIntake"
+              }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 0.867
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "stopDeployIntake"
+              }
+            }
+          ]
         }
       }
     },
     {
       "name": "startIntakeRoller",
-      "waypointRelativePos": 0.7743639823717944,
+      "waypointRelativePos": 0.12424037812288977,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",

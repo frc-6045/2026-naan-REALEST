@@ -13,7 +13,19 @@
         {
           "type": "named",
           "data": {
-            "name": "autoAimWhileDriving"
+            "name": "startDeployIntake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.67
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "stopDeployIntake"
           }
         }
       ]

@@ -50,27 +50,53 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "quarterpath3novision"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "quarterpath3novision"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "startStowIntake"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.2
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "stopStowIntake"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "autoAimWhileDriving"
+            "name": "autoAimAndShoot"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "quarterpath4novision"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": []
           }
         }
       ]

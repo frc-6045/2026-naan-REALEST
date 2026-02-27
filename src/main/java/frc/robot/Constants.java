@@ -46,7 +46,7 @@ public final class Constants {
     // Motor Speed Limits (percentage, -1.0 to 1.0)
     public static final double kFeederMotorMaximumSpeed = 1;
     public static final double kIntakeMotorMaximumSpeed = 1;
-    public static final double kIntakePivotMotorMaximumSpeed = .2567;
+    public static final double kIntakePivotMotorMaximumSpeed = .4;
     public static final double kShooterMotorMaximumSpeed = 1;
     public static final double kTopRollerMotorMaximumSpeed = 1;
     public static final double kSpindexerMotorMaximumSpeed = 1;
@@ -163,8 +163,8 @@ public final class Constants {
     public static final double kMaxShootingDistanceMeters = 7.0;
 
     // Autonomous auto-aim timing (seconds)
-    public static final double kAutoShootFeedDurationSec = 0.5; // How long to run feeder after auto-fire triggers
-    public static final double kAutoShootTimeoutSec = 5.0; // Safety timeout to prevent stalling auto
+    public static final double kAutoShootFeedDurationSec = 20; // How long to run feeder after auto-fire triggers
+    public static final double kAutoShootTimeoutSec = 20.0; // Safety timeout to prevent stalling auto
     public static final double kFeedingGracePeriodSec = 0.5; // Grace period before stopping feeder if not ready (prevents brief aim loss from stopping feed)
   }
 
