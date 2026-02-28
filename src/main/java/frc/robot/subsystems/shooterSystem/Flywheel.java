@@ -25,12 +25,6 @@ public class Flywheel extends SubsystemBase {
   private final SparkClosedLoopController m_FlywheelPIDController2;
   private final SparkFlexConfig m_config = new SparkFlexConfig();
 
-  // Track last PID values to detect changes
-  private double m_lastP = MotorConstants.kShooterP;
-  private double m_lastI = MotorConstants.kShooterI;
-  private double m_lastD = MotorConstants.kShooterD;
-  private double m_lastFF = MotorConstants.kShooterFF;
-
   public Flywheel() {
     m_FlywheelMotor1 = new SparkFlex(MotorConstants.kShooterMotor1CanID, MotorType.kBrushless);
     m_FlywheelMotor2 = new SparkFlex(MotorConstants.kShooterMotor2CanID, MotorType.kBrushless);
