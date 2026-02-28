@@ -54,8 +54,19 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
+      "name": "startIntakeRoller",
+      "waypointRelativePos": 0.12424037812288977,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "startIntakeRoller"
+        }
+      }
+    },
+    {
       "name": "deployIntake",
-      "waypointRelativePos": 0.067,
+      "waypointRelativePos": 0.27,
       "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",
@@ -80,17 +91,6 @@
               }
             }
           ]
-        }
-      }
-    },
-    {
-      "name": "startIntakeRoller",
-      "waypointRelativePos": 0.12424037812288977,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "startIntakeRoller"
         }
       }
     }
