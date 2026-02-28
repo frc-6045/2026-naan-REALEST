@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.Directions;
 import frc.robot.Constants.MotorConstants;
+import frc.robot.commands.IntakeCommands.IntakePivotSetpoint;
 import frc.robot.commands.IntakeCommands.RunIntake;
 import frc.robot.commands.IntakeCommands.RunIntakePivot;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
@@ -154,6 +155,8 @@ public class Bindings {
         /*============================*/
         /*       Test Bindings        */
         /*============================*/
+
+        //m_testController.a().whileTrue(new IntakePivotSetpoint(intakePivot, 0));
 
     }
 }
