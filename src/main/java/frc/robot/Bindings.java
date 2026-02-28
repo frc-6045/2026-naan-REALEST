@@ -6,7 +6,9 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.Directions;
@@ -131,7 +133,16 @@ public class Bindings {
         // m_operatorController.pov(180).whileTrue(new RunFeeder(feeder, Directions.IN));
         // m_operatorController.pov(180).whileTrue(new ShooterOpenLoop(flywheel, () -> {return 2440;}));
         // m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, () -> {return 2725;}));
-        m_operatorController.pov(180).whileTrue(new RevShooter(flywheel, topRoller, () -> {return 2440;}, () -> {return 2725;}));
+        m_operatorController.pov(180).whileTrue(new ParallelCommandGroup(
+            new RevShooter(flywheel, topRoller, () -> {return 2440;}, () -> {return 2440;}),
+            new SequentialCommandGroup(
+                new WaitCommand(1.67),
+                new ParallelCommandGroup(
+                    new RunFeeder(feeder, Directions.IN),
+                    new RunSpindexer(spindexer, MotorConstants.kSpindexerSpeed)
+                )
+            )
+        ));
         
 
         // Spindexer CW (normal direction)
