@@ -25,12 +25,6 @@ public class TopRoller extends SubsystemBase {
   private final SparkClosedLoopController m_PIDController;
   private final RelativeEncoder m_Encoder;
 
-  // Track last PID values to detect changes
-  private double m_lastP = MotorConstants.kRollerP;
-  private double m_lastI = MotorConstants.kRollerI;
-  private double m_lastD = MotorConstants.kRollerD;
-  private double m_lastFF = MotorConstants.kRollerFF;
-
   public TopRoller() {
     m_Motor = new SparkFlex(MotorConstants.kTopRollerMotorCanID, MotorType.kBrushless);
 
