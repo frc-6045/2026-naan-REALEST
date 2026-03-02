@@ -56,7 +56,7 @@ public class Bindings {
         m_driverController.rightTrigger(0.05).whileTrue(
             Commands.runEnd(
                 () -> {
-                    double t = m_operatorController.getRightTriggerAxis();
+                    double t = m_driverController.getRightTriggerAxis();
                     intake.setSpeed(t);
                 },
                 () -> intake.setSpeed(0.0),
@@ -66,7 +66,7 @@ public class Bindings {
         m_driverController.leftTrigger(0.05).whileTrue(
             Commands.runEnd(
                 () -> {
-                    double t = -m_operatorController.getLeftTriggerAxis();
+                    double t = -m_driverController.getLeftTriggerAxis();
                     intake.setSpeed(t);
                 },
                 () -> intake.setSpeed(0.0),

@@ -55,12 +55,12 @@ public class TopRoller extends SubsystemBase {
     m_rollerConfig
         .idleMode(IdleMode.kBrake)
         .inverted(true)
-        .smartCurrentLimit(MotorConstants.kTopRollerCurrentLimit)
-        .openLoopRampRate(0.167)
-        .closedLoopRampRate(0.167);
+        .smartCurrentLimit(MotorConstants.kTopRollerCurrentLimit);
     m_rollerConfig.encoder
         .velocityConversionFactor(1.0)  // 1:1, no gearing - raw motor RPM
-        .positionConversionFactor(1.0);
+        .positionConversionFactor(1.0)
+        .uvwAverageDepth(2)
+        .uvwMeasurementPeriod(10);
     m_rollerConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(MotorConstants.kRollerP)
