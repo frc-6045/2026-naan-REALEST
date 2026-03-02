@@ -114,5 +114,10 @@ public class Flywheel extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Flywheel/Velocity (RPM)", getRPM());
+    double tunedP = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/P", MotorConstants.kShooterP);
+    double tunedI = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/I", MotorConstants.kShooterI);
+    double tunedD = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/D", MotorConstants.kShooterD);
+    double tunedFF = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/FF", MotorConstants.kShooterFF);
+
   }
 }
