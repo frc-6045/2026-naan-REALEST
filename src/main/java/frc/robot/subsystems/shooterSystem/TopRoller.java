@@ -25,6 +25,12 @@ public class TopRoller extends SubsystemBase {
   private final SparkClosedLoopController m_PIDController;
   private final RelativeEncoder m_Encoder;
 
+  // Track last PIDF values for live tuning
+  private double m_lastP = MotorConstants.kRollerP;
+  private double m_lastI = MotorConstants.kRollerI;
+  private double m_lastD = MotorConstants.kRollerD;
+  private double m_lastFF = MotorConstants.kRollerFF;
+
   public TopRoller() {
     m_Motor = new SparkFlex(MotorConstants.kTopRollerMotorCanID, MotorType.kBrushless);
 
@@ -40,6 +46,12 @@ public class TopRoller extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Roller/Target RPM", 0);
     SmartDashboard.putNumber("Subsystem: Roller/Speed", 0);
     SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", 0);
+
+    // Initialize PIDF tuning values
+    SmartDashboard.putNumber("Subsystem: Roller/PIDF/P", MotorConstants.kRollerP);
+    SmartDashboard.putNumber("Subsystem: Roller/PIDF/I", MotorConstants.kRollerI);
+    SmartDashboard.putNumber("Subsystem: Roller/PIDF/D", MotorConstants.kRollerD);
+    SmartDashboard.putNumber("Subsystem: Roller/PIDF/FF", MotorConstants.kRollerFF);
   }
 
   /**
@@ -111,9 +123,26 @@ public class TopRoller extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", getRPM());
+
+    // Live PIDF tuning - only reconfigure if values changed
     double tunedP = SmartDashboard.getNumber("Subsystem: Roller/PIDF/P", MotorConstants.kRollerP);
     double tunedI = SmartDashboard.getNumber("Subsystem: Roller/PIDF/I", MotorConstants.kRollerI);
     double tunedD = SmartDashboard.getNumber("Subsystem: Roller/PIDF/D", MotorConstants.kRollerD);
     double tunedFF = SmartDashboard.getNumber("Subsystem: Roller/PIDF/FF", MotorConstants.kRollerFF);
+
+    if (tunedP != m_lastP || tunedI != m_lastI || tunedD != m_lastD || tunedFF != m_lastFF) {
+      SparkFlexConfig pidConfig = new SparkFlexConfig();
+      pidConfig.closedLoop
+          .p(tunedP)
+          .i(tunedI)
+          .d(tunedD)
+          .velocityFF(tunedFF);
+      m_Motor.configure(pidConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+
+      m_lastP = tunedP;
+      m_lastI = tunedI;
+      m_lastD = tunedD;
+      m_lastFF = tunedFF;
+    }
   }
 }
