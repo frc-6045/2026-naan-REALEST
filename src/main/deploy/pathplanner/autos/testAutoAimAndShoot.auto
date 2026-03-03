@@ -5,15 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "barelydrive"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "autoAimAndShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "not a path"
           }
         }
       ]

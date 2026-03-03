@@ -5,33 +5,27 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "outpost12"
+          }
+        },
+        {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 3.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "startatoutpost1"
+            "pathName": "outpost23"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "autoAimAndShoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "startatoutpost2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "startatoutpost3"
           }
         }
       ]
