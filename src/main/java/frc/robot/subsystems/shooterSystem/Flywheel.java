@@ -82,9 +82,9 @@ public class Flywheel extends SubsystemBase {
         .d(MotorConstants.kShooterD)
         .velocityFF(MotorConstants.kShooterFF)
         .iZone(MotorConstants.kShooterIZone);
-    // m_config.encoder
-    //     .uvwAverageDepth(2)
-    //     .uvwMeasurementPeriod(10);
+    m_config.encoder
+        .uvwAverageDepth(2)
+        .uvwMeasurementPeriod(10);
   }
 
   public void setSpeed(double speed) {
