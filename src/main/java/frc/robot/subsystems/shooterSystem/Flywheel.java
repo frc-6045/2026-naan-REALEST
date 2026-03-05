@@ -74,6 +74,8 @@ public class Flywheel extends SubsystemBase {
   private void updateMotorSettings() {
     m_config
         .idleMode(IdleMode.kBrake)
+        .openLoopRampRate(0.167)
+        .closedLoopRampRate(0.167)
         .smartCurrentLimit(MotorConstants.kShooterCurrentLimit);
     m_config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -82,9 +84,9 @@ public class Flywheel extends SubsystemBase {
         .d(MotorConstants.kShooterD)
         .velocityFF(MotorConstants.kShooterFF)
         .iZone(MotorConstants.kShooterIZone);
-    m_config.encoder
-        .uvwAverageDepth(2)
-        .uvwMeasurementPeriod(10);
+    // m_config.encoder
+    //     .uvwAverageDepth(2)
+    //     .uvwMeasurementPeriod(10);
   }
 
   public void setSpeed(double speed) {

@@ -53,16 +53,16 @@ public class Bindings {
         m_driverController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
         m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
 
-        m_driverController.rightTrigger(0.05).whileTrue(
-            Commands.runEnd(
-                () -> {
-                    double t = m_driverController.getRightTriggerAxis();
-                    intake.setSpeed(t);
-                },
-                () -> intake.setSpeed(0.0),
-                intake
-            )
-        );
+        // m_driverController.rightTrigger(0.05).whileTrue(
+        //     Commands.runEnd(
+        //         () -> {
+        //             double t = m_driverController.getRightTriggerAxis();
+        //             intake.setSpeed(t);
+        //         },
+        //         () -> intake.setSpeed(0.0),
+        //         intake
+        //     )
+        // );
         m_driverController.leftTrigger(0.05).whileTrue(
             Commands.runEnd(
                 () -> {

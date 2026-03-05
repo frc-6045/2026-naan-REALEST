@@ -127,6 +127,12 @@
                     }
                   ]
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "startIntakeRoller"
+                }
               }
             ]
           }

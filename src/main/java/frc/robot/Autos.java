@@ -125,11 +125,28 @@ public class Autos {
         .withTimeout(ShootingConstants.kAutoShootTimeoutSec);
     }, Set.of(swerve, flywheel, topRoller, feeder, spindexer)).asProxy());
 
+    NamedCommands.registerCommand("autoAimAndShoot5Second", Commands.defer(() -> {
+      Timer feedTimer = new Timer();
+      AutoAimAndShoot cmd = new AutoAimAndShoot(
+          swerve, flywheel, topRoller, feeder, spindexer, () -> 0.0, () -> 0.0);
+
+      return cmd.until(() -> {
+        if (cmd.isFeedingActive()) {
+          if (!feedTimer.isRunning()) {
+            feedTimer.start();
+          }
+          return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
+        }
+        return false;
+      }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
+        .withTimeout(5);
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer)).asProxy());
+
     // Aim while driving -- overrides PathPlanner rotation to aim at target, spins up + feeds
-    NamedCommands.registerCommand("autoAimWhileDriving", Commands.defer(
-      () -> new AutoAimWhileDriving(swerve, flywheel, topRoller, feeder, spindexer)
-          .withTimeout(ShootingConstants.kAutoShootTimeoutSec),
-      Set.of(flywheel, topRoller, feeder, spindexer)).asProxy());
+    // NamedCommands.registerCommand("autoAimWhileDriving", Commands.defer(
+    //   () -> new AutoAimWhileDriving(swerve, flywheel, topRoller, feeder, spindexer)
+    //       .withTimeout(ShootingConstants.kAutoShootTimeoutSec),
+    //   Set.of(flywheel, topRoller, feeder, spindexer)).asProxy());
 
     // Cancel prep -- stops flywheel and top roller
     NamedCommands.registerCommand("stopAim", new ParallelCommandGroup(
@@ -145,6 +162,7 @@ public class Autos {
     // Add autos to chooser
     m_autoChooser.addOption("half auto", AutoBuilder.buildAuto("quarterautonovisionAllison"));
     m_autoChooser.addOption("full auto", AutoBuilder.buildAuto("moreautonovisionAllison"));
+    m_autoChooser.addOption("3/4 auto", AutoBuilder.buildAuto("34autonovisionAllison"));
     m_autoChooser.addOption("outpost auto", AutoBuilder.buildAuto("outpost auto"));
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);

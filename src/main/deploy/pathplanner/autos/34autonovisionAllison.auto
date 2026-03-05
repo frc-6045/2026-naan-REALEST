@@ -33,7 +33,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "quarterpath2novision"
+            "pathName": "Copy of longerpath2novision"
           }
         },
         {
@@ -56,7 +56,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "quarterpath3novision"
+                  "pathName": "Copy of longer path 3"
                 }
               },
               {
@@ -94,7 +94,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "autoAimAndShoot5Second"
+                  "name": "autoAimAndShoot"
                 }
               },
               {
@@ -135,12 +135,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "shoottooutpost"
           }
         }
       ]

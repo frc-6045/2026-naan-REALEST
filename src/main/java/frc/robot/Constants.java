@@ -70,7 +70,7 @@ public final class Constants {
     // Motor Current Limits (Amps)
     public static final int kFeederCurrentLimit = 50;
     public static final int kIntakeCurrentLimit = 50;
-    public static final int kIntakePivotCurrentLimit = 40;
+    public static final int kIntakePivotCurrentLimit = 50;
     public static final int kShooterCurrentLimit = 60;
     public static final int kTopRollerCurrentLimit = 60;
     public static final int kSpindexerCurrentLimit = 80;
@@ -83,22 +83,22 @@ public final class Constants {
     public static final double kDeploySetpoint = .6767676767;
 
     // Shooter PID Constants (for velocity control in RPM)
-    public static final double kShooterP = 0.0008; // Proportional gain
+    public static final double kShooterP = 0.000; // Proportional gain
     public static final double kShooterI = 0.0; // Integral gain
-    public static final double kShooterD = 0.02; // Derivative gain
-    public static final double kShooterFF = 0.00189867; // Feed-forward gain (velocity feed-forward)
+    public static final double kShooterD = 0.0; // Derivative gain
+    public static final double kShooterFF = 0.00184; // Feed-forward gain (velocity feed-forward)
     public static final double kShooterIZone = 400.0; // I term only active within this RPM error range
 
-    public static final double kRollerP = 0.00067; // Proportional gain
+    public static final double kRollerP = 0.0001; // Proportional gain
     public static final double kRollerI = 0.0; // Integral gain
-    public static final double kRollerD = 0.02; // Derivative gain
-    public static final double kRollerFF = 0.0018969; // Feed-forward gain (velocity feed-forward)
+    public static final double kRollerD = 0.0; // Derivative gain
+    public static final double kRollerFF = 0.00182; // Feed-forward gain (velocity feed-forward)
     public static final double kRollerIZone = 400.0; // I term only active within this RPM error range
 
     // Shooter Target Speed (RPM)
     public static final double kShooterTargetRPM = 2200.0; // Target shooter wheel speed in RPM
     public static final double kRollerTargetRPM = 2400; // Target shooter wheel speed in RPM
-    public static final double kShooterRPMTolerance = 400.0; // Acceptable RPM tolerance before feeding
+    public static final double kShooterRPMTolerance = 600.0; // Acceptable RPM tolerance before feeding
     public static final double kRollerRPMTolerance = 600.0; // Acceptable roller RPM tolerance before feeding
   }
 
@@ -171,7 +171,7 @@ public final class Constants {
     // Autonomous auto-aim timing (seconds)
     public static final double kAutoShootFeedDurationSec = 20; // How long to run feeder after auto-fire triggers
     public static final double kAutoShootTimeoutSec = 20.0; // Safety timeout to prevent stalling auto
-    public static final double kFeedingGracePeriodSec = 0.25; // Grace period before stopping feeder if not ready (prevents brief aim loss from stopping feed)
+    public static final double kFeedingGracePeriodSec = 0; // Grace period before stopping feeder if not ready (prevents brief aim loss from stopping feed)
   }
 
   public static class VelocityCompensationConstants {
