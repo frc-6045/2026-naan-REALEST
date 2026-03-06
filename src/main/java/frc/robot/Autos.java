@@ -164,9 +164,9 @@ public class Autos {
     m_autoChooser.addOption("full auto", AutoBuilder.buildAuto("moreautonovisionAllison"));
     m_autoChooser.addOption("3/4 auto", AutoBuilder.buildAuto("34autonovisionAllison"));
     m_autoChooser.addOption("outpost auto", AutoBuilder.buildAuto("outpost auto"));
-    m_autoChooser.addOption("half auto", AutoBuilder.buildAuto("quarterautonovisionwithbigswoop"));
-    m_autoChooser.addOption("full auto", AutoBuilder.buildAuto("moreautonovisionwithbigswoop"));
-    m_autoChooser.addOption("3/4 auto", AutoBuilder.buildAuto("34autonovisionwithbigswoop"));
+    m_autoChooser.addOption("half auto swoop", AutoBuilder.buildAuto("quarterautonovisionwithbigswoop"));
+    m_autoChooser.addOption("full auto swoop", AutoBuilder.buildAuto("moreautonovisionwithbigswoop"));
+    m_autoChooser.addOption("3/4 auto swoop", AutoBuilder.buildAuto("34autonovisionwithbigswoop"));
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
