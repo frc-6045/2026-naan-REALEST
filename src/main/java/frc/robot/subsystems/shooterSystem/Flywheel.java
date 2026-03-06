@@ -129,26 +129,26 @@ public class Flywheel extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Flywheel/Velocity (RPM)", getRPM());
 
-    // Live PIDF tuning - only reconfigure if values changed
-    double tunedP = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/P", MotorConstants.kShooterP);
-    double tunedI = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/I", MotorConstants.kShooterI);
-    double tunedD = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/D", MotorConstants.kShooterD);
-    double tunedFF = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/FF", MotorConstants.kShooterFF);
+    // // Live PIDF tuning - only reconfigure if values changed
+    // double tunedP = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/P", MotorConstants.kShooterP);
+    // double tunedI = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/I", MotorConstants.kShooterI);
+    // double tunedD = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/D", MotorConstants.kShooterD);
+    // double tunedFF = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/FF", MotorConstants.kShooterFF);
 
-    if (tunedP != m_lastP || tunedI != m_lastI || tunedD != m_lastD || tunedFF != m_lastFF) {
-      SparkFlexConfig pidConfig = new SparkFlexConfig();
-      pidConfig.closedLoop
-          .p(tunedP)
-          .i(tunedI)
-          .d(tunedD)
-          .velocityFF(tunedFF);
-      m_FlywheelMotor1.configure(pidConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-      m_FlywheelMotor2.configure(pidConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    // if (tunedP != m_lastP || tunedI != m_lastI || tunedD != m_lastD || tunedFF != m_lastFF) {
+    //   SparkFlexConfig pidConfig = new SparkFlexConfig();
+    //   pidConfig.closedLoop
+    //       .p(tunedP)
+    //       .i(tunedI)
+    //       .d(tunedD)
+    //       .velocityFF(tunedFF);
+    //   m_FlywheelMotor1.configure(pidConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    //   m_FlywheelMotor2.configure(pidConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
-      m_lastP = tunedP;
-      m_lastI = tunedI;
-      m_lastD = tunedD;
-      m_lastFF = tunedFF;
-    }
+    //   m_lastP = tunedP;
+    //   m_lastI = tunedI;
+    //   m_lastD = tunedD;
+    //   m_lastFF = tunedFF;
+    // }
   }
 }

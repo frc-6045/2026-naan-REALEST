@@ -96,8 +96,8 @@ public double applyLimits(double speed) {
     double limitedSpeed = m_RampLimiter.calculate(m_TargetSpeed);
     m_IntakeDeployMotor.set(limitedSpeed);
 
-    double position = getAbsoluteEncoderReading();
+    // double position = getAbsoluteEncoderReading();
     SmartDashboard.putNumber("Subsystem: Intake Pivot/Speed", limitedSpeed);
-    SmartDashboard.putNumber("Subsystem: Intake Pivot/Position", position);
+    // SmartDashboard.putNumber("Subsystem: Intake Pivot/Position", position);
   }
 }
