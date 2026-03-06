@@ -53,6 +53,9 @@ public class Autos {
 
     // --- Register NamedCommands for PathPlanner ---
 
+    NamedCommands.registerCommand("print1", new InstantCommand(()->{System.out.println("Auto troubleshoot print 1!");}));
+    NamedCommands.registerCommand("print2", new InstantCommand(()->{System.out.println("Auto troubleshoot print 2!");}));
+
     // Intake commands
     NamedCommands.registerCommand("deployIntake", new DeployIntake(intakePivot));
     NamedCommands.registerCommand("stowIntake", new StowIntake(intakePivot));
@@ -167,6 +170,7 @@ public class Autos {
     m_autoChooser.addOption("half auto swoop", AutoBuilder.buildAuto("quarterautonovisionwithbigswoop"));
     m_autoChooser.addOption("full auto swoop", AutoBuilder.buildAuto("moreautonovisionwithbigswoop"));
     m_autoChooser.addOption("3/4 auto swoop", AutoBuilder.buildAuto("34autonovisionwithbigswoop"));
+    m_autoChooser.addOption("test intake pivot", AutoBuilder.buildAuto("teststow"));
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
