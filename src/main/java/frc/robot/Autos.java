@@ -56,16 +56,16 @@ public class Autos {
     // Intake commands
     NamedCommands.registerCommand("deployIntake", new DeployIntake(intakePivot));
     NamedCommands.registerCommand("stowIntake", new StowIntake(intakePivot));
-    NamedCommands.registerCommand("startDeployIntake", new InstantCommand(() -> intakePivot.setSpeed(.32067), intakePivot));
-    NamedCommands.registerCommand("startStowIntake", new InstantCommand(() -> intakePivot.setSpeed(-.167), intakePivot));
-    NamedCommands.registerCommand("stopDeployIntake", new InstantCommand(() -> intakePivot.stopMotor(), intakePivot));
-    NamedCommands.registerCommand("stopStowIntake", new InstantCommand(() -> intakePivot.stopMotor(), intakePivot));
+    NamedCommands.registerCommand("startDeployIntake", new InstantCommand(() -> intakePivot.setSpeed(.32067), intakePivot).asProxy());
+    NamedCommands.registerCommand("startStowIntake", new InstantCommand(() -> intakePivot.setSpeed(-.167), intakePivot).asProxy());
+    NamedCommands.registerCommand("stopDeployIntake", new InstantCommand(() -> intakePivot.stopMotor(), intakePivot).asProxy());
+    NamedCommands.registerCommand("stopStowIntake", new InstantCommand(() -> intakePivot.stopMotor(), intakePivot).asProxy());
     NamedCommands.registerCommand("raiseIntakeHalfway", new RaiseIntakeHalfway(intakePivot));
-    NamedCommands.registerCommand("startIntakeRoller", new InstantCommand(() -> intake.setSpeed(MotorConstants.kIntakeRollerSpeed), intake));
-    NamedCommands.registerCommand("stopIntake", new InstantCommand(() -> intake.stopIntakeMotor(), intake));
+    NamedCommands.registerCommand("startIntakeRoller", new InstantCommand(() -> intake.setSpeed(MotorConstants.kIntakeRollerSpeed), intake).asProxy());
+    NamedCommands.registerCommand("stopIntake", new InstantCommand(() -> intake.stopIntakeMotor(), intake).asProxy());
 
     // Spindexer commands
-    NamedCommands.registerCommand("startSpindexer", new InstantCommand(() -> spindexer.setSpeed(MotorConstants.kSpindexerSpeed), spindexer));
+    NamedCommands.registerCommand("startSpindexer", new InstantCommand(() -> spindexer.setSpeed(MotorConstants.kSpindexerSpeed), spindexer).asProxy());
     NamedCommands.registerCommand("stopSpindexer", new StopSpindexer(spindexer));
 
     // Flywheel commands
@@ -77,8 +77,8 @@ public class Autos {
     ));
 
     // Feeder commands
-    NamedCommands.registerCommand("feed", new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederSpeed), feeder));
-    NamedCommands.registerCommand("stopFeeder", new InstantCommand(() -> feeder.stopFeederMotor(), feeder));
+    NamedCommands.registerCommand("feed", new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederSpeed), feeder).asProxy());
+    NamedCommands.registerCommand("stopFeeder", new InstantCommand(() -> feeder.stopFeederMotor(), feeder).asProxy());
 
     // Composite commands
     NamedCommands.registerCommand("intakeGamePiece", new SequentialCommandGroup(
