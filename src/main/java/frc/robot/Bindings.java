@@ -18,6 +18,7 @@ import frc.robot.commands.IntakeCommands.RunIntake;
 import frc.robot.commands.IntakeCommands.RunIntakePivot;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.ShootFeedCommands.RunFeeder;
+import frc.robot.commands.ShootFeedCommands.TowerShot;
 import frc.robot.commands.ShootFeedCommands.ShooterOpenLoop;
 import frc.robot.commands.ShootFeedCommands.TopRollerOpenLoop;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShoot;
@@ -134,16 +135,7 @@ public class Bindings {
         // m_operatorController.pov(180).whileTrue(new RunFeeder(feeder, Directions.IN));
         // m_operatorController.pov(180).whileTrue(new ShooterOpenLoop(flywheel, () -> {return 2440;}));
         // m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, () -> {return 2725;}));
-        m_operatorController.pov(180).whileTrue(new ParallelCommandGroup(
-            new RevShooter(flywheel, topRoller, () -> {return 2440;}, () -> {return 2440;}),
-            new SequentialCommandGroup(
-                new WaitCommand(1.67),
-                new ParallelCommandGroup(
-                    new RunFeeder(feeder, Directions.IN),
-                    new RunSpindexer(spindexer, MotorConstants.kSpindexerSpeed)
-                )
-            )
-        ));
+        m_operatorController.pov(180).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer));
         
 
         // Spindexer CW (normal direction)
