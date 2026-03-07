@@ -35,7 +35,6 @@ public class Bindings {
     public static void configureBindings(
         CommandXboxController m_driverController,
         CommandXboxController m_operatorController,
-        CommandXboxController m_testController,
         Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve
     ) {
 
@@ -121,6 +120,7 @@ public class Bindings {
         // Feed to shooter
         m_operatorController.x().whileTrue(new RunFeeder(feeder, Directions.IN));
 
+        
         // Intake pivot deploy/stow (open-loop)
         m_operatorController.a().whileTrue(new RunIntakePivot(intakePivot, Directions.IN));
         m_operatorController.b().whileTrue(new RunIntakePivot(intakePivot, Directions.OUT));
