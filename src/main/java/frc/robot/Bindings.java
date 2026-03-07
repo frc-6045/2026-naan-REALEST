@@ -128,7 +128,7 @@ public class Bindings {
         m_operatorController.b().whileTrue(new RunIntakePivot(intakePivot, Directions.OUT));
 
         // Hub shot (D-pad up)
-        m_operatorController.pov(0).whileTrue(new HubShot(flywheel, topRoller, feeder, spindexer));
+        //m_operatorController.pov(0).whileTrue(new HubShot(flywheel, topRoller, feeder, spindexer));
         // m_operatorController.pov(0).whileTrue(new TopRollerOpenLoop(topRoller, () -> MotorConstants.kTopRollerSpeed));
         // m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, () -> -MotorConstants.kTopRollerSpeed));
 
