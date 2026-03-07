@@ -105,6 +105,11 @@ public final class Constants {
     public static final double kTowerShotFlywheelRPM = 2350.0; // Target flywheel RPM for tower shot
     public static final double kTowerShotTopRollerRPM = 2550.0; // Target top roller RPM for tower shot
     public static final double kTowerShotSpinUpDelaySec = 1.0; // Delay before feeding (seconds)
+
+    // Hub Shot Constants
+    public static final double kHubShotFlywheelRPM = 2350.0; // Target flywheel RPM for hub shot
+    public static final double kHubShotTopRollerRPM = 2550.0; // Target top roller RPM for hub shot
+    public static final double kHubShotSpinUpDelaySec = 1.0; // Delay before feeding (seconds)
   }
 
   public static class SwerveConstants {

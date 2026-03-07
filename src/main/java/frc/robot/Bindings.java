@@ -18,6 +18,7 @@ import frc.robot.commands.IntakeCommands.RunIntake;
 import frc.robot.commands.IntakeCommands.RunIntakePivot;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.ShootFeedCommands.RunFeeder;
+import frc.robot.commands.ShootFeedCommands.HubShot;
 import frc.robot.commands.ShootFeedCommands.TowerShot;
 import frc.robot.commands.ShootFeedCommands.ShooterOpenLoop;
 import frc.robot.commands.ShootFeedCommands.TopRollerOpenLoop;
@@ -126,7 +127,8 @@ public class Bindings {
         m_operatorController.a().whileTrue(new RunIntakePivot(intakePivot, Directions.IN));
         m_operatorController.b().whileTrue(new RunIntakePivot(intakePivot, Directions.OUT));
 
-        // Top roller open loop up/down
+        // Hub shot (D-pad up)
+        m_operatorController.pov(0).whileTrue(new HubShot(flywheel, topRoller, feeder, spindexer));
         // m_operatorController.pov(0).whileTrue(new TopRollerOpenLoop(topRoller, () -> MotorConstants.kTopRollerSpeed));
         // m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, () -> -MotorConstants.kTopRollerSpeed));
 
