@@ -25,7 +25,7 @@ public class TopRoller extends SubsystemBase {
   private final SparkClosedLoopController m_PIDController;
   private final RelativeEncoder m_Encoder;
 
-  // Track last PID values to detect changes
+  // Track last PIDF values for live tuning
   private double m_lastP = MotorConstants.kRollerP;
   private double m_lastI = MotorConstants.kRollerI;
   private double m_lastD = MotorConstants.kRollerD;
@@ -46,16 +46,12 @@ public class TopRoller extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Roller/Target RPM", 0);
     SmartDashboard.putNumber("Subsystem: Roller/Speed", 0);
     SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", 0);
-    SmartDashboard.putNumber("Subsystem: Roller/Debug/Encoder Position", 0);
-    SmartDashboard.putNumber("Subsystem: Roller/Current (A)", 0);
-    SmartDashboard.putNumber("Subsystem: Roller/Debug/Applied Output", 0);
-    SmartDashboard.putNumber("Subsystem: Roller/Debug/Motor Temp (C)", 0);
-    SmartDashboard.putNumber("Subsystem: Roller/Debug/Faults", 0);
+
+    // Initialize PIDF tuning values
     SmartDashboard.putNumber("Subsystem: Roller/PIDF/P", MotorConstants.kRollerP);
     SmartDashboard.putNumber("Subsystem: Roller/PIDF/I", MotorConstants.kRollerI);
     SmartDashboard.putNumber("Subsystem: Roller/PIDF/D", MotorConstants.kRollerD);
     SmartDashboard.putNumber("Subsystem: Roller/PIDF/FF", MotorConstants.kRollerFF);
-    SmartDashboard.putString("Subsystem: Roller/PIDF/Status", "OK");
   }
 
   /**
@@ -71,12 +67,12 @@ public class TopRoller extends SubsystemBase {
     m_rollerConfig
         .idleMode(IdleMode.kBrake)
         .inverted(true)
-        .smartCurrentLimit(MotorConstants.kTopRollerCurrentLimit)
-        .openLoopRampRate(0.167)
-        .closedLoopRampRate(0.167);
+        .smartCurrentLimit(MotorConstants.kTopRollerCurrentLimit);
     m_rollerConfig.encoder
         .velocityConversionFactor(1.0)  // 1:1, no gearing - raw motor RPM
-        .positionConversionFactor(1.0);
+        .positionConversionFactor(1.0)
+        .uvwAverageDepth(2)
+        .uvwMeasurementPeriod(10);
     m_rollerConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(MotorConstants.kRollerP)
@@ -127,30 +123,26 @@ public class TopRoller extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", getRPM());
-    SmartDashboard.putNumber("Subsystem: Roller/Current (A)", m_Motor.getOutputCurrent());
 
-    double tunedP = SmartDashboard.getNumber("Subsystem: Roller/PIDF/P", MotorConstants.kRollerP);
-    double tunedI = SmartDashboard.getNumber("Subsystem: Roller/PIDF/I", MotorConstants.kRollerI);
-    double tunedD = SmartDashboard.getNumber("Subsystem: Roller/PIDF/D", MotorConstants.kRollerD);
-    double tunedFF = SmartDashboard.getNumber("Subsystem: Roller/PIDF/FF", MotorConstants.kRollerFF);
+    // // Live PIDF tuning - only reconfigure if values changed
+    // double tunedP = SmartDashboard.getNumber("Subsystem: Roller/PIDF/P", MotorConstants.kRollerP);
+    // double tunedI = SmartDashboard.getNumber("Subsystem: Roller/PIDF/I", MotorConstants.kRollerI);
+    // double tunedD = SmartDashboard.getNumber("Subsystem: Roller/PIDF/D", MotorConstants.kRollerD);
+    // double tunedFF = SmartDashboard.getNumber("Subsystem: Roller/PIDF/FF", MotorConstants.kRollerFF);
 
-    if (tunedP != m_lastP || tunedI != m_lastI || tunedD != m_lastD || tunedFF != m_lastFF) {
-      m_rollerConfig.closedLoop
-          .p(tunedP)
-          .i(tunedI)
-          .d(tunedD)
-          .velocityFF(tunedFF);
+    // if (tunedP != m_lastP || tunedI != m_lastI || tunedD != m_lastD || tunedFF != m_lastFF) {
+    //   SparkFlexConfig pidConfig = new SparkFlexConfig();
+    //   pidConfig.closedLoop
+    //       .p(tunedP)
+    //       .i(tunedI)
+    //       .d(tunedD)
+    //       .velocityFF(tunedFF);
+    //   m_Motor.configure(pidConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
-      m_Motor.configure(m_rollerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-
-      m_lastP = tunedP;
-      m_lastI = tunedI;
-      m_lastD = tunedD;
-      m_lastFF = tunedFF;
-
-      SmartDashboard.putString("Subsystem: Roller/PIDF/Status", "Updated!");
-    } else {
-      SmartDashboard.putString("Subsystem: Roller/PIDF/Status", "OK");
-    }
+    //   m_lastP = tunedP;
+    //   m_lastI = tunedI;
+    //   m_lastD = tunedD;
+    //   m_lastFF = tunedFF;
+    //}
   }
 }

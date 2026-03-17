@@ -20,12 +20,12 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
 import frc.robot.commands.AutoCommands.StartRevShooter;
-import frc.robot.commands.AutoCommands.StopShooter;
 import frc.robot.commands.IntakeCommands.DeployIntake;
+import frc.robot.commands.IntakeCommands.RaiseIntakeHalfway;
 import frc.robot.commands.IntakeCommands.StowIntake;
-import frc.robot.commands.ShootFeedCommands.AutoAimAndShoot;
-import frc.robot.commands.ShootFeedCommands.AutoAimPrepare;
-import frc.robot.commands.ShootFeedCommands.RevShooter;
+import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShoot;
+import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimPrepare;
+import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimWhileDriving;
 import frc.robot.commands.SpindexerCommands.StopSpindexer;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
@@ -53,14 +53,22 @@ public class Autos {
 
     // --- Register NamedCommands for PathPlanner ---
 
+    NamedCommands.registerCommand("print1", new InstantCommand(()->{System.out.println("Auto troubleshoot print 1!");}));
+    NamedCommands.registerCommand("print2", new InstantCommand(()->{System.out.println("Auto troubleshoot print 2!");}));
+
     // Intake commands
     NamedCommands.registerCommand("deployIntake", new DeployIntake(intakePivot));
     NamedCommands.registerCommand("stowIntake", new StowIntake(intakePivot));
-    NamedCommands.registerCommand("startIntakeRoller", new InstantCommand(() -> intake.setSpeed(MotorConstants.kIntakeRollerSpeed), intake));
-    NamedCommands.registerCommand("stopIntake", new InstantCommand(() -> intake.stopIntakeMotor(), intake));
+    NamedCommands.registerCommand("startDeployIntake", new InstantCommand(() -> intakePivot.setSpeed(.32067), intakePivot).asProxy());
+    NamedCommands.registerCommand("startStowIntake", new InstantCommand(() -> intakePivot.setSpeed(-.167), intakePivot).asProxy());
+    NamedCommands.registerCommand("stopDeployIntake", new InstantCommand(() -> intakePivot.stopMotor(), intakePivot).asProxy());
+    NamedCommands.registerCommand("stopStowIntake", new InstantCommand(() -> intakePivot.stopMotor(), intakePivot).asProxy());
+    NamedCommands.registerCommand("raiseIntakeHalfway", new RaiseIntakeHalfway(intakePivot));
+    NamedCommands.registerCommand("startIntakeRoller", new InstantCommand(() -> intake.setSpeed(MotorConstants.kIntakeRollerSpeed), intake).asProxy());
+    NamedCommands.registerCommand("stopIntake", new InstantCommand(() -> intake.stopIntakeMotor(), intake).asProxy());
 
     // Spindexer commands
-    NamedCommands.registerCommand("startSpindexer", new InstantCommand(() -> spindexer.setSpeed(MotorConstants.kSpindexerSpeed), spindexer));
+    NamedCommands.registerCommand("startSpindexer", new InstantCommand(() -> spindexer.setSpeed(MotorConstants.kSpindexerSpeed), spindexer).asProxy());
     NamedCommands.registerCommand("stopSpindexer", new StopSpindexer(spindexer));
 
     // Flywheel commands
@@ -72,8 +80,8 @@ public class Autos {
     ));
 
     // Feeder commands
-    NamedCommands.registerCommand("feed", new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederSpeed), feeder));
-    NamedCommands.registerCommand("stopFeeder", new InstantCommand(() -> feeder.stopFeederMotor(), feeder));
+    NamedCommands.registerCommand("feed", new InstantCommand(() -> feeder.setSpeed(MotorConstants.kFeederSpeed), feeder).asProxy());
+    NamedCommands.registerCommand("stopFeeder", new InstantCommand(() -> feeder.stopFeederMotor(), feeder).asProxy());
 
     // Composite commands
     NamedCommands.registerCommand("intakeGamePiece", new SequentialCommandGroup(
@@ -100,7 +108,7 @@ public class Autos {
     // Auto-aim commands (Limelight-based shooting for autonomous)
 
     // Prep only -- spins flywheel + sets top roller while PathPlanner drives
-    NamedCommands.registerCommand("autoAim", new AutoAimPrepare(flywheel, topRoller).asProxy());
+    NamedCommands.registerCommand("autoAimPrepShooter", new AutoAimPrepare(flywheel, topRoller).asProxy());
 
     // Full stop-aim-shoot -- stops driving, rotates to target, fires, ends after feeding
     NamedCommands.registerCommand("autoAimAndShoot", Commands.defer(() -> {
@@ -120,6 +128,29 @@ public class Autos {
         .withTimeout(ShootingConstants.kAutoShootTimeoutSec);
     }, Set.of(swerve, flywheel, topRoller, feeder, spindexer)).asProxy());
 
+    NamedCommands.registerCommand("autoAimAndShoot5Second", Commands.defer(() -> {
+      Timer feedTimer = new Timer();
+      AutoAimAndShoot cmd = new AutoAimAndShoot(
+          swerve, flywheel, topRoller, feeder, spindexer, () -> 0.0, () -> 0.0);
+
+      return cmd.until(() -> {
+        if (cmd.isFeedingActive()) {
+          if (!feedTimer.isRunning()) {
+            feedTimer.start();
+          }
+          return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
+        }
+        return false;
+      }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
+        .withTimeout(5);
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer)).asProxy());
+
+    // Aim while driving -- overrides PathPlanner rotation to aim at target, spins up + feeds
+    // NamedCommands.registerCommand("autoAimWhileDriving", Commands.defer(
+    //   () -> new AutoAimWhileDriving(swerve, flywheel, topRoller, feeder, spindexer)
+    //       .withTimeout(ShootingConstants.kAutoShootTimeoutSec),
+    //   Set.of(flywheel, topRoller, feeder, spindexer)).asProxy());
+
     // Cancel prep -- stops flywheel and top roller
     NamedCommands.registerCommand("stopAim", new ParallelCommandGroup(
       new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel),
@@ -132,10 +163,14 @@ public class Autos {
     m_autoChooser.setDefaultOption("None", null);
 
     // Add autos to chooser
-    m_autoChooser.addOption("normal auto", AutoBuilder.buildAuto("halfauto"));
-    m_autoChooser.addOption("quarter-field auto", AutoBuilder.buildAuto("quarterauto"));
-    m_autoChooser.addOption("test square", AutoBuilder.buildAuto("drawsquare"));
-    m_autoChooser.addOption("test commands", AutoBuilder.buildAuto("testcommands"));
+    m_autoChooser.addOption("half auto", AutoBuilder.buildAuto("quarterautonovisionAllison"));
+    m_autoChooser.addOption("full auto", AutoBuilder.buildAuto("moreautonovisionAllison"));
+    m_autoChooser.addOption("3/4 auto", AutoBuilder.buildAuto("34autonovisionAllison"));
+    m_autoChooser.addOption("outpost auto", AutoBuilder.buildAuto("outpost auto"));
+    m_autoChooser.addOption("half auto swoop", AutoBuilder.buildAuto("quarterautonovisionwithbigswoop"));
+    m_autoChooser.addOption("full auto swoop", AutoBuilder.buildAuto("moreautonovisionwithbigswoop"));
+    m_autoChooser.addOption("3/4 auto swoop", AutoBuilder.buildAuto("34autonovisionwithbigswoop"));
+    m_autoChooser.addOption("test intake pivot", AutoBuilder.buildAuto("teststow"));
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }

@@ -5,7 +5,6 @@ import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.Constants.MotorConstants;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Command to feed a ball into the shooter.
@@ -48,8 +47,6 @@ public class FeedToShooter extends Command {
 
   @Override
   public void initialize() {
-    // Initialize dashboard indicators
-    SmartDashboard.putBoolean("Feeding", false);
   }
 
   @Override
@@ -58,14 +55,10 @@ public class FeedToShooter extends Command {
     if (!m_checkSpeed || m_flywheel.isAtTargetSpeed(m_targetRPM)) {
       m_feeder.setSpeed(MotorConstants.kFeederSpeed);
       m_spindexer.setSpeed(MotorConstants.kSpindexerSpeed);
-      SmartDashboard.putBoolean("Feeding", true);
-      SmartDashboard.putBoolean("Shooter Ready", true);
     } else {
       // Shooter not ready yet, wait
       m_feeder.stopFeederMotor();
       m_spindexer.stopSpindexerMotor();
-      SmartDashboard.putBoolean("Feeding", false);
-      SmartDashboard.putBoolean("Shooter Ready", false);
     }
   }
 
@@ -74,7 +67,6 @@ public class FeedToShooter extends Command {
     // Stop the feeder and spindexer when button is released
     m_feeder.stopFeederMotor();
     m_spindexer.stopSpindexerMotor();
-    SmartDashboard.putBoolean("Feeding", false);
   }
 
   @Override

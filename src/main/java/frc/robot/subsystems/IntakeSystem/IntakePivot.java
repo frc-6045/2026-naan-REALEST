@@ -10,6 +10,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,6 +20,7 @@ import frc.robot.Constants.MotorConstants;
 public class IntakePivot extends SubsystemBase {
   private final SparkFlex m_IntakeDeployMotor;
   private final AbsoluteEncoder m_AbsoluteEncoder;
+  private final PIDController m_PID;
   private final SparkFlexConfig m_config = new SparkFlexConfig();
   private final SlewRateLimiter m_RampLimiter = new SlewRateLimiter(MotorConstants.kIntakeRampRate);
   private double m_TargetSpeed = 0.0;
@@ -27,13 +29,15 @@ public class IntakePivot extends SubsystemBase {
   public IntakePivot() {
     m_IntakeDeployMotor = new SparkFlex(MotorConstants.kIntakeDeployMotorCanID, MotorType.kBrushless);
     m_AbsoluteEncoder = m_IntakeDeployMotor.getAbsoluteEncoder();
+    m_PID = new PIDController(.01,0,0);
+    m_PID.enableContinuousInput(-1, 1);
+    m_PID.setTolerance(.067);
 
     updateMotorSettings();
     m_IntakeDeployMotor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     // Initialize SmartDashboard values
     SmartDashboard.putNumber("Subsystem: Intake Pivot/Speed", 0);
-    SmartDashboard.putNumber("Subsystem: Intake Pivot/Current (A)", 0);
   }
 
   private void updateMotorSettings() {
@@ -57,7 +61,18 @@ public class IntakePivot extends SubsystemBase {
       DriverStation.reportWarning(warning, false);
     }
 
+    // Apply limit enforcement based on current position
+    speed = applyLimits(speed);
+
     m_TargetSpeed = speed;
+  }
+
+public double applyLimits(double speed) {
+  return speed;
+}
+
+  public void goToSetpoint(double setpoint) {
+    setSpeed(m_PID.calculate(getAbsoluteEncoderReading(), setpoint));
   }
 
   public void stopMotor() {
@@ -72,12 +87,17 @@ public class IntakePivot extends SubsystemBase {
     return m_AbsoluteEncoder.getPosition();
   }
 
+  public boolean atSetpoint() {
+    return m_PID.atSetpoint();
+  }
+
   @Override
   public void periodic() {
     double limitedSpeed = m_RampLimiter.calculate(m_TargetSpeed);
     m_IntakeDeployMotor.set(limitedSpeed);
+
+    // double position = getAbsoluteEncoderReading();
     SmartDashboard.putNumber("Subsystem: Intake Pivot/Speed", limitedSpeed);
-    SmartDashboard.putNumber("Subsystem: Intake Pivot/Current (A)", getCurrent());
-    SmartDashboard.putNumber("Subsystem: Intake Position", getAbsoluteEncoderReading());
+    // SmartDashboard.putNumber("Subsystem: Intake Pivot/Position", position);
   }
 }

@@ -3,6 +3,7 @@
   "robotLength": 0.8509,
   "holonomicMode": true,
   "pathFolders": [
+    "outpost auto paths",
     "halfpaths",
     "quarterpaths"
   ],

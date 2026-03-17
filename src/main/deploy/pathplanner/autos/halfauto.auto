@@ -13,7 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "halfpath1"
+            "pathName": "halfpath0.5"
           }
         },
         {
@@ -86,12 +86,6 @@
                 "type": "named",
                 "data": {
                   "name": "stopIntake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "stowIntake"
                 }
               }
             ]
@@ -186,12 +180,6 @@
                 "type": "named",
                 "data": {
                   "name": "stopIntake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "stowIntake"
                 }
               }
             ]

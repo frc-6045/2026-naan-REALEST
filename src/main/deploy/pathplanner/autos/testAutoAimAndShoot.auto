@@ -5,9 +5,15 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "autoAimAndShoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "OverTheBump"
+            "pathName": "not a path"
           }
         }
       ]

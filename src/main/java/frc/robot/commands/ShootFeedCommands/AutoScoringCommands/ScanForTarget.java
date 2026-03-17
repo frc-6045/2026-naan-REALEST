@@ -1,4 +1,4 @@
-package frc.robot.commands.ShootFeedCommands;
+package frc.robot.commands.ShootFeedCommands.AutoScoringCommands;
 
 import java.util.function.DoubleSupplier;
 
@@ -6,7 +6,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
@@ -62,8 +61,6 @@ public class ScanForTarget extends Command {
 
         m_scanPhase = 1;
         m_PID.reset();
-
-        SmartDashboard.putString("Scan", "Scanning...");
     }
 
     @Override
@@ -98,21 +95,16 @@ public class ScanForTarget extends Command {
     public boolean isFinished() {
         // Target found
         if (LimelightHelpers.getTV(m_limelightName)) {
-            SmartDashboard.putString("Scan", "Target found! ID: "
-                    + (int) LimelightHelpers.getFiducialID(m_limelightName)
-                    + " in " + String.format("%.2f", m_timer.get()) + "s");
             return true;
         }
 
         // Scan complete, no target
         if (m_scanPhase == 3) {
-            SmartDashboard.putString("Scan", "No target found");
             return true;
         }
 
         // Timeout
         if (m_timer.get() > kTimeoutSeconds) {
-            SmartDashboard.putString("Scan", "Timed out");
             return true;
         }
 

@@ -29,7 +29,6 @@ public class Intake extends SubsystemBase {
 
     // Initialize SmartDashboard values
     SmartDashboard.putNumber("Subsystem: Intake/Speed", 0);
-    SmartDashboard.putNumber("Subsystem: Intake/Current (A)", 0);
   }
 
   private void updateMotorSettings() {
@@ -69,6 +68,5 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     m_IntakeMotor.set(m_TargetSpeed);
     SmartDashboard.putNumber("Subsystem: Intake/Speed", m_TargetSpeed);
-    SmartDashboard.putNumber("Subsystem: Intake/Current (A)", getCurrent());
   }
 }

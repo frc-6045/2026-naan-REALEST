@@ -25,7 +25,7 @@ public class Flywheel extends SubsystemBase {
   private final SparkClosedLoopController m_FlywheelPIDController2;
   private final SparkFlexConfig m_config = new SparkFlexConfig();
 
-  // Track last PID values to detect changes
+  // Track last PIDF values for live tuning
   private double m_lastP = MotorConstants.kShooterP;
   private double m_lastI = MotorConstants.kShooterI;
   private double m_lastD = MotorConstants.kShooterD;
@@ -54,13 +54,12 @@ public class Flywheel extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Flywheel/Velocity (RPM)", 0);
     SmartDashboard.putNumber("Subsystem: Flywheel/Motor 1 Velocity", 0);
     SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Velocity", 0);
-    // SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/P", MotorConstants.kShooterP);
-    // SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/I", MotorConstants.kShooterI);
-    // SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/D", MotorConstants.kShooterD);
-    // SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/FF", MotorConstants.kShooterFF);
-    // SmartDashboard.putString("Subsystem: Flywheel/PIDF/Status", "OK");
-    SmartDashboard.putNumber("Subsystem: Flywheel/Current1 (A)", 0);
-    SmartDashboard.putNumber("Subsystem: Flywheel/Current2 (A)", 0);
+
+    // Initialize PIDF tuning values
+    SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/P", MotorConstants.kShooterP);
+    SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/I", MotorConstants.kShooterI);
+    SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/D", MotorConstants.kShooterD);
+    SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/FF", MotorConstants.kShooterFF);
   }
 
   /**
@@ -75,9 +74,9 @@ public class Flywheel extends SubsystemBase {
   private void updateMotorSettings() {
     m_config
         .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(MotorConstants.kShooterCurrentLimit)
         .openLoopRampRate(0.167)
-        .closedLoopRampRate(0.167);
+        .closedLoopRampRate(0.167)
+        .smartCurrentLimit(MotorConstants.kShooterCurrentLimit);
     m_config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(MotorConstants.kShooterP)
@@ -85,6 +84,9 @@ public class Flywheel extends SubsystemBase {
         .d(MotorConstants.kShooterD)
         .velocityFF(MotorConstants.kShooterFF)
         .iZone(MotorConstants.kShooterIZone);
+    // m_config.encoder
+    //     .uvwAverageDepth(2)
+    //     .uvwMeasurementPeriod(10);
   }
 
   public void setSpeed(double speed) {
@@ -125,38 +127,28 @@ public class Flywheel extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Subsystem: Flywheel/Current1 (A)", m_FlywheelMotor1.getOutputCurrent());
-    SmartDashboard.putNumber("Subsystem: Flywheel/Current2 (A)", m_FlywheelMotor2.getOutputCurrent());
     SmartDashboard.putNumber("Subsystem: Flywheel/Velocity (RPM)", getRPM());
-    // SmartDashboard.putNumber("Subsystem: Flywheel/Motor 1 Velocity", m_FlywheelMotor1.getEncoder().getVelocity());
-    // SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Velocity", m_FlywheelMotor2.getEncoder().getVelocity());
 
-    // Live PID tuning - check if values changed on SmartDashboard
-    double tunedP = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/P", MotorConstants.kShooterP);
-    double tunedI = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/I", MotorConstants.kShooterI);
-    double tunedD = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/D", MotorConstants.kShooterD);
-    double tunedFF = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/FF", MotorConstants.kShooterFF);
+    // // Live PIDF tuning - only reconfigure if values changed
+    // double tunedP = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/P", MotorConstants.kShooterP);
+    // double tunedI = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/I", MotorConstants.kShooterI);
+    // double tunedD = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/D", MotorConstants.kShooterD);
+    // double tunedFF = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/FF", MotorConstants.kShooterFF);
 
-    if (tunedP != m_lastP || tunedI != m_lastI || tunedD != m_lastD || tunedFF != m_lastFF) {
-      m_config.closedLoop
-          .p(tunedP)
-          .i(tunedI)
-          .d(tunedD)
-          .velocityFF(tunedFF);
+    // if (tunedP != m_lastP || tunedI != m_lastI || tunedD != m_lastD || tunedFF != m_lastFF) {
+    //   SparkFlexConfig pidConfig = new SparkFlexConfig();
+    //   pidConfig.closedLoop
+    //       .p(tunedP)
+    //       .i(tunedI)
+    //       .d(tunedD)
+    //       .velocityFF(tunedFF);
+    //   m_FlywheelMotor1.configure(pidConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    //   m_FlywheelMotor2.configure(pidConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
-      m_config.inverted(false);
-      m_FlywheelMotor1.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-      m_config.inverted(true);
-      m_FlywheelMotor2.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-
-      m_lastP = tunedP;
-      m_lastI = tunedI;
-      m_lastD = tunedD;
-      m_lastFF = tunedFF;
-
-      SmartDashboard.putString("Subsystem: Flywheel/PIDF/Status", "Updated!");
-    } else {
-      SmartDashboard.putString("Subsystem: Flywheel/PIDF/Status", "OK");
-    }
+    //   m_lastP = tunedP;
+    //   m_lastI = tunedI;
+    //   m_lastD = tunedD;
+    //   m_lastFF = tunedFF;
+    // }
   }
 }

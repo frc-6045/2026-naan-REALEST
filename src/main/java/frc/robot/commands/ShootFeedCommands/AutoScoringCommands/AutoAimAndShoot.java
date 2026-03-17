@@ -1,4 +1,4 @@
-package frc.robot.commands.ShootFeedCommands;
+package frc.robot.commands.ShootFeedCommands.AutoScoringCommands;
 
 import java.util.function.DoubleSupplier;
 
@@ -79,8 +79,6 @@ public class AutoAimAndShoot extends Command {
         m_graceTimer.stop();
         m_graceTimer.reset();
         m_tagLock.reset();
-
-        SmartDashboard.putBoolean("AutoAim Active", true);
     }
 
     @Override
@@ -132,11 +130,7 @@ public class AutoAimAndShoot extends Command {
 
             updateFeedState(readyToFire);
 
-            // TODO: Disable verbose telemetry before competition events to reduce NetworkTables traffic
             // Telemetry
-            SmartDashboard.putNumber("AutoAim Distance", target.distanceMeters);
-            SmartDashboard.putNumber("AutoAim Target Roller RPM", targetRollerRPM);
-            SmartDashboard.putNumber("AutoAim Target RPM", targetRPM);
             SmartDashboard.putBoolean("AutoAim Aimed", aimed);
             SmartDashboard.putBoolean("AutoAim TopRollerReady", topRollerReady);
             SmartDashboard.putBoolean("AutoAim FlywheelReady", flywheelReady);
@@ -145,14 +139,6 @@ public class AutoAimAndShoot extends Command {
             // Velocity compensation telemetry
             double robotSpeed = Math.hypot(fieldVelocity.vxMetersPerSecond,
                     fieldVelocity.vyMetersPerSecond);
-            SmartDashboard.putBoolean("VComp Active", compensation.compensationActive);
-            SmartDashboard.putNumber("VComp Aim Lead (deg)", compensation.aimLeadDegrees);
-            SmartDashboard.putNumber("VComp Adjusted Dist", compensation.adjustedDistanceMeters);
-            SmartDashboard.putNumber("VComp Raw Dist", target.distanceMeters);
-            SmartDashboard.putNumber("VComp Flight Time (s)", compensation.flightTimeSec);
-            SmartDashboard.putNumber("VComp Lateral V (m/s)", compensation.lateralVelocityMps);
-            SmartDashboard.putNumber("VComp Radial V (m/s)", compensation.radialVelocityMps);
-            SmartDashboard.putNumber("VComp Robot Speed (m/s)", robotSpeed);
         } else {
             // No valid target: drive with zero rotation, keep motors spinning at last RPM
             m_swerve.drive(translation, 0.0, true);
@@ -166,16 +152,7 @@ public class AutoAimAndShoot extends Command {
 
             SmartDashboard.putBoolean("AutoAim Aimed", false);
             SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
-            clearVCompTelemetry();
         }
-
-        // Common telemetry
-        SmartDashboard.putBoolean("AutoAim HasTarget", target.hasValidTarget);
-        SmartDashboard.putNumber("AutoAim TX", target.txDegrees);
-        SmartDashboard.putNumber("AutoAim TY", target.tyDegrees);
-        SmartDashboard.putBoolean("AutoAim Feeding", m_feeding);
-        SmartDashboard.putNumber("AutoAim LockedTagID", target.lockedTagID);
-        SmartDashboard.putNumber("AutoAim DetectedID", target.detectedTagID);
     }
 
     @Override
@@ -187,9 +164,6 @@ public class AutoAimAndShoot extends Command {
         m_feeder.stopFeederMotor();
         m_spindexer.stopSpindexerMotor();
         // Swerve default command auto-resumes
-
-        SmartDashboard.putBoolean("AutoAim Active", false);
-        SmartDashboard.putBoolean("AutoAim Feeding", false);
         SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
     }
 
@@ -235,17 +209,5 @@ public class AutoAimAndShoot extends Command {
             m_spindexer.stopSpindexerMotor();
             m_feeding = false;
         }
-    }
-
-    /** Zeros all velocity-compensation telemetry when no target is visible. */
-    private void clearVCompTelemetry() {
-        SmartDashboard.putBoolean("VComp Active", false);
-        SmartDashboard.putNumber("VComp Aim Lead (deg)", 0.0);
-        SmartDashboard.putNumber("VComp Adjusted Dist", 0.0);
-        SmartDashboard.putNumber("VComp Raw Dist", 0.0);
-        SmartDashboard.putNumber("VComp Flight Time (s)", 0.0);
-        SmartDashboard.putNumber("VComp Lateral V (m/s)", 0.0);
-        SmartDashboard.putNumber("VComp Radial V (m/s)", 0.0);
-        SmartDashboard.putNumber("VComp Robot Speed (m/s)", 0.0);
     }
 }
