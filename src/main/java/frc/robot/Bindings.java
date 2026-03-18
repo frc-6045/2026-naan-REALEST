@@ -18,7 +18,6 @@ import frc.robot.commands.IntakeCommands.RunIntake;
 import frc.robot.commands.IntakeCommands.RunIntakePivot;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.ShootFeedCommands.RunFeeder;
-import frc.robot.commands.ShootFeedCommands.HubShot;
 import frc.robot.commands.ShootFeedCommands.TowerShot;
 import frc.robot.commands.ShootFeedCommands.ShooterOpenLoop;
 import frc.robot.commands.ShootFeedCommands.TopRollerOpenLoop;
