@@ -50,7 +50,6 @@ public class Bindings {
         m_driverController.back().whileTrue(Commands.run(() -> swerve.lock(), swerve));
 
         // Intake rollers
-        m_driverController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
         m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
 
         // m_driverController.rightTrigger(0.05).whileTrue(
