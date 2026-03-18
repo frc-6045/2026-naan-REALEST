@@ -16,16 +16,19 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 
 public class Intake extends SubsystemBase {
-  private final SparkFlex m_IntakeMotor;
+  private final SparkFlex m_IntakeMotor1;
+  private final SparkFlex m_IntakeMotor2;
   private final SparkFlexConfig m_config = new SparkFlexConfig();
   private double m_TargetSpeed = 0.0;
 
   @SuppressWarnings("deprecation")
   public Intake() {
-    m_IntakeMotor = new SparkFlex(MotorConstants.kIntakeMotorCanID, MotorType.kBrushless);
+    m_IntakeMotor1 = new SparkFlex(MotorConstants.kIntakeMotorLeftCanID, MotorType.kBrushless);
+    m_IntakeMotor2 = new SparkFlex(MotorConstants.kIntakeMotorRightCanID, MotorType.kBrushless);
 
     updateMotorSettings();
-    m_IntakeMotor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    m_IntakeMotor1.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    m_IntakeMotor2.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     // Initialize SmartDashboard values
     SmartDashboard.putNumber("Subsystem: Intake/Speed", 0);
@@ -61,12 +64,13 @@ public class Intake extends SubsystemBase {
   }
 
   public double getCurrent() {
-    return m_IntakeMotor.getOutputCurrent();
+    return m_IntakeMotor1.getOutputCurrent();
   }
 
   @Override
   public void periodic() {
-    m_IntakeMotor.set(m_TargetSpeed);
+    m_IntakeMotor1.set(m_TargetSpeed);
+    m_IntakeMotor2.set(m_TargetSpeed);
     SmartDashboard.putNumber("Subsystem: Intake/Speed", m_TargetSpeed);
   }
 }
