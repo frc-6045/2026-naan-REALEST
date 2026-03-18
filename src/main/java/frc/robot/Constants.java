@@ -32,6 +32,7 @@ public final class Constants {
 
   public static class MotorConstants {
     // Can IDs
+    public static final int kIntakeBlackRollerMotorCanID = 10;
     public static final int kFeederMotorCanID = 11;
 
     public static final int kIntakeMotorLeftCanID = 12;

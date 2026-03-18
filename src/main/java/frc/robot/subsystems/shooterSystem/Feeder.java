@@ -16,14 +16,17 @@ import frc.robot.Constants.MotorConstants;
 
 public class Feeder extends SubsystemBase {
   private final SparkFlex m_FeederMotor;
+  private final SparkFlex m_IntakeBlackRollerMotor;
   private final SparkFlexConfig m_config = new SparkFlexConfig();
 
   @SuppressWarnings("deprecation")
   public Feeder() {
     m_FeederMotor = new SparkFlex(MotorConstants.kFeederMotorCanID, MotorType.kBrushless);
+    m_IntakeBlackRollerMotor = new SparkFlex(MotorConstants.kIntakeBlackRollerMotorCanID, MotorType.kBrushless);
 
     updateMotorSettings();
     m_FeederMotor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    m_IntakeBlackRollerMotor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     // Initialize SmartDashboard values
     SmartDashboard.putNumber("Subsystem: Feeder/Speed", 0);
@@ -51,11 +54,13 @@ public class Feeder extends SubsystemBase {
     }
 
     m_FeederMotor.set(-speed);
+    m_IntakeBlackRollerMotor.set(speed);
     SmartDashboard.putNumber("Subsystem: Feeder/Speed", -speed);
   }
 
   public void stopFeederMotor() {
     m_FeederMotor.stopMotor();
+    m_IntakeBlackRollerMotor.stopMotor();
     SmartDashboard.putNumber("Subsystem: Feeder/Speed", 0);
   }
 
