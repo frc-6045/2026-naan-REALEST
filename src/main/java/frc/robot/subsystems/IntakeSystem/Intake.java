@@ -69,8 +69,8 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    m_IntakeMotorLeft.set(m_TargetSpeed);
-    m_IntakeMotorRight.set(-m_TargetSpeed);
+    m_IntakeMotorLeft.set(-m_TargetSpeed);
+    m_IntakeMotorRight.set(m_TargetSpeed);
     SmartDashboard.putNumber("Subsystem: Intake/Speed", m_TargetSpeed);
   }
 }

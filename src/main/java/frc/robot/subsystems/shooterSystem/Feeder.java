@@ -50,8 +50,8 @@ public class Feeder extends SubsystemBase {
       DriverStation.reportWarning(warning, false);
     }
 
-    m_FeederMotor.set(speed);
-    SmartDashboard.putNumber("Subsystem: Feeder/Speed", speed);
+    m_FeederMotor.set(-speed);
+    SmartDashboard.putNumber("Subsystem: Feeder/Speed", -speed);
   }
 
   public void stopFeederMotor() {
