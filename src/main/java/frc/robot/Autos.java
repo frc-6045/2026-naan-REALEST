@@ -171,6 +171,7 @@ public class Autos {
     m_autoChooser.addOption("full auto swoop", AutoBuilder.buildAuto("moreautonovisionwithbigswoop"));
     m_autoChooser.addOption("3/4 auto swoop", AutoBuilder.buildAuto("34autonovisionwithbigswoop"));
     m_autoChooser.addOption("test intake pivot", AutoBuilder.buildAuto("teststow"));
+    m_autoChooser.addOption("45 degree auto", AutoBuilder.buildAuto("45 degree start"));
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
