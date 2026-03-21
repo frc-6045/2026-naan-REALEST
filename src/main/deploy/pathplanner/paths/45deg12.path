@@ -64,7 +64,7 @@
             {
               "type": "named",
               "data": {
-                "name": "deployIntake"
+                "name": "startDeployIntake"
               }
             },
             {
@@ -104,7 +104,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 0.8,
     "rotation": 90.0
   },
   "reversed": false,

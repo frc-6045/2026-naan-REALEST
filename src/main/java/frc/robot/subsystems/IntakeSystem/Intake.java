@@ -74,5 +74,6 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Intake/Speed", m_TargetSpeed);
     SmartDashboard.putNumber("Subsystem: Intake/Left Actual Speed", m_IntakeMotorLeft.getEncoder().getVelocity());
     SmartDashboard.putNumber("Subsystem: Intake/Right Actual Speed", m_IntakeMotorRight.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Subsystem: Intake/Velocity", m_TargetSpeed);
   }
 }

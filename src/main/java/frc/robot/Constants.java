@@ -59,7 +59,7 @@ public final class Constants {
     public static final double kIntakeRollerSpeed = 1; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
     public static final double kFeederSpeed = 1; // Speed to feed ball into shooter
     public static final double kSpindexerSpeed = 1; // Speed to index balls from intake to feeder
-    public static final double kTopRollerSpeed = .5;
+    public static final double kTopRollerSpeed = 1;
 
     public static final double kIntakeRampRate = 3.14; // Max change in motor output per second (units/sec) - prevents harsh stops on chain
     public static final double kIntakeStowTimeout = 1.2; // Safety timeout for deploy/stow operations (seconds)
@@ -71,19 +71,19 @@ public final class Constants {
 
     // Motor Current Limits (Amps)
     public static final int kFeederCurrentLimit = 50;
-    public static final int kIntakeCurrentLimit = 50;
+    public static final int kIntakeCurrentLimit = 80;
     public static final int kIntakePivotCurrentLimit = 50;
     public static final int kShooterCurrentLimit = 60;
     public static final int kTopRollerCurrentLimit = 60;
     public static final int kSpindexerCurrentLimit = 80;
 
-    public static final double kPivotLimit1 = .6767676767;
-    public static final double kPivotLimit2 = .6767676767;
-    public static final double kPivotSoftLimit1 = .6767676767;
-    public static final double kPivotSoftLimit2 = .6767676767;
-    public static final double kStowSetpoint = .6767676767;
-    public static final double kDeploySetpoint = .6767676767;
-
+    // public static final double kPivotLimit1 = .6767676767;
+    // public static final double kPivotLimit2 = .6767676767;
+    // public static final double kPivotSoftLimit1 = .6767676767;
+    // public static final double kPivotSoftLimit2 = .6767676767;
+    // public static final double kStowSetpoint = .6767676767;
+    // public static final double kDeploySetpoint = .6767676767;
+    
     // Shooter PID Constants (for velocity control in RPM)
     public static final double kShooterP = 0.000; // Proportional gain
     public static final double kShooterI = 0.0; // Integral gain
