@@ -17,47 +17,9 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "stopIntake"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "45deg34"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "startStowIntake"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.67
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "stopStowIntake"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+            "pathName": "45deg34"
           }
         },
         {
