@@ -79,7 +79,7 @@ public class Bindings {
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)),
             new AutoAimAndShoot(
-                swerve, flywheel, topRoller, feeder, spindexer, intake,
+                swerve, flywheel, topRoller, feeder, spindexer,
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
             )));
