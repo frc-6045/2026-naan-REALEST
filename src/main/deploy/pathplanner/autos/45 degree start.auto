@@ -59,6 +59,30 @@
                       "data": {
                         "name": "stopStowIntake"
                       }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.67
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "startStowIntake"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.67
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "stopStowIntake"
+                      }
                     }
                   ]
                 }

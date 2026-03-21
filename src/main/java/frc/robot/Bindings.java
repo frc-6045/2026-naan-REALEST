@@ -83,7 +83,7 @@ public class Bindings {
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
             )));
-        m_driverController.rightTrigger().whileTrue(Commands.run(() -> swerve.lock(), swerve));
+        //m_driverController.rightTrigger().whileTrue(Commands.run(() -> swerve.lock(), swerve));
         // m_driverController.rightTrigger(0.5).whileTrue(
         //     new AutoAimAndShoot(
         //         swerve, flywheel, topRoller, feeder, spindexer,

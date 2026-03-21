@@ -60,9 +60,14 @@ public class Autos {
     NamedCommands.registerCommand("deployIntake", new DeployIntake(intakePivot));
     NamedCommands.registerCommand("stowIntake", new StowIntake(intakePivot));
     NamedCommands.registerCommand("startDeployIntake", new InstantCommand(() -> intakePivot.setSpeed(.32067), intakePivot));
-    NamedCommands.registerCommand("startStowIntake", new InstantCommand(() -> intakePivot.setSpeed(-.167), intakePivot));
+    //NamedCommands.registerCommand("startStowIntake", new InstantCommand(() -> intakePivot.setSpeed(-.167), intakePivot));
     NamedCommands.registerCommand("stopDeployIntake", new InstantCommand(() -> intakePivot.stopMotor(), intakePivot));
     NamedCommands.registerCommand("stopStowIntake", new InstantCommand(() -> intakePivot.stopMotor(), intakePivot));
+    NamedCommands.registerCommand("startStowIntake",
+      new InstantCommand(() -> {
+        System.out.println(">>> startStowIntake FIRED at " + Timer.getFPGATimestamp());
+        intakePivot.setSpeed(-.167);
+    }, intakePivot));
     NamedCommands.registerCommand("raiseIntakeHalfway", new RaiseIntakeHalfway(intakePivot));
     NamedCommands.registerCommand("startIntakeRoller", new InstantCommand(() -> intake.setSpeed(MotorConstants.kIntakeRollerSpeed), intake).asProxy());
     NamedCommands.registerCommand("stopIntake", new InstantCommand(() -> intake.stopIntakeMotor(), intake).asProxy());
