@@ -119,7 +119,7 @@ public class Autos {
     NamedCommands.registerCommand("autoAimAndShoot", Commands.defer(() -> {
       Timer feedTimer = new Timer();
       AutoAimAndShoot cmd = new AutoAimAndShoot(
-          swerve, flywheel, topRoller, feeder, spindexer, () -> 0.0, () -> 0.0);
+          swerve, flywheel, topRoller, feeder, spindexer, intake, () -> 0.0, () -> 0.0);
 
       return cmd.until(() -> {
         if (cmd.isFeedingActive()) {
@@ -131,12 +131,12 @@ public class Autos {
         return false;
       }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
         .withTimeout(ShootingConstants.kAutoShootTimeoutSec);
-    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer)).asProxy());
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intake)).asProxy());
 
     NamedCommands.registerCommand("autoAimAndShoot5Second", Commands.defer(() -> {
       Timer feedTimer = new Timer();
       AutoAimAndShoot cmd = new AutoAimAndShoot(
-          swerve, flywheel, topRoller, feeder, spindexer, () -> 0.0, () -> 0.0);
+          swerve, flywheel, topRoller, feeder, spindexer, intake, () -> 0.0, () -> 0.0);
 
       return cmd.until(() -> {
         if (cmd.isFeedingActive()) {
@@ -148,7 +148,7 @@ public class Autos {
         return false;
       }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
         .withTimeout(5);
-    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer)).asProxy());
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intake)).asProxy());
 
     // Aim while driving -- overrides PathPlanner rotation to aim at target, spins up + feeds
     // NamedCommands.registerCommand("autoAimWhileDriving", Commands.defer(

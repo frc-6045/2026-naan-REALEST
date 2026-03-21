@@ -18,6 +18,7 @@ import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
@@ -38,6 +39,7 @@ public class AutoAimAndShoot extends Command {
     private final TopRoller m_topRoller;
     private final Feeder m_feeder;
     private final Spindexer m_spindexer;
+    private final Intake m_intake;
 
     private final DoubleSupplier m_translationXSupplier; // Forward/back (field-relative Y on joystick)
     private final DoubleSupplier m_translationYSupplier; // Left/right (field-relative X on joystick)
@@ -53,12 +55,13 @@ public class AutoAimAndShoot extends Command {
 
     public AutoAimAndShoot(
             Swerve swerve, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
-            DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier) {
+            Intake intake, DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier) {
         m_swerve = swerve;
         m_flywheel = flywheel;
         m_topRoller = topRoller;
         m_feeder = feeder;
         m_spindexer = spindexer;
+        m_intake = intake;
         m_translationXSupplier = translationXSupplier;
         m_translationYSupplier = translationYSupplier;
 
@@ -66,7 +69,7 @@ public class AutoAimAndShoot extends Command {
         m_aimPID.setTolerance(AimConstants.kAimToleranceDegrees);
         m_aimPID.setSetpoint(0); // Target: zero tx offset
 
-        addRequirements(swerve, flywheel, topRoller, feeder, spindexer);
+        addRequirements(swerve, flywheel, topRoller, feeder, spindexer, intake);
     }
 
     @Override
@@ -146,6 +149,7 @@ public class AutoAimAndShoot extends Command {
             m_topRoller.setRPM(m_lastTargetRollerRPM);
             m_feeder.stopFeederMotor();
             m_spindexer.stopSpindexerMotor();
+            m_intake.stopIntakeMotor();
             m_feeding = false;
             m_graceTimer.stop();
             m_graceTimer.reset();
@@ -163,6 +167,7 @@ public class AutoAimAndShoot extends Command {
         m_topRoller.stopRollerMotor();
         m_feeder.stopFeederMotor();
         m_spindexer.stopSpindexerMotor();
+        m_intake.stopIntakeMotor();
         // Swerve default command auto-resumes
         SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
     }
@@ -188,6 +193,7 @@ public class AutoAimAndShoot extends Command {
         if (readyToFire) {
             m_feeder.setSpeed(MotorConstants.kFeederSpeed);
             m_spindexer.setSpeed(MotorConstants.kSpindexerSpeed);
+            m_intake.setSpeed(MotorConstants.kIntakeRollerSpeed);
             m_feeding = true;
             m_graceTimer.stop();
             m_graceTimer.reset();
@@ -204,9 +210,11 @@ public class AutoAimAndShoot extends Command {
             }
             m_feeder.setSpeed(MotorConstants.kFeederSpeed);
             m_spindexer.setSpeed(MotorConstants.kSpindexerSpeed);
+            m_intake.setSpeed(MotorConstants.kIntakeRollerSpeed);
         } else {
             m_feeder.stopFeederMotor();
             m_spindexer.stopSpindexerMotor();
+            m_intake.stopIntakeMotor();
             m_feeding = false;
         }
     }
