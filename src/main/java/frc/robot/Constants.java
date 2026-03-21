@@ -83,7 +83,7 @@ public final class Constants {
     // public static final double kPivotSoftLimit2 = .6767676767;
     // public static final double kStowSetpoint = .6767676767;
     // public static final double kDeploySetpoint = .6767676767;
-    
+
     // Shooter PID Constants (for velocity control in RPM)
     public static final double kShooterP = 0.000; // Proportional gain
     public static final double kShooterI = 0.0; // Integral gain
@@ -155,7 +155,7 @@ public final class Constants {
 
   public static class VisionPoseConstants {
     public static final double kMaxAngularVelocityDegPerSec = 360.0; // Reject vision if spinning faster
-    public static final double kMaxTagDistanceMeters = 5.0;          // Reject tags beyond this range
+    public static final double kMaxTagDistanceMeters = 6.7;          // Reject tags beyond this range
     public static final double kBaseStdDevXY = 0.5;                  // Base trust in meters (lower = trust more)
     public static final double kBaseStdDevTheta = 9999999;           // Near-infinite: don't correct heading from vision
     public static final double kStdDevScalePerMeter = 0.5;           // Trust decreases linearly with distance

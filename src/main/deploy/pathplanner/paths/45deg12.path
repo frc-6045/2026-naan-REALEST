@@ -55,7 +55,7 @@
   "eventMarkers": [
     {
       "name": "deploy :D",
-      "waypointRelativePos": 0.16629786849710976,
+      "waypointRelativePos": 0.053400469653179156,
       "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",
@@ -70,7 +70,7 @@
             {
               "type": "wait",
               "data": {
-                "waitTime": 0.8
+                "waitTime": 0.85
               }
             },
             {

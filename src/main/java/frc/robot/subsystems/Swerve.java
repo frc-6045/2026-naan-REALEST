@@ -388,7 +388,7 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {
         // Vision pose correction (fixes odometry drift after bump crossings)
-        //updateVisionPose();
+        updateVisionPose();
         SmartDashboard.putBoolean("Vision/Accepted", m_lastVisionAccepted);
         SmartDashboard.putString("Vision/Status", m_lastVisionRejectReason);
     }
