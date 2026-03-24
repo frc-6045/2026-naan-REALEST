@@ -77,12 +77,14 @@ public final class Constants {
     public static final int kTopRollerCurrentLimit = 60;
     public static final int kSpindexerCurrentLimit = 80;
 
-    // public static final double kPivotLimit1 = .6767676767;
-    // public static final double kPivotLimit2 = .6767676767;
-    // public static final double kPivotSoftLimit1 = .6767676767;
-    // public static final double kPivotSoftLimit2 = .6767676767;
-    // public static final double kStowSetpoint = .6767676767;
-    // public static final double kDeploySetpoint = .6767676767;
+    // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
+    // TODO: Determine empirically on the robot
+    public static final double kIntakePivotDeploySetpoint = 0.85;   // Fully down (deployed)
+    public static final double kIntakePivotMiddleSetpoint = 0.70;   // Halfway — oscillation bottom
+    public static final double kIntakePivotStowSetpoint = 0.55;     // Fully up (stowed/raised)
+
+    // Seconds per oscillation direction (up->middle or middle->up)
+    public static final double kIntakePivotOscillationPeriodSec = 0.8;
 
     // Shooter PID Constants (for velocity control in RPM)
     public static final double kShooterP = 0.000; // Proportional gain

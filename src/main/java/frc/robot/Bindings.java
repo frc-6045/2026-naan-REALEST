@@ -74,15 +74,18 @@ public class Bindings {
         );
 
         // Auto-aim and auto-shoot (driver retains left stick translational control)
+        // After shooting ends, intake pivot returns to deploy position automatically
         m_driverController.rightTrigger().whileTrue(new SequentialCommandGroup(
             new ScanForTarget(swerve,
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)),
             new AutoAimAndShoot(
-                swerve, flywheel, topRoller, feeder, spindexer, intake,
+                swerve, flywheel, topRoller, feeder, spindexer, intake, intakePivot,
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
-            )));
+            )
+        ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint())));
         //m_driverController.rightTrigger().whileTrue(Commands.run(() -> swerve.lock(), swerve));
         // m_driverController.rightTrigger(0.5).whileTrue(
         //     new AutoAimAndShoot(

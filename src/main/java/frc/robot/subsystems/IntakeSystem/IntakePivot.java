@@ -30,7 +30,7 @@ public class IntakePivot extends SubsystemBase {
     m_IntakeDeployMotor = new SparkFlex(MotorConstants.kIntakeDeployMotorCanID, MotorType.kBrushless);
     m_AbsoluteEncoder = m_IntakeDeployMotor.getAbsoluteEncoder();
     m_PID = new PIDController(.01,0,0);
-    m_PID.enableContinuousInput(-1, 1);
+    m_PID.enableContinuousInput(0, 1);
     m_PID.setTolerance(.067);
 
     updateMotorSettings();
@@ -96,8 +96,8 @@ public double applyLimits(double speed) {
     double limitedSpeed = m_RampLimiter.calculate(m_TargetSpeed);
     m_IntakeDeployMotor.set(limitedSpeed);
 
-    // double position = getAbsoluteEncoderReading();
+    double position = getAbsoluteEncoderReading();
     SmartDashboard.putNumber("Subsystem: Intake Pivot/Speed", limitedSpeed);
-    // SmartDashboard.putNumber("Subsystem: Intake Pivot/Position", position);
+    SmartDashboard.putNumber("Subsystem: Intake Pivot/Position", position);
   }
 }

@@ -19,6 +19,7 @@ import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.IntakeSystem.Intake;
+import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
@@ -40,6 +41,7 @@ public class AutoAimAndShoot extends Command {
     private final Feeder m_feeder;
     private final Spindexer m_spindexer;
     private final Intake m_intake;
+    private final IntakePivot m_intakePivot;
 
     private final DoubleSupplier m_translationXSupplier; // Forward/back (field-relative Y on joystick)
     private final DoubleSupplier m_translationYSupplier; // Left/right (field-relative X on joystick)
@@ -51,17 +53,25 @@ public class AutoAimAndShoot extends Command {
     private boolean m_feeding = false;
     private final Timer m_graceTimer = new Timer();
 
+    // Intake pivot automation state
+    private enum PivotState { IDLE, RAISING, OSCILLATING }
+    private PivotState m_pivotState = PivotState.IDLE;
+    private boolean m_oscillatingUp = true;
+    private final Timer m_oscillationTimer = new Timer();
+
     private final LimelightTargeting.TagLockState m_tagLock = new LimelightTargeting.TagLockState();
 
     public AutoAimAndShoot(
             Swerve swerve, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
-            Intake intake, DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier) {
+            Intake intake, IntakePivot intakePivot,
+            DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier) {
         m_swerve = swerve;
         m_flywheel = flywheel;
         m_topRoller = topRoller;
         m_feeder = feeder;
         m_spindexer = spindexer;
         m_intake = intake;
+        m_intakePivot = intakePivot;
         m_translationXSupplier = translationXSupplier;
         m_translationYSupplier = translationYSupplier;
 
@@ -69,7 +79,7 @@ public class AutoAimAndShoot extends Command {
         m_aimPID.setTolerance(AimConstants.kAimToleranceDegrees);
         m_aimPID.setSetpoint(0); // Target: zero tx offset
 
-        addRequirements(swerve, flywheel, topRoller, feeder, spindexer, intake);
+        addRequirements(swerve, flywheel, topRoller, feeder, spindexer, intake, intakePivot);
     }
 
     @Override
@@ -82,6 +92,12 @@ public class AutoAimAndShoot extends Command {
         m_graceTimer.stop();
         m_graceTimer.reset();
         m_tagLock.reset();
+
+        // Reset pivot state
+        m_pivotState = PivotState.IDLE;
+        m_oscillatingUp = true;
+        m_oscillationTimer.stop();
+        m_oscillationTimer.reset();
     }
 
     @Override
@@ -132,6 +148,7 @@ public class AutoAimAndShoot extends Command {
             boolean readyToFire = aimed && topRollerReady && flywheelReady;
 
             updateFeedState(readyToFire);
+            updatePivotState(m_feeding);
 
             // Telemetry
             SmartDashboard.putBoolean("AutoAim Aimed", aimed);
@@ -150,7 +167,11 @@ public class AutoAimAndShoot extends Command {
             m_feeder.stopFeederMotor();
             m_spindexer.stopSpindexerMotor();
             m_intake.stopIntakeMotor();
+            m_intakePivot.stopMotor();
             m_feeding = false;
+            m_pivotState = PivotState.IDLE;
+            m_oscillationTimer.stop();
+            m_oscillationTimer.reset();
             m_graceTimer.stop();
             m_graceTimer.reset();
 
@@ -168,6 +189,9 @@ public class AutoAimAndShoot extends Command {
         m_feeder.stopFeederMotor();
         m_spindexer.stopSpindexerMotor();
         m_intake.stopIntakeMotor();
+        m_intakePivot.stopMotor();
+        m_oscillationTimer.stop();
+        m_oscillationTimer.reset();
         // Swerve default command auto-resumes
         SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
     }
@@ -183,6 +207,49 @@ public class AutoAimAndShoot extends Command {
      */
     public boolean isFeedingActive() {
         return m_feeding;
+    }
+
+    /**
+     * Manage intake pivot during feeding: raise to stow setpoint, then oscillate between stow and middle
+     * to funnel stuck balls into the spindexer.
+     */
+    private void updatePivotState(boolean feeding) {
+        if (!feeding) {
+            m_intakePivot.stopMotor();
+            if (m_pivotState != PivotState.IDLE) {
+                m_pivotState = PivotState.IDLE;
+                m_oscillationTimer.stop();
+                m_oscillationTimer.reset();
+            }
+            return;
+        }
+
+        switch (m_pivotState) {
+            case IDLE:
+                // Start raising toward stow setpoint
+                m_pivotState = PivotState.RAISING;
+                // fall through to RAISING
+            case RAISING:
+                m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotStowSetpoint);
+                if (m_intakePivot.atSetpoint()) {
+                    m_pivotState = PivotState.OSCILLATING;
+                    m_oscillatingUp = false; // Start by heading toward middle
+                    m_oscillationTimer.reset();
+                    m_oscillationTimer.start();
+                }
+                break;
+            case OSCILLATING:
+                if (m_oscillationTimer.hasElapsed(MotorConstants.kIntakePivotOscillationPeriodSec)) {
+                    m_oscillatingUp = !m_oscillatingUp;
+                    m_oscillationTimer.reset();
+                    m_oscillationTimer.start();
+                }
+                double target = m_oscillatingUp
+                    ? MotorConstants.kIntakePivotStowSetpoint
+                    : MotorConstants.kIntakePivotMiddleSetpoint;
+                m_intakePivot.goToSetpoint(target);
+                break;
+        }
     }
 
     /**
