@@ -56,7 +56,7 @@ public final class Constants {
     // Default speeds
     public static final double kIntakeStowSpeed = -.167; // Speed for stowing intake
     public static final double kIntakeDeploySpeed = .167; // Speed for deploying intake
-    public static final double kIntakeRollerSpeed = 1; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
+    public static final double kIntakeRollerSpeed = .8; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
     public static final double kFeederSpeed = 1; // Speed to feed ball into shooter
     public static final double kSpindexerSpeed = 1; // Speed to index balls from intake to feeder
     public static final double kTopRollerSpeed = 1;
