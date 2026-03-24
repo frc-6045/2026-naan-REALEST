@@ -167,13 +167,10 @@ public class AutoAimAndShoot extends Command {
             m_feeder.stopFeederMotor();
             m_spindexer.stopSpindexerMotor();
             m_intake.stopIntakeMotor();
-            m_intakePivot.stopMotor();
             m_feeding = false;
-            m_pivotState = PivotState.IDLE;
-            m_oscillationTimer.stop();
-            m_oscillationTimer.reset();
             m_graceTimer.stop();
             m_graceTimer.reset();
+            updatePivotState(false);
 
             SmartDashboard.putBoolean("AutoAim Aimed", false);
             SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
@@ -226,10 +223,8 @@ public class AutoAimAndShoot extends Command {
 
         switch (m_pivotState) {
             case IDLE:
-                // Start raising toward stow setpoint
-                m_pivotState = PivotState.RAISING;
-                // fall through to RAISING
             case RAISING:
+                m_pivotState = PivotState.RAISING;
                 m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotStowSetpoint);
                 if (m_intakePivot.atSetpoint()) {
                     m_pivotState = PivotState.OSCILLATING;
