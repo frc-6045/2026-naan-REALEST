@@ -86,6 +86,15 @@ public final class Constants {
     // Seconds per oscillation direction (up->middle or middle->up)
     public static final double kIntakePivotOscillationPeriodSec = 0.8;
 
+    // Intake Pivot Feed Forward (ArmFeedforward, output converted from volts to duty cycle)
+    // TODO: Tune on robot — kG is the most important, start by increasing until the arm holds position with PID off
+    public static final double kIntakePivotKS = 0.0;   // Static friction compensation
+    public static final double kIntakePivotKG = 0.0;   // Gravity compensation — increase until arm holds position
+    public static final double kIntakePivotKV = 0.0;   // Velocity feed forward
+    // Encoder offset: radians to add so encoder 0.0 maps to arm horizontal (0 rad)
+    // TODO: Determine empirically — set arm horizontal, read encoder, then offset = -encoderReading * 2π
+    public static final double kIntakePivotEncoderOffsetRad = 0.0;
+
     // Shooter PID Constants (for velocity control in RPM)
     public static final double kShooterP = 0.000; // Proportional gain
     public static final double kShooterI = 0.0; // Integral gain
