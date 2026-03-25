@@ -24,23 +24,25 @@ public class Feeder extends SubsystemBase {
     m_FeederMotor = new SparkFlex(MotorConstants.kFeederMotorCanID, MotorType.kBrushless);
     m_IntakeBlackRollerMotor = new SparkFlex(MotorConstants.kIntakeBlackRollerMotorCanID, MotorType.kBrushless);
 
-    updateMotorSettings();
-    m_FeederMotor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-    m_IntakeBlackRollerMotor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    updateMotorSettings(m_FeederMotor, true);
+    updateMotorSettings(m_IntakeBlackRollerMotor, false);
+    
 
     // Initialize SmartDashboard values
     SmartDashboard.putNumber("Subsystem: Feeder/Speed", 0);
   }
 
-  private void updateMotorSettings() {
+  private void updateMotorSettings(SparkFlex motor, boolean inverted) {
     m_config
-        .inverted(true)
+        .inverted(inverted)
         .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(MotorConstants.kFeederCurrentLimit)
         .openLoopRampRate(0.167)
         .closedLoopRampRate(0.167);
     m_config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
+    
+        motor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   public void setSpeed(double speed) {
