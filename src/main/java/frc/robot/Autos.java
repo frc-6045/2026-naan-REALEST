@@ -121,7 +121,7 @@ public class Autos {
     NamedCommands.registerCommand("autoAimAndShoot", Commands.defer(() -> {
       Timer feedTimer = new Timer();
       AutoAimAndShoot cmd = new AutoAimAndShoot(
-          swerve, flywheel, topRoller, feeder, spindexer, intake, intakePivot, () -> 0.0, () -> 0.0);
+          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, () -> 0.0, () -> 0.0);
 
       return cmd.until(() -> {
         if (cmd.isFeedingActive()) {
@@ -135,12 +135,12 @@ public class Autos {
         .withTimeout(ShootingConstants.kAutoShootTimeoutSec)
         .andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
             .until(() -> intakePivot.atSetpoint()));
-    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intake, intakePivot)).asProxy());
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot)).asProxy());
 
     NamedCommands.registerCommand("autoAimAndShoot5Second", Commands.defer(() -> {
       Timer feedTimer = new Timer();
       AutoAimAndShoot cmd = new AutoAimAndShoot(
-          swerve, flywheel, topRoller, feeder, spindexer, intake, intakePivot, () -> 0.0, () -> 0.0);
+          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, () -> 0.0, () -> 0.0);
 
       return cmd.until(() -> {
         if (cmd.isFeedingActive()) {
@@ -154,7 +154,7 @@ public class Autos {
         .withTimeout(5)
         .andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
             .until(() -> intakePivot.atSetpoint()));
-    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intake, intakePivot)).asProxy());
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot)).asProxy());
 
     // Aim while driving -- overrides PathPlanner rotation to aim at target, spins up + feeds
     // NamedCommands.registerCommand("autoAimWhileDriving", Commands.defer(
