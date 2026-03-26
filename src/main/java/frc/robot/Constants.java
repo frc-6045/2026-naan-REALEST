@@ -77,12 +77,23 @@ public final class Constants {
     public static final int kTopRollerCurrentLimit = 60;
     public static final int kSpindexerCurrentLimit = 80;
 
-    // public static final double kPivotLimit1 = .6767676767;
-    // public static final double kPivotLimit2 = .6767676767;
-    // public static final double kPivotSoftLimit1 = .6767676767;
-    // public static final double kPivotSoftLimit2 = .6767676767;
-    // public static final double kStowSetpoint = .6767676767;
-    // public static final double kDeploySetpoint = .6767676767;
+    // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
+    // TODO: Determine empirically on the robot
+    public static final double kIntakePivotDeploySetpoint = 0.694;   // Fully down (deployed)
+    public static final double kIntakePivotMiddleSetpoint = 0.45;   // Halfway — oscillation bottom
+    public static final double kIntakePivotStowSetpoint = 0.3;     // Fully up (stowed/raised)
+
+    // Seconds per oscillation direction (up->middle or middle->up)
+    public static final double kIntakePivotOscillationPeriodSec = 0.8;
+
+    // Intake Pivot Feed Forward (ArmFeedforward, output converted from volts to duty cycle)
+    // TODO: Tune on robot — kG is the most important, start by increasing until the arm holds position with PID off
+    public static final double kIntakePivotKS = 0.0;   // Static friction compensation
+    public static final double kIntakePivotKG = 0.02;   // Gravity compensation — increase until arm holds position
+    public static final double kIntakePivotKV = 0.0;   // Velocity feed forward
+    // Encoder offset: radians to add so encoder 0.0 maps to arm horizontal (0 rad)
+    // TODO: Determine empirically — set arm horizontal, read encoder, then offset = -encoderReading * 2π
+    public static final double kIntakePivotEncoderOffsetRad = 0.0;
 
     // Shooter PID Constants (for velocity control in RPM)
     public static final double kShooterP = 0.000; // Proportional gain

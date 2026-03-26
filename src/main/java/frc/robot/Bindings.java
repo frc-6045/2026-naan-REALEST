@@ -74,15 +74,18 @@ public class Bindings {
         // );
 
         // Auto-aim and auto-shoot (driver retains left stick translational control)
+        // After shooting ends, intake pivot returns to deploy position automatically
         m_driverController.rightTrigger().whileTrue(new SequentialCommandGroup(
             new ScanForTarget(swerve,
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)),
             new AutoAimAndShoot(
-                swerve, flywheel, topRoller, feeder, spindexer,
+                swerve, flywheel, topRoller, feeder, spindexer, intakePivot,
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
-            )));
+            )
+        ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint())));
         //m_driverController.rightTrigger().whileTrue(Commands.run(() -> swerve.lock(), swerve));
         // m_driverController.rightTrigger(0.5).whileTrue(
         //     new AutoAimAndShoot(
@@ -124,8 +127,10 @@ public class Bindings {
 
         
         // Intake pivot deploy/stow (open-loop)
-        m_operatorController.a().whileTrue(new RunIntakePivot(intakePivot, Directions.IN));
-        m_operatorController.b().whileTrue(new RunIntakePivot(intakePivot, Directions.OUT));
+        m_operatorController.a().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotStowSetpoint));
+        m_operatorController.b().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint));
+
+        m_operatorController.pov(270).onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotMiddleSetpoint));
 
         // Hub shot (D-pad up)
         //m_operatorController.pov(0).whileTrue(new HubShot(flywheel, topRoller, feeder, spindexer));

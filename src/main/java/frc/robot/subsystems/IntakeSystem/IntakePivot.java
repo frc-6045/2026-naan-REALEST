@@ -10,9 +10,11 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
@@ -21,6 +23,7 @@ public class IntakePivot extends SubsystemBase {
   private final SparkFlex m_IntakeDeployMotor;
   private final AbsoluteEncoder m_AbsoluteEncoder;
   private final PIDController m_PID;
+  private final ArmFeedforward m_Feedforward;
   private final SparkFlexConfig m_config = new SparkFlexConfig();
   private final SlewRateLimiter m_RampLimiter = new SlewRateLimiter(MotorConstants.kIntakeRampRate);
   private double m_TargetSpeed = 0.0;
@@ -29,9 +32,13 @@ public class IntakePivot extends SubsystemBase {
   public IntakePivot() {
     m_IntakeDeployMotor = new SparkFlex(MotorConstants.kIntakeDeployMotorCanID, MotorType.kBrushless);
     m_AbsoluteEncoder = m_IntakeDeployMotor.getAbsoluteEncoder();
-    m_PID = new PIDController(.01,0,0);
-    m_PID.enableContinuousInput(-1, 1);
+    m_PID = new PIDController(2,0,0);
+    m_PID.enableContinuousInput(0, 1);
     m_PID.setTolerance(.067);
+    m_Feedforward = new ArmFeedforward(
+        MotorConstants.kIntakePivotKS,
+        MotorConstants.kIntakePivotKG,
+        MotorConstants.kIntakePivotKV);
 
     updateMotorSettings();
     m_IntakeDeployMotor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
@@ -72,7 +79,17 @@ public double applyLimits(double speed) {
 }
 
   public void goToSetpoint(double setpoint) {
-    setSpeed(m_PID.calculate(getAbsoluteEncoderReading(), setpoint));
+    double encoderPosition = getAbsoluteEncoderReading();
+    double pidOutput = m_PID.calculate(encoderPosition, setpoint);
+    double armAngleRad = encoderToRadians(encoderPosition);
+    double ffVolts = m_Feedforward.calculate(armAngleRad, 0);
+    double ffDutyCycle = ffVolts / RobotController.getBatteryVoltage();
+    setSpeed(pidOutput + ffDutyCycle);
+  }
+
+  /** Convert absolute encoder reading (0-1) to arm angle in radians for feed forward. */
+  private double encoderToRadians(double encoderReading) {
+    return (encoderReading * 2.0 * Math.PI) + MotorConstants.kIntakePivotEncoderOffsetRad;
   }
 
   public void stopMotor() {
@@ -96,8 +113,8 @@ public double applyLimits(double speed) {
     double limitedSpeed = m_RampLimiter.calculate(m_TargetSpeed);
     m_IntakeDeployMotor.set(limitedSpeed);
 
-    // double position = getAbsoluteEncoderReading();
+    double position = getAbsoluteEncoderReading();
     SmartDashboard.putNumber("Subsystem: Intake Pivot/Speed", limitedSpeed);
-    // SmartDashboard.putNumber("Subsystem: Intake Pivot/Position", position);
+    SmartDashboard.putNumber("Subsystem: Intake Pivot/Position", position);
   }
 }

@@ -21,6 +21,7 @@ import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
 import frc.robot.commands.AutoCommands.StartRevShooter;
 import frc.robot.commands.IntakeCommands.DeployIntake;
+import frc.robot.commands.IntakeCommands.IntakePivotSetpoint;
 import frc.robot.commands.IntakeCommands.RaiseIntakeHalfway;
 import frc.robot.commands.IntakeCommands.StowIntake;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShoot;
@@ -116,10 +117,11 @@ public class Autos {
     NamedCommands.registerCommand("autoAimPrepShooter", new AutoAimPrepare(flywheel, topRoller).asProxy());
 
     // Full stop-aim-shoot -- stops driving, rotates to target, fires, ends after feeding
+    // Intake pivot returns to deploy position after shooting
     NamedCommands.registerCommand("autoAimAndShoot", Commands.defer(() -> {
       Timer feedTimer = new Timer();
       AutoAimAndShoot cmd = new AutoAimAndShoot(
-          swerve, flywheel, topRoller, feeder, spindexer, () -> 0.0, () -> 0.0);
+          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, () -> 0.0, () -> 0.0);
 
       return cmd.until(() -> {
         if (cmd.isFeedingActive()) {
@@ -130,13 +132,15 @@ public class Autos {
         }
         return false;
       }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
-        .withTimeout(ShootingConstants.kAutoShootTimeoutSec);
-    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer)).asProxy());
+        .withTimeout(ShootingConstants.kAutoShootTimeoutSec)
+        .andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint()));
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot)).asProxy());
 
     NamedCommands.registerCommand("autoAimAndShoot5Second", Commands.defer(() -> {
       Timer feedTimer = new Timer();
       AutoAimAndShoot cmd = new AutoAimAndShoot(
-          swerve, flywheel, topRoller, feeder, spindexer, () -> 0.0, () -> 0.0);
+          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, () -> 0.0, () -> 0.0);
 
       return cmd.until(() -> {
         if (cmd.isFeedingActive()) {
@@ -147,8 +151,10 @@ public class Autos {
         }
         return false;
       }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
-        .withTimeout(5);
-    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer)).asProxy());
+        .withTimeout(5)
+        .andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint()));
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot)).asProxy());
 
     // Aim while driving -- overrides PathPlanner rotation to aim at target, spins up + feeds
     // NamedCommands.registerCommand("autoAimWhileDriving", Commands.defer(
