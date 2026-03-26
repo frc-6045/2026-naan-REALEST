@@ -56,14 +56,14 @@ public final class Constants {
     // Default speeds
     public static final double kIntakeStowSpeed = -.167; // Speed for stowing intake
     public static final double kIntakeDeploySpeed = .167; // Speed for deploying intake
-    public static final double kIntakeRollerSpeed = .8; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
+    public static final double kIntakeRollerSpeed = 1; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
     public static final double kFeederSpeed = 1; // Speed to feed ball into shooter
     public static final double kSpindexerSpeed = 1; // Speed to index balls from intake to feeder
     public static final double kTopRollerSpeed = 1;
 
     public static final double kIntakeRampRate = 3.14; // Max change in motor output per second (units/sec) - prevents harsh stops on chain
     public static final double kIntakeStowTimeout = 1.2; // Safety timeout for deploy/stow operations (seconds)
-    public static final double kIntakeDeployTimeout = .8; // Safety timeout for deploy/stow operations (seconds)
+    public static final double kIntakeDeployTimeout = 1; // Safety timeout for deploy/stow operations (seconds)
     public static final double kRaiseIntakeHalfwayTimeout = 0.6; // for intake up halfway when shoot
 
     // Current Spike Detection Thresholds (Amps) UNUSED
