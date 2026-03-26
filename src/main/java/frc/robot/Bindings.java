@@ -130,7 +130,7 @@ public class Bindings {
         m_operatorController.a().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotStowSetpoint));
         m_operatorController.b().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint));
 
-        m_operatorController.pov(270).onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotMiddleSetpoint));
+        m_operatorController.rightBumper().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotMiddleSetpoint));
 
         // Hub shot (D-pad up)
         //m_operatorController.pov(0).whileTrue(new HubShot(flywheel, topRoller, feeder, spindexer));
