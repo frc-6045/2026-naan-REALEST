@@ -127,8 +127,8 @@ public class Bindings {
 
         
         // Intake pivot deploy/stow (open-loop)
-        m_operatorController.a().whileTrue(new RunIntakePivot(intakePivot, Directions.IN));
-        m_operatorController.b().whileTrue(new RunIntakePivot(intakePivot, Directions.OUT));
+        m_operatorController.a().whileTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotStowSetpoint));
+        m_operatorController.b().whileTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint));
 
         // Hub shot (D-pad up)
         //m_operatorController.pov(0).whileTrue(new HubShot(flywheel, topRoller, feeder, spindexer));
