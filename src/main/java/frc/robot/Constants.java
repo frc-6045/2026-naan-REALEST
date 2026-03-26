@@ -66,8 +66,9 @@ public final class Constants {
     public static final double kIntakeDeployTimeout = 1; // Safety timeout for deploy/stow operations (seconds)
     public static final double kRaiseIntakeHalfwayTimeout = 0.6; // for intake up halfway when shoot
 
-    // Current Spike Detection Thresholds (Amps) UNUSED
+    // Current Spike Detection Thresholds (Amps)
     public static final double kIntakeCurrentSpikeThreshold = 40; // Current threshold to detect stow/deploy complete
+    public static final double kIntakePivotCurrentThreshold = 15; // Current threshold to detect game piece contact during autoshoot oscillation
 
     // Motor Current Limits (Amps)
     public static final int kFeederCurrentLimit = 50;
