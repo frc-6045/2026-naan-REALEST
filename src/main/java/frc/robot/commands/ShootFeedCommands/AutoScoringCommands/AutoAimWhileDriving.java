@@ -48,6 +48,8 @@ public class AutoAimWhileDriving extends Command {
     private double m_lastAimLead = 0.0;
     private boolean m_feeding = false;
     private final Timer m_graceTimer = new Timer();
+    // true = going up (toward stow), false = returning to deploy
+    private boolean m_pivotGoingUp = true;
 
     private final LimelightTargeting.TagLockState m_tagLock = new LimelightTargeting.TagLockState();
 
@@ -75,6 +77,7 @@ public class AutoAimWhileDriving extends Command {
         m_lastAimLead = 0.0;
         m_graceTimer.stop();
         m_graceTimer.reset();
+        m_pivotGoingUp = true;
 
         // Enable rotation override -- PathPlanner will call getRotationTarget() each cycle
         PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTarget);
@@ -195,13 +198,25 @@ public class AutoAimWhileDriving extends Command {
         // Current-based oscillation: go up until hit piece, then back to deploy
         double pivotCurrent = m_intakePivot.getCurrent();
         SmartDashboard.putNumber("AutoAimWhileDriving/pivot current", pivotCurrent);
+        SmartDashboard.putBoolean("AutoAimWhileDriving/pivot going up", m_pivotGoingUp);
 
-        if (pivotCurrent > MotorConstants.kIntakePivotCurrentThreshold) {
-            // Hit a game piece - go back to deploy position
+        if (m_pivotGoingUp) {
+            // Going up toward stow
+            if (pivotCurrent > MotorConstants.kIntakePivotCurrentThreshold) {
+                // Hit a game piece - switch to going back to deploy
+                m_pivotGoingUp = false;
+            } else {
+                m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotStowSetpoint);
+            }
+        }
+
+        if (!m_pivotGoingUp) {
+            // Returning to deploy
             m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotDeploySetpoint);
-        } else {
-            // Keep moving up (towards stow) to push pieces
-            m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotStowSetpoint);
+            if (m_intakePivot.atSetpoint()) {
+                // Reached deploy, start going up again
+                m_pivotGoingUp = true;
+            }
         }
     }
 

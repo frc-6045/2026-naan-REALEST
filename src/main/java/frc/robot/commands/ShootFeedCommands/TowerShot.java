@@ -23,6 +23,8 @@ public class TowerShot extends Command {
     private final Spindexer m_spindexer;
     private final IntakePivot m_intakePivot;
     private final Intake m_intake;
+    // true = going up (toward stow), false = returning to deploy
+    private boolean m_goingUp;
 
     public TowerShot(Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
                      IntakePivot intakePivot, Intake intake) {
@@ -40,6 +42,7 @@ public class TowerShot extends Command {
     public void initialize() {
         m_flywheel.setTargetRPM(MotorConstants.kTowerShotFlywheelRPM);
         m_topRoller.setRPM(MotorConstants.kTowerShotTopRollerRPM);
+        m_goingUp = true;
     }
 
     @Override

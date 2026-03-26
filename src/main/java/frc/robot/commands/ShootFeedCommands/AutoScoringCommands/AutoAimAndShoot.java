@@ -52,6 +52,8 @@ public class AutoAimAndShoot extends Command {
     private double m_lastTargetRollerRPM = MotorConstants.kRollerTargetRPM;
     private boolean m_feeding = false;
     private final Timer m_graceTimer = new Timer();
+    // true = going up (toward stow), false = returning to deploy
+    private boolean m_pivotGoingUp = true;
 
     private final LimelightTargeting.TagLockState m_tagLock = new LimelightTargeting.TagLockState();
 
@@ -86,7 +88,7 @@ public class AutoAimAndShoot extends Command {
         m_graceTimer.stop();
         m_graceTimer.reset();
         m_tagLock.reset();
-
+        m_pivotGoingUp = true;
     }
 
     @Override
@@ -206,13 +208,25 @@ public class AutoAimAndShoot extends Command {
         // Current-based oscillation: go up until hit piece, then back to deploy
         double pivotCurrent = m_intakePivot.getCurrent();
         SmartDashboard.putNumber("AutoAim/pivot current", pivotCurrent);
+        SmartDashboard.putBoolean("AutoAim/pivot going up", m_pivotGoingUp);
 
-        if (pivotCurrent > MotorConstants.kIntakePivotCurrentThreshold) {
-            // Hit a game piece - go back to deploy position
+        if (m_pivotGoingUp) {
+            // Going up toward stow
+            if (pivotCurrent > MotorConstants.kIntakePivotCurrentThreshold) {
+                // Hit a game piece - switch to going back to deploy
+                m_pivotGoingUp = false;
+            } else {
+                m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotStowSetpoint);
+            }
+        }
+
+        if (!m_pivotGoingUp) {
+            // Returning to deploy
             m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotDeploySetpoint);
-        } else {
-            // Keep moving up (towards stow) to push pieces
-            m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotStowSetpoint);
+            if (m_intakePivot.atSetpoint()) {
+                // Reached deploy, start going up again
+                m_pivotGoingUp = true;
+            }
         }
     }
 
