@@ -50,7 +50,7 @@ public class Bindings {
         m_driverController.back().whileTrue(Commands.run(() -> swerve.lock(), swerve));
 
         // Intake rollers
-        m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
+       // m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
 
         // m_driverController.rightTrigger(0.05).whileTrue(
         //     Commands.runEnd(
@@ -62,16 +62,16 @@ public class Bindings {
         //         intake
         //     )
         // );
-        m_driverController.leftTrigger(0.05).whileTrue(
-            Commands.runEnd(
-                () -> {
-                    double t = -m_driverController.getLeftTriggerAxis();
-                    intake.setSpeed(t);
-                },
-                () -> intake.setSpeed(0.0),
-                intake
-            )
-        );
+        // m_driverController.leftTrigger(0.05).whileTrue(
+        //     Commands.runEnd(
+        //         () -> {
+        //             double t = -m_driverController.getLeftTriggerAxis();
+        //             intake.setSpeed(t);
+        //         },
+        //         () -> intake.setSpeed(0.0),
+        //         intake
+        //     )
+        // );
 
         // Auto-aim and auto-shoot (driver retains left stick translational control)
         // After shooting ends, intake pivot returns to deploy position automatically
@@ -108,7 +108,7 @@ public class Bindings {
             Commands.runEnd(
                 () -> {
                     double t = m_operatorController.getLeftTriggerAxis();
-                    intake.setSpeed(t);
+                    intake.setSpeed(-t);
                 },
                 () -> intake.setSpeed(0.0),
                 intake
