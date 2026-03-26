@@ -32,7 +32,7 @@ public class IntakePivot extends SubsystemBase {
   public IntakePivot() {
     m_IntakeDeployMotor = new SparkFlex(MotorConstants.kIntakeDeployMotorCanID, MotorType.kBrushless);
     m_AbsoluteEncoder = m_IntakeDeployMotor.getAbsoluteEncoder();
-    m_PID = new PIDController(.01,0,0);
+    m_PID = new PIDController(2,0,0);
     m_PID.enableContinuousInput(0, 1);
     m_PID.setTolerance(.067);
     m_Feedforward = new ArmFeedforward(
