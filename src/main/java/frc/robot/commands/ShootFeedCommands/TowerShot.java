@@ -57,9 +57,6 @@ public class TowerShot extends Command {
             m_feeder.stopFeederMotor();
         }
 
-        // Run intake rollers
-        m_intake.setSpeed(MotorConstants.kIntakeRollerSpeed);
-
         // Intake pivot oscillation: go up until hit piece, then back to deploy
         double pivotCurrent = m_intakePivot.getCurrent();
         SmartDashboard.putNumber("TowerShot/pivot current", pivotCurrent);

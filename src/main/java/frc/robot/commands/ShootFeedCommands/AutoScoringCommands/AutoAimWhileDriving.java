@@ -192,9 +192,6 @@ public class AutoAimWhileDriving extends Command {
             return;
         }
 
-        // Run intake rollers while feeding
-        m_intake.setSpeed(MotorConstants.kIntakeRollerSpeed);
-
         // Current-based oscillation: go up until hit piece, then back to deploy
         double pivotCurrent = m_intakePivot.getCurrent();
         SmartDashboard.putNumber("AutoAimWhileDriving/pivot current", pivotCurrent);

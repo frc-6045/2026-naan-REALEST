@@ -26,6 +26,9 @@ public class AutoShootNoVision extends Command {
     private final double m_flywheelRPM;
     private final double m_topRollerRPM;
 
+    // true = going up (toward stow), false = returning to deploy
+    private boolean m_goingUp;
+
     public AutoShootNoVision(Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
                               IntakePivot intakePivot, Intake intake, double flywheelRPM, double rollerRPM) {
         m_flywheel = flywheel;
@@ -44,6 +47,7 @@ public class AutoShootNoVision extends Command {
     public void initialize() {
         m_flywheel.setTargetRPM(m_flywheelRPM);
         m_topRoller.setRPM(m_topRollerRPM);
+        m_goingUp = true; // Start by going up
     }
 
     @Override
@@ -61,20 +65,29 @@ public class AutoShootNoVision extends Command {
             m_feeder.stopFeederMotor();
         }
 
-        // Run intake rollers
-        m_intake.setSpeed(MotorConstants.kIntakeRollerSpeed);
-
         // Intake pivot oscillation with current-based sensing
-        // Go to deploy, when current spikes (hit piece), go back to deploy and repeat
+        // Go up until current spike, then return to deploy, repeat
         double pivotCurrent = m_intakePivot.getCurrent();
         SmartDashboard.putNumber("AutoShootNoVision/pivot current", pivotCurrent);
+        SmartDashboard.putBoolean("AutoShootNoVision/going up", m_goingUp);
 
-        if (pivotCurrent > MotorConstants.kIntakePivotCurrentThreshold) {
-            // Hit a game piece - go back to deploy position to reset
+        if (m_goingUp) {
+            // Going up toward stow
+            if (pivotCurrent > MotorConstants.kIntakePivotCurrentThreshold) {
+                // Hit a game piece - switch to going back to deploy
+                m_goingUp = false;
+            } else {
+                m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotStowSetpoint);
+            }
+        }
+
+        if (!m_goingUp) {
+            // Returning to deploy
             m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotDeploySetpoint);
-        } else {
-            // Keep moving down (towards stow direction to push pieces)
-            m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotStowSetpoint);
+            if (m_intakePivot.atSetpoint()) {
+                // Reached deploy, start going up again
+                m_goingUp = true;
+            }
         }
     }
 
