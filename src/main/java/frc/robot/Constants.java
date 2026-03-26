@@ -68,7 +68,7 @@ public final class Constants {
 
     // Current Spike Detection Thresholds (Amps)
     public static final double kIntakeCurrentSpikeThreshold = 40; // Current threshold to detect stow/deploy complete
-    public static final double kIntakePivotCurrentThreshold = 15; // Current threshold to detect game piece contact during autoshoot oscillation
+    public static final double kIntakePivotCurrentThreshold = 45; // Current threshold to detect game piece contact during autoshoot oscillation
 
     // Motor Current Limits (Amps)
     public static final int kFeederCurrentLimit = 50;
@@ -80,9 +80,9 @@ public final class Constants {
 
     // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
     // TODO: Determine empirically on the robot
-    public static final double kIntakePivotDeploySetpoint = 0.694;   // Fully down (deployed)
+    public static final double kIntakePivotDeploySetpoint = 0.737;   // Fully down (deployed)
     public static final double kIntakePivotMiddleSetpoint = 0.45;   // Halfway — oscillation bottom
-    public static final double kIntakePivotStowSetpoint = 0.3;     // Fully up (stowed/raised)
+    public static final double kIntakePivotStowSetpoint = 0.349;     // Fully up (stowed/raised)
 
     // Seconds per oscillation direction (up->middle or middle->up)
     public static final double kIntakePivotOscillationPeriodSec = 0.8;
