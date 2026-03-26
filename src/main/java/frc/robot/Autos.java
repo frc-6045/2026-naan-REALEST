@@ -121,7 +121,7 @@ public class Autos {
     NamedCommands.registerCommand("autoAimAndShoot", Commands.defer(() -> {
       Timer feedTimer = new Timer();
       AutoAimAndShoot cmd = new AutoAimAndShoot(
-          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, () -> 0.0, () -> 0.0);
+          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake, () -> 0.0, () -> 0.0);
 
       return cmd.until(() -> {
         if (cmd.isFeedingActive()) {
@@ -140,7 +140,7 @@ public class Autos {
     NamedCommands.registerCommand("autoAimAndShoot5Second", Commands.defer(() -> {
       Timer feedTimer = new Timer();
       AutoAimAndShoot cmd = new AutoAimAndShoot(
-          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, () -> 0.0, () -> 0.0);
+          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake, () -> 0.0, () -> 0.0);
 
       return cmd.until(() -> {
         if (cmd.isFeedingActive()) {

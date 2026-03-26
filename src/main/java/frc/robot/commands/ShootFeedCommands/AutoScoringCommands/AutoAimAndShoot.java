@@ -18,6 +18,7 @@ import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.shooterSystem.Feeder;
@@ -40,6 +41,7 @@ public class AutoAimAndShoot extends Command {
     private final Feeder m_feeder;
     private final Spindexer m_spindexer;
     private final IntakePivot m_intakePivot;
+    private final Intake m_intake;
 
     private final DoubleSupplier m_translationXSupplier; // Forward/back (field-relative Y on joystick)
     private final DoubleSupplier m_translationYSupplier; // Left/right (field-relative X on joystick)
@@ -51,17 +53,11 @@ public class AutoAimAndShoot extends Command {
     private boolean m_feeding = false;
     private final Timer m_graceTimer = new Timer();
 
-    // Intake pivot automation state
-    private enum PivotState { IDLE, RAISING, OSCILLATING }
-    private PivotState m_pivotState = PivotState.IDLE;
-    private boolean m_oscillatingUp = true;
-    private final Timer m_oscillationTimer = new Timer();
-
     private final LimelightTargeting.TagLockState m_tagLock = new LimelightTargeting.TagLockState();
 
     public AutoAimAndShoot(
             Swerve swerve, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
-            IntakePivot intakePivot,
+            IntakePivot intakePivot, Intake intake,
             DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier) {
         m_swerve = swerve;
         m_flywheel = flywheel;
@@ -69,6 +65,7 @@ public class AutoAimAndShoot extends Command {
         m_feeder = feeder;
         m_spindexer = spindexer;
         m_intakePivot = intakePivot;
+        m_intake = intake;
         m_translationXSupplier = translationXSupplier;
         m_translationYSupplier = translationYSupplier;
 
@@ -76,7 +73,7 @@ public class AutoAimAndShoot extends Command {
         m_aimPID.setTolerance(AimConstants.kAimToleranceDegrees);
         m_aimPID.setSetpoint(0); // Target: zero tx offset
 
-        addRequirements(swerve, flywheel, topRoller, feeder, spindexer, intakePivot);
+        addRequirements(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake);
     }
 
     @Override
@@ -90,11 +87,6 @@ public class AutoAimAndShoot extends Command {
         m_graceTimer.reset();
         m_tagLock.reset();
 
-        // Reset pivot state
-        m_pivotState = PivotState.IDLE;
-        m_oscillatingUp = true;
-        m_oscillationTimer.stop();
-        m_oscillationTimer.reset();
     }
 
     @Override
@@ -182,8 +174,7 @@ public class AutoAimAndShoot extends Command {
         m_feeder.stopFeederMotor();
         m_spindexer.stopSpindexerMotor();
         m_intakePivot.stopMotor();
-        m_oscillationTimer.stop();
-        m_oscillationTimer.reset();
+        m_intake.stopIntakeMotor();
         // Swerve default command auto-resumes
         SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
     }
@@ -202,43 +193,29 @@ public class AutoAimAndShoot extends Command {
     }
 
     /**
-     * Manage intake pivot during feeding: raise to stow setpoint, then oscillate between stow and middle
-     * to funnel stuck balls into the spindexer.
+     * Manage intake pivot during feeding: move up until current spike, then back to deploy.
+     * Oscillates: deploy -> stow (until current spike) -> deploy -> repeat
      */
     private void updatePivotState(boolean feeding) {
         if (!feeding) {
             m_intakePivot.stopMotor();
-            if (m_pivotState != PivotState.IDLE) {
-                m_pivotState = PivotState.IDLE;
-                m_oscillationTimer.stop();
-                m_oscillationTimer.reset();
-            }
+            m_intake.stopIntakeMotor();
             return;
         }
 
-        switch (m_pivotState) {
-            case IDLE:
-            case RAISING:
-                m_pivotState = PivotState.RAISING;
-                m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotStowSetpoint);
-                if (m_intakePivot.atSetpoint()) {
-                    m_pivotState = PivotState.OSCILLATING;
-                    m_oscillatingUp = false; // Start by heading toward middle
-                    m_oscillationTimer.reset();
-                    m_oscillationTimer.start();
-                }
-                break;
-            case OSCILLATING:
-                if (m_oscillationTimer.hasElapsed(MotorConstants.kIntakePivotOscillationPeriodSec)) {
-                    m_oscillatingUp = !m_oscillatingUp;
-                    m_oscillationTimer.reset();
-                    m_oscillationTimer.start();
-                }
-                double target = m_oscillatingUp
-                    ? MotorConstants.kIntakePivotStowSetpoint
-                    : MotorConstants.kIntakePivotMiddleSetpoint;
-                m_intakePivot.goToSetpoint(target);
-                break;
+        // Run intake rollers while feeding
+        m_intake.setSpeed(MotorConstants.kIntakeRollerSpeed);
+
+        // Current-based oscillation: go up until hit piece, then back to deploy
+        double pivotCurrent = m_intakePivot.getCurrent();
+        SmartDashboard.putNumber("AutoAim/pivot current", pivotCurrent);
+
+        if (pivotCurrent > MotorConstants.kIntakePivotCurrentThreshold) {
+            // Hit a game piece - go back to deploy position
+            m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotDeploySetpoint);
+        } else {
+            // Keep moving up (towards stow) to push pieces
+            m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotStowSetpoint);
         }
     }
 

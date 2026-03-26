@@ -26,9 +26,6 @@ public class AutoShootNoVision extends Command {
     private final double m_flywheelRPM;
     private final double m_topRollerRPM;
 
-    // Oscillation state: true = going to deploy, false = going to mid
-    private boolean m_goingTowardsHitPiece;
-
     public AutoShootNoVision(Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
                               IntakePivot intakePivot, Intake intake, double flywheelRPM, double rollerRPM) {
         m_flywheel = flywheel;
@@ -47,8 +44,6 @@ public class AutoShootNoVision extends Command {
     public void initialize() {
         m_flywheel.setTargetRPM(m_flywheelRPM);
         m_topRoller.setRPM(m_topRollerRPM);
-        // Start by going towards deploy position
-        m_goingTowardsHitPiece = true;
     }
 
     @Override
@@ -70,28 +65,16 @@ public class AutoShootNoVision extends Command {
         m_intake.setSpeed(MotorConstants.kIntakeRollerSpeed);
 
         // Intake pivot oscillation with current-based sensing
+        // Go to deploy, when current spikes (hit piece), go back to deploy and repeat
         double pivotCurrent = m_intakePivot.getCurrent();
         SmartDashboard.putNumber("AutoShootNoVision/pivot current", pivotCurrent);
-        SmartDashboard.putBoolean("AutoShootNoVision/going to deploy", m_goingTowardsHitPiece);
 
-        if (m_goingTowardsHitPiece) {
-            // Moving towards deploy position, check for current spike (hit game piece)
-            if (pivotCurrent > MotorConstants.kIntakePivotCurrentThreshold) {
-                // Hit a game piece, switch to going to mid
-                m_goingTowardsHitPiece = false;
-            } else {
-                // Keep going towards deploy
-                m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotDeploySetpoint);
-            }
-        }
-
-        if (!m_goingTowardsHitPiece) {
-            // Moving towards mid position
-            m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotMiddleSetpoint);
-            if (m_intakePivot.atSetpoint()) {
-                // Reached mid, switch back to going towards deploy
-                m_goingTowardsHitPiece = true;
-            }
+        if (pivotCurrent > MotorConstants.kIntakePivotCurrentThreshold) {
+            // Hit a game piece - go back to deploy position to reset
+            m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotDeploySetpoint);
+        } else {
+            // Keep moving down (towards stow direction to push pieces)
+            m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotStowSetpoint);
         }
     }
 

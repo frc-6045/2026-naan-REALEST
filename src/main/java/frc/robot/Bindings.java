@@ -80,7 +80,7 @@ public class Bindings {
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)),
             new AutoAimAndShoot(
-                swerve, flywheel, topRoller, feeder, spindexer, intakePivot,
+                swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
             )
@@ -142,7 +142,7 @@ public class Bindings {
         // m_operatorController.pov(180).whileTrue(new RunFeeder(feeder, Directions.IN));
         // m_operatorController.pov(180).whileTrue(new ShooterOpenLoop(flywheel, () -> {return 2440;}));
         // m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, () -> {return 2725;}));
-        m_operatorController.pov(180).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer));
+        m_operatorController.pov(180).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake));
         
 
         // Spindexer CW (normal direction)
