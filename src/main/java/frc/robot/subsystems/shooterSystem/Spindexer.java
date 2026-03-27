@@ -70,5 +70,6 @@ public class Spindexer extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Spindexer/Velocity (RPM)", getRPM());
+    SmartDashboard.putNumber("Subsystem: Spindexer/Current", getCurrent());
   }
 }
