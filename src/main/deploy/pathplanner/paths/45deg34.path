@@ -25,7 +25,7 @@
       },
       "nextControl": {
         "x": 5.620843532986112,
-        "y": 2.0772473234953712
+        "y": 2.0772473234953717
       },
       "isLocked": false,
       "linkedName": null
@@ -47,7 +47,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.19183823529411761,
-      "rotationDegrees": -105.60087604476682
+      "rotationDegrees": -105.60087604476684
     },
     {
       "waypointRelativePos": 0.7013602941176484,
@@ -96,19 +96,7 @@
                   {
                     "type": "named",
                     "data": {
-                      "name": "startStowIntake"
-                    }
-                  },
-                  {
-                    "type": "wait",
-                    "data": {
-                      "waitTime": 0.67
-                    }
-                  },
-                  {
-                    "type": "named",
-                    "data": {
-                      "name": "stopStowIntake"
+                      "name": "stow intake setpoint :C"
                     }
                   }
                 ]

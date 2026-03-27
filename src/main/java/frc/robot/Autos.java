@@ -168,6 +168,13 @@ public class Autos {
       new InstantCommand(() -> topRoller.stopRollerMotor(), topRoller)
     ).asProxy());
 
+
+
+    NamedCommands.registerCommand("deploy intake setpoint :C", new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint));
+    NamedCommands.registerCommand("stow intake setpoint :C", new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotStowSetpoint));
+
+
+
     // --- Auto Chooser ---
 
     m_autoChooser = new SendableChooser<>();
