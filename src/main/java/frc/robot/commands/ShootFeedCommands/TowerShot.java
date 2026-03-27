@@ -63,13 +63,25 @@ public class TowerShot extends Command {
         // Intake pivot oscillation: go up until hit piece, then back to deploy
         double pivotCurrent = m_intakePivot.getCurrent();
         SmartDashboard.putNumber("TowerShot/pivot current", pivotCurrent);
+        SmartDashboard.putBoolean("TowerShot/going up", m_goingUp);
 
-        if (pivotCurrent > MotorConstants.kIntakePivotCurrentThreshold) {
-            // Hit a game piece - go back to deploy position
+        if (m_goingUp) {
+            // Going up toward stow
+            if (pivotCurrent > MotorConstants.kIntakePivotCurrentThreshold) {
+                // Hit a game piece - switch to going back to deploy
+                m_goingUp = false;
+            } else {
+                m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotStowSetpoint);
+            }
+        }
+
+        if (!m_goingUp) {
+            // Returning to deploy
             m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotDeploySetpoint);
-        } else {
-            // Keep moving up (towards stow) to push pieces
-            m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotStowSetpoint);
+            if (m_intakePivot.atSetpoint()) {
+                // Reached deploy, start going up again
+                m_goingUp = true;
+            }
         }
     }
 
