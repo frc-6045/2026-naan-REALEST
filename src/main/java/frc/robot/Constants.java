@@ -80,9 +80,9 @@ public final class Constants {
 
     // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
     // TODO: Determine empirically on the robot
-    public static final double kIntakePivotDeploySetpoint = 0.737;   // Fully down (deployed)
-    public static final double kIntakePivotMiddleSetpoint = 0.45;   // Halfway — oscillation bottom
-    public static final double kIntakePivotStowSetpoint = 0.349;     // Fully up (stowed/raised)
+    public static final double kIntakePivotDeploySetpoint = 0.1482;   // Fully down (deployed)
+    public static final double kIntakePivotMiddleSetpoint = 0.9688;   // Halfway — oscillation bottom
+    public static final double kIntakePivotStowSetpoint = 0.7805;     // Fully up (stowed/raised)
 
     // Seconds per oscillation direction (up->middle or middle->up)
     public static final double kIntakePivotOscillationPeriodSec = 0.8;
@@ -94,7 +94,7 @@ public final class Constants {
     public static final double kIntakePivotKV = 0.0;   // Velocity feed forward
     // Encoder offset: radians to add so encoder 0.0 maps to arm horizontal (0 rad)
     // TODO: Determine empirically — set arm horizontal, read encoder, then offset = -encoderReading * 2π
-    public static final double kIntakePivotEncoderOffsetRad = 0.0;
+    public static final double kIntakePivotEncoderOffsetRad = 1.0;
 
     // Shooter PID Constants (for velocity control in RPM)
     public static final double kShooterP = 0.000; // Proportional gain
