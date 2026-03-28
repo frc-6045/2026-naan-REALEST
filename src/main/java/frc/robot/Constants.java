@@ -192,7 +192,7 @@ public final class Constants {
     // Autonomous auto-aim timing (seconds)
     public static final double kAutoShootFeedDurationSec = 20; // How long to run feeder after auto-fire triggers
     public static final double kAutoShootTimeoutSec = 20.0; // Safety timeout to prevent stalling auto
-    public static final double kFeedingGracePeriodSec = 0.15; // Grace period before stopping feeder if not ready (prevents brief aim loss from stopping feed)
+    public static final double kFeedingGracePeriodSec = 0.15; // Keeps feeder running through brief aim jitter while moving (~3 cycles at 50Hz)
   }
 
   public static class VelocityCompensationConstants {

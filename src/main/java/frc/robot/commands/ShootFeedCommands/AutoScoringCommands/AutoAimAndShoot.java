@@ -139,12 +139,7 @@ public class AutoAimAndShoot extends Command {
             m_swerve.drive(translation, rotationSpeed, true);
 
             // Check if all conditions are met (aimed = reached lead angle, not necessarily centered)
-            // Use wider tolerance while moving so the robot will actually shoot
-            double robotSpeed = Math.hypot(fieldVelocity.vxMetersPerSecond,
-                    fieldVelocity.vyMetersPerSecond);
-            double aimTolerance = robotSpeed > AimConstants.kMovingSpeedThresholdMps
-                    ? AimConstants.kAimMovingToleranceDegrees
-                    : AimConstants.kAimToleranceDegrees;
+            double aimTolerance = compensation.getAimToleranceDegrees();
             boolean aimed = Math.abs(target.txDegrees - aimSetpoint) < aimTolerance;
             boolean topRollerReady = m_topRoller.isAtTargetSpeed(targetRollerRPM);
             boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
@@ -154,11 +149,11 @@ public class AutoAimAndShoot extends Command {
             updatePivotState(m_feeding);
 
             // Telemetry
-            SmartDashboard.putBoolean("AutoAim Aimed", aimed);
-            SmartDashboard.putBoolean("AutoAim TopRollerReady", topRollerReady);
-            SmartDashboard.putBoolean("AutoAim FlywheelReady", flywheelReady);
-            SmartDashboard.putBoolean("AutoAim ReadyToFire", readyToFire);
-            SmartDashboard.putNumber("AutoAim/RobotSpeed", robotSpeed);
+            SmartDashboard.putBoolean("AutoAim/Aimed", aimed);
+            SmartDashboard.putBoolean("AutoAim/TopRollerReady", topRollerReady);
+            SmartDashboard.putBoolean("AutoAim/FlywheelReady", flywheelReady);
+            SmartDashboard.putBoolean("AutoAim/ReadyToFire", readyToFire);
+            SmartDashboard.putNumber("AutoAim/RobotSpeed", compensation.robotSpeedMps);
             SmartDashboard.putNumber("AutoAim/AimLead", compensation.aimLeadDegrees);
             SmartDashboard.putNumber("AutoAim/CompDistance", compensatedDistance);
             SmartDashboard.putNumber("AutoAim/RawDistance", target.distanceMeters);
@@ -176,8 +171,8 @@ public class AutoAimAndShoot extends Command {
             m_graceTimer.reset();
             updatePivotState(false);
 
-            SmartDashboard.putBoolean("AutoAim Aimed", false);
-            SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
+            SmartDashboard.putBoolean("AutoAim/Aimed", false);
+            SmartDashboard.putBoolean("AutoAim/ReadyToFire", false);
         }
     }
 
@@ -193,7 +188,7 @@ public class AutoAimAndShoot extends Command {
         m_oscillationTimer.stop();
         m_oscillationTimer.reset();
         // Swerve default command auto-resumes
-        SmartDashboard.putBoolean("AutoAim ReadyToFire", false);
+        SmartDashboard.putBoolean("AutoAim/ReadyToFire", false);
     }
 
     @Override
