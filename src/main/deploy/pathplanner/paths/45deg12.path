@@ -37,7 +37,7 @@
       },
       "prevControl": {
         "x": 7.538311342592593,
-        "y": 0.8546606626157418
+        "y": 0.8546606626157417
       },
       "nextControl": null,
       "isLocked": false,
@@ -54,8 +54,19 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
+      "name": "intake :D",
+      "waypointRelativePos": 0.42379425578034663,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "startIntakeRoller"
+        }
+      }
+    },
+    {
       "name": "deploy :D",
-      "waypointRelativePos": 0.053400469653179156,
+      "waypointRelativePos": 1.0155300472653592,
       "endWaypointRelativePos": null,
       "command": {
         "type": "sequential",
@@ -64,33 +75,10 @@
             {
               "type": "named",
               "data": {
-                "name": "startDeployIntake"
-              }
-            },
-            {
-              "type": "wait",
-              "data": {
-                "waitTime": 1.35
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "stopDeployIntake"
+                "name": "deploy intake setpoint :C"
               }
             }
           ]
-        }
-      }
-    },
-    {
-      "name": "intake :D",
-      "waypointRelativePos": 0.42379425578034663,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "startIntakeRoller"
         }
       }
     }

@@ -66,8 +66,9 @@ public final class Constants {
     public static final double kIntakeDeployTimeout = 1; // Safety timeout for deploy/stow operations (seconds)
     public static final double kRaiseIntakeHalfwayTimeout = 0.6; // for intake up halfway when shoot
 
-    // Current Spike Detection Thresholds (Amps) UNUSED
+    // Current Spike Detection Thresholds (Amps)
     public static final double kIntakeCurrentSpikeThreshold = 40; // Current threshold to detect stow/deploy complete
+    public static final double kIntakePivotCurrentThreshold = 45; // Current threshold to detect game piece contact during autoshoot oscillation
 
     // Motor Current Limits (Amps)
     public static final int kFeederCurrentLimit = 50;
@@ -79,9 +80,9 @@ public final class Constants {
 
     // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
     // TODO: Determine empirically on the robot
-    public static final double kIntakePivotDeploySetpoint = 0.694;   // Fully down (deployed)
-    public static final double kIntakePivotMiddleSetpoint = 0.45;   // Halfway — oscillation bottom
-    public static final double kIntakePivotStowSetpoint = 0.3;     // Fully up (stowed/raised)
+    public static final double kIntakePivotDeploySetpoint = 0.5385;   // Fully down (deployed)
+    public static final double kIntakePivotMiddleSetpoint = 0.3004;   // Halfway — oscillation bottom
+    public static final double kIntakePivotStowSetpoint = 0.1121;     // Fully up (stowed/raised)
 
     // Seconds per oscillation direction (up->middle or middle->up)
     public static final double kIntakePivotOscillationPeriodSec = 0.8;
@@ -93,7 +94,7 @@ public final class Constants {
     public static final double kIntakePivotKV = 0.0;   // Velocity feed forward
     // Encoder offset: radians to add so encoder 0.0 maps to arm horizontal (0 rad)
     // TODO: Determine empirically — set arm horizontal, read encoder, then offset = -encoderReading * 2π
-    public static final double kIntakePivotEncoderOffsetRad = 0.0;
+    public static final double kIntakePivotEncoderOffsetRad = 1.0;
 
     // Shooter PID Constants (for velocity control in RPM)
     public static final double kShooterP = 0.000; // Proportional gain
@@ -133,7 +134,7 @@ public final class Constants {
     public static final int kAprilTagPipeline = 0; // Pipeline index for AprilTag detection
 
     // Limelight mounting configuration (relative to robot center)
-    public static final double kLimelightMountHeightMeters = 0.64135; // Height of lens from floor (meters)
+    public static final double kLimelightMountHeightMeters = 0.71755; // Height of lens from floor (meters)
     public static final double kLimelightMountAngleDegrees = 0.0; // Angle above horizontal (degrees)
 
     // Target configuration

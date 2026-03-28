@@ -18,6 +18,9 @@ import frc.robot.Constants.AimConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
+import frc.robot.IntakePivotOscillator;
+import frc.robot.subsystems.IntakeSystem.Intake;
+import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
@@ -38,25 +41,30 @@ public class AutoAimWhileDriving extends Command {
     private final TopRoller m_topRoller;
     private final Feeder m_feeder;
     private final Spindexer m_spindexer;
+    private final IntakePivot m_intakePivot;
+    private final Intake m_intake;
 
     private double m_lastTargetRPM = MotorConstants.kShooterTargetRPM;
     private double m_lastTargetRollerRPM = MotorConstants.kRollerTargetRPM;
     private double m_lastAimLead = 0.0;
     private boolean m_feeding = false;
     private final Timer m_graceTimer = new Timer();
+    private final IntakePivotOscillator.OscillationState m_pivotState = new IntakePivotOscillator.OscillationState();
 
     private final LimelightTargeting.TagLockState m_tagLock = new LimelightTargeting.TagLockState();
 
     public AutoAimWhileDriving(Swerve swerve, Flywheel flywheel, TopRoller topRoller,
-            Feeder feeder, Spindexer spindexer) {
+            Feeder feeder, Spindexer spindexer, IntakePivot intakePivot, Intake intake) {
         m_swerve = swerve;
         m_flywheel = flywheel;
         m_topRoller = topRoller;
         m_feeder = feeder;
         m_spindexer = spindexer;
+        m_intakePivot = intakePivot;
+        m_intake = intake;
 
         // NOT requiring swerve -- PathPlanner owns it
-        addRequirements(flywheel, topRoller, feeder, spindexer);
+        addRequirements(flywheel, topRoller, feeder, spindexer, intakePivot, intake);
     }
 
     @Override
@@ -69,6 +77,7 @@ public class AutoAimWhileDriving extends Command {
         m_lastAimLead = 0.0;
         m_graceTimer.stop();
         m_graceTimer.reset();
+        m_pivotState.reset();
 
         // Enable rotation override -- PathPlanner will call getRotationTarget() each cycle
         PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTarget);
@@ -107,6 +116,7 @@ public class AutoAimWhileDriving extends Command {
             boolean readyToFire = aimed && topRollerReady && flywheelReady;
 
             updateFeedState(readyToFire);
+            IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, m_feeding, "AutoAim/");
 
             // Telemetry
             SmartDashboard.putBoolean("AutoAim/Aimed", aimed);
@@ -129,6 +139,7 @@ public class AutoAimWhileDriving extends Command {
             m_feeding = false;
             m_graceTimer.stop();
             m_graceTimer.reset();
+            IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, false, "AutoAim/");
 
             SmartDashboard.putBoolean("AutoAim/Aimed", false);
             SmartDashboard.putBoolean("AutoAim/ReadyToFire", false);
@@ -146,6 +157,8 @@ public class AutoAimWhileDriving extends Command {
         m_topRoller.stopRollerMotor();
         m_feeder.stopFeederMotor();
         m_spindexer.stopSpindexerMotor();
+        m_intakePivot.stopMotor();
+        m_intake.stopIntakeMotor();
 
         SmartDashboard.putBoolean("AutoAim/ReadyToFire", false);
         SmartDashboard.putBoolean("AutoAim/OverrideActive", false);

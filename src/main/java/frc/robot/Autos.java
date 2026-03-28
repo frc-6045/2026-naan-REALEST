@@ -121,7 +121,7 @@ public class Autos {
     NamedCommands.registerCommand("autoAimAndShoot", Commands.defer(() -> {
       Timer feedTimer = new Timer();
       AutoAimAndShoot cmd = new AutoAimAndShoot(
-          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, () -> 0.0, () -> 0.0);
+          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake, () -> 0.0, () -> 0.0);
 
       return cmd.until(() -> {
         if (cmd.isFeedingActive()) {
@@ -140,7 +140,7 @@ public class Autos {
     NamedCommands.registerCommand("autoAimAndShoot5Second", Commands.defer(() -> {
       Timer feedTimer = new Timer();
       AutoAimAndShoot cmd = new AutoAimAndShoot(
-          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, () -> 0.0, () -> 0.0);
+          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake, () -> 0.0, () -> 0.0);
 
       return cmd.until(() -> {
         if (cmd.isFeedingActive()) {
@@ -168,20 +168,15 @@ public class Autos {
       new InstantCommand(() -> topRoller.stopRollerMotor(), topRoller)
     ).asProxy());
 
+    NamedCommands.registerCommand("deploy intake setpoint :C", new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint));
+    NamedCommands.registerCommand("stow intake setpoint :C", new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotStowSetpoint));
+
     // --- Auto Chooser ---
 
     m_autoChooser = new SendableChooser<>();
     m_autoChooser.setDefaultOption("None", null);
 
     // Add autos to chooser
-    m_autoChooser.addOption("half auto", AutoBuilder.buildAuto("quarterautonovisionAllison"));
-    m_autoChooser.addOption("full auto", AutoBuilder.buildAuto("moreautonovisionAllison"));
-    m_autoChooser.addOption("3/4 auto", AutoBuilder.buildAuto("34autonovisionAllison"));
-    m_autoChooser.addOption("outpost auto", AutoBuilder.buildAuto("outpost auto"));
-    m_autoChooser.addOption("half auto swoop", AutoBuilder.buildAuto("quarterautonovisionwithbigswoop"));
-    m_autoChooser.addOption("full auto swoop", AutoBuilder.buildAuto("moreautonovisionwithbigswoop"));
-    m_autoChooser.addOption("3/4 auto swoop", AutoBuilder.buildAuto("34autonovisionwithbigswoop"));
-    m_autoChooser.addOption("test intake pivot", AutoBuilder.buildAuto("teststow"));
     m_autoChooser.addOption("45 degree auto", AutoBuilder.buildAuto("45 degree start"));
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);

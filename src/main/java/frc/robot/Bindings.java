@@ -80,7 +80,7 @@ public class Bindings {
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)),
             new AutoAimAndShoot(
-                swerve, flywheel, topRoller, feeder, spindexer, intakePivot,
+                swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
             )
@@ -100,8 +100,7 @@ public class Bindings {
         /*============================*/
 
         // Intake rollers
-        m_operatorController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
-        m_operatorController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
+        m_operatorController.leftBumper().whileTrue(new RunIntake(intake, Directions.IN)); //actually out
 
         // Variable-speed intake via left trigger (proportional to trigger axis)
         m_operatorController.leftTrigger(0.05).whileTrue(
@@ -130,7 +129,7 @@ public class Bindings {
         m_operatorController.a().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotStowSetpoint));
         m_operatorController.b().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint));
 
-        m_operatorController.pov(270).onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotMiddleSetpoint));
+        m_operatorController.rightBumper().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotMiddleSetpoint));
 
         // Hub shot (D-pad up)
         //m_operatorController.pov(0).whileTrue(new HubShot(flywheel, topRoller, feeder, spindexer));
@@ -142,7 +141,7 @@ public class Bindings {
         // m_operatorController.pov(180).whileTrue(new RunFeeder(feeder, Directions.IN));
         // m_operatorController.pov(180).whileTrue(new ShooterOpenLoop(flywheel, () -> {return 2440;}));
         // m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, () -> {return 2725;}));
-        m_operatorController.pov(180).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer));
+        m_operatorController.pov(180).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake));
         
 
         // Spindexer CW (normal direction)
