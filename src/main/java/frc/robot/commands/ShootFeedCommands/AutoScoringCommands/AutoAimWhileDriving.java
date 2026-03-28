@@ -100,7 +100,13 @@ public class AutoAimWhileDriving extends Command {
             m_flywheel.setTargetRPM(targetRPM);
 
             // Check if all conditions are met (aimed = reached lead angle, not necessarily centered)
-            boolean aimed = Math.abs(target.txDegrees - compensation.aimLeadDegrees) < AimConstants.kAimToleranceDegrees;
+            // Use wider tolerance while moving so the robot will actually shoot
+            double robotSpeed = Math.hypot(fieldVelocity.vxMetersPerSecond,
+                    fieldVelocity.vyMetersPerSecond);
+            double aimTolerance = robotSpeed > AimConstants.kMovingSpeedThresholdMps
+                    ? AimConstants.kAimMovingToleranceDegrees
+                    : AimConstants.kAimToleranceDegrees;
+            boolean aimed = Math.abs(target.txDegrees - compensation.aimLeadDegrees) < aimTolerance;
             boolean topRollerReady = m_topRoller.isAtTargetSpeed(targetRollerRPM);
             boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
             boolean readyToFire = aimed && topRollerReady && flywheelReady;

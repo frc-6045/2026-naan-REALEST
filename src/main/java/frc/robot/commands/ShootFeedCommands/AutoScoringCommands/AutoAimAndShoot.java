@@ -139,7 +139,13 @@ public class AutoAimAndShoot extends Command {
             m_swerve.drive(translation, rotationSpeed, true);
 
             // Check if all conditions are met (aimed = reached lead angle, not necessarily centered)
-            boolean aimed = Math.abs(target.txDegrees - aimSetpoint) < AimConstants.kAimToleranceDegrees;
+            // Use wider tolerance while moving so the robot will actually shoot
+            double robotSpeed = Math.hypot(fieldVelocity.vxMetersPerSecond,
+                    fieldVelocity.vyMetersPerSecond);
+            double aimTolerance = robotSpeed > AimConstants.kMovingSpeedThresholdMps
+                    ? AimConstants.kAimMovingToleranceDegrees
+                    : AimConstants.kAimToleranceDegrees;
+            boolean aimed = Math.abs(target.txDegrees - aimSetpoint) < aimTolerance;
             boolean topRollerReady = m_topRoller.isAtTargetSpeed(targetRollerRPM);
             boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
             boolean readyToFire = aimed && topRollerReady && flywheelReady;
@@ -152,10 +158,12 @@ public class AutoAimAndShoot extends Command {
             SmartDashboard.putBoolean("AutoAim TopRollerReady", topRollerReady);
             SmartDashboard.putBoolean("AutoAim FlywheelReady", flywheelReady);
             SmartDashboard.putBoolean("AutoAim ReadyToFire", readyToFire);
-
-            // Velocity compensation telemetry
-            double robotSpeed = Math.hypot(fieldVelocity.vxMetersPerSecond,
-                    fieldVelocity.vyMetersPerSecond);
+            SmartDashboard.putNumber("AutoAim/RobotSpeed", robotSpeed);
+            SmartDashboard.putNumber("AutoAim/AimLead", compensation.aimLeadDegrees);
+            SmartDashboard.putNumber("AutoAim/CompDistance", compensatedDistance);
+            SmartDashboard.putNumber("AutoAim/RawDistance", target.distanceMeters);
+            SmartDashboard.putBoolean("AutoAim/CompActive", compensation.compensationActive);
+            SmartDashboard.putNumber("AutoAim/AimTolerance", aimTolerance);
         } else {
             // No valid target: drive with zero rotation, keep motors spinning at last RPM
             m_swerve.drive(translation, 0.0, true);
