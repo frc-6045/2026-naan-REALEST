@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import frc.robot.Constants.AimConstants;
 import frc.robot.Constants.VelocityCompensationConstants;
 
 /**
@@ -25,21 +26,31 @@ public final class ShotCompensation {
         public final double radialVelocityMps;
         /** Whether compensation was actually applied */
         public final boolean compensationActive;
+        /** Robot speed magnitude (m/s) */
+        public final double robotSpeedMps;
 
         public CompensationResult(double aimLeadDegrees, double adjustedDistanceMeters,
                 double flightTimeSec, double lateralVelocityMps, double radialVelocityMps,
-                boolean compensationActive) {
+                boolean compensationActive, double robotSpeedMps) {
             this.aimLeadDegrees = aimLeadDegrees;
             this.adjustedDistanceMeters = adjustedDistanceMeters;
             this.flightTimeSec = flightTimeSec;
             this.lateralVelocityMps = lateralVelocityMps;
             this.radialVelocityMps = radialVelocityMps;
             this.compensationActive = compensationActive;
+            this.robotSpeedMps = robotSpeedMps;
         }
 
         /** Zero-compensation result (robot stationary or compensation disabled). */
         public static CompensationResult zero(double distanceMeters) {
-            return new CompensationResult(0.0, distanceMeters, 0.0, 0.0, 0.0, false);
+            return new CompensationResult(0.0, distanceMeters, 0.0, 0.0, 0.0, false, 0.0);
+        }
+
+        /** Returns the appropriate aim tolerance based on robot speed. */
+        public double getAimToleranceDegrees() {
+            return robotSpeedMps > AimConstants.kMovingSpeedThresholdMps
+                    ? AimConstants.kAimMovingToleranceDegrees
+                    : AimConstants.kAimToleranceDegrees;
         }
     }
 
@@ -106,6 +117,6 @@ public final class ShotCompensation {
         double adjustedDistance = distanceMeters + distanceAdjustment;
 
         return new CompensationResult(aimLeadDeg, adjustedDistance, flightTime,
-                lateralVelocity, radialVelocity, true);
+                lateralVelocity, radialVelocity, true, robotSpeed);
     }
 }

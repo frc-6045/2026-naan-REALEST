@@ -65,6 +65,9 @@ public class Swerve extends SubsystemBase {
         m_swerveDrive.setAngularVelocityCompensation(true, true, 0.1);
         m_swerveDrive.setModuleEncoderAutoSynchronize(true, 1);
 
+        // Ensure Limelight is on AprilTag pipeline for MegaTag2 pose estimation
+        LimelightHelpers.setPipelineIndex(LimelightConstants.kLimelightName, LimelightConstants.kAprilTagPipeline);
+
         // Setup PathPlanner
         setupPathPlanner();
     }
@@ -266,11 +269,11 @@ public class Swerve extends SubsystemBase {
      * Red alliance faces 180 degrees, blue alliance faces 0 degrees.
      */
     public void zeroGyroWithAlliance() {
+        zeroGyro();
         if (isRedAlliance()) {
-            zeroGyro();
             resetOdometry(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(180)));
         } else {
-            zeroGyro();
+            resetOdometry(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(0)));
         }
     }
 
