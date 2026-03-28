@@ -3,6 +3,7 @@ package frc.robot.commands.ShootFeedCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.MotorConstants;
+import frc.robot.IntakePivotOscillator;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.shooterSystem.Spindexer;
@@ -23,8 +24,7 @@ public class TowerShot extends Command {
     private final Spindexer m_spindexer;
     private final IntakePivot m_intakePivot;
     private final Intake m_intake;
-    // true = going up (toward stow), false = returning to deploy
-    private boolean m_goingUp;
+    private final IntakePivotOscillator.OscillationState m_pivotState = new IntakePivotOscillator.OscillationState();
 
     public TowerShot(Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
                      IntakePivot intakePivot, Intake intake) {
@@ -42,7 +42,7 @@ public class TowerShot extends Command {
     public void initialize() {
         m_flywheel.setTargetRPM(MotorConstants.kTowerShotFlywheelRPM);
         m_topRoller.setRPM(MotorConstants.kTowerShotTopRollerRPM);
-        m_goingUp = true;
+        m_pivotState.reset();
     }
 
     @Override
@@ -60,29 +60,7 @@ public class TowerShot extends Command {
             m_feeder.stopFeederMotor();
         }
 
-        // Intake pivot oscillation: go up until hit piece, then back to deploy
-        double pivotCurrent = m_intakePivot.getCurrent();
-        SmartDashboard.putNumber("TowerShot/pivot current", pivotCurrent);
-        SmartDashboard.putBoolean("TowerShot/going up", m_goingUp);
-
-        if (m_goingUp) {
-            // Going up toward stow
-            if (pivotCurrent > MotorConstants.kIntakePivotCurrentThreshold) {
-                // Hit a game piece - switch to going back to deploy
-                m_goingUp = false;
-            } else {
-                m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotStowSetpoint);
-            }
-        }
-
-        if (!m_goingUp) {
-            // Returning to deploy
-            m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotDeploySetpoint);
-            if (m_intakePivot.atSetpoint()) {
-                // Reached deploy, start going up again
-                m_goingUp = true;
-            }
-        }
+        IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, true, "TowerShot/");
     }
 
     @Override

@@ -18,6 +18,7 @@ import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.IntakePivotOscillator;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.Swerve;
@@ -52,8 +53,7 @@ public class AutoAimAndShoot extends Command {
     private double m_lastTargetRollerRPM = MotorConstants.kRollerTargetRPM;
     private boolean m_feeding = false;
     private final Timer m_graceTimer = new Timer();
-    // true = going up (toward stow), false = returning to deploy
-    private boolean m_pivotGoingUp = true;
+    private final IntakePivotOscillator.OscillationState m_pivotState = new IntakePivotOscillator.OscillationState();
 
     private final LimelightTargeting.TagLockState m_tagLock = new LimelightTargeting.TagLockState();
 
@@ -88,7 +88,7 @@ public class AutoAimAndShoot extends Command {
         m_graceTimer.stop();
         m_graceTimer.reset();
         m_tagLock.reset();
-        m_pivotGoingUp = true;
+        m_pivotState.reset();
     }
 
     @Override
@@ -140,7 +140,7 @@ public class AutoAimAndShoot extends Command {
             boolean readyToFire = aimed && topRollerReady && flywheelReady;
 
             updateFeedState(readyToFire);
-            updatePivotState(m_feeding);
+            IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, m_feeding, "AutoAim/");
 
             // Telemetry
             SmartDashboard.putBoolean("AutoAim/Aimed", aimed);
@@ -163,7 +163,7 @@ public class AutoAimAndShoot extends Command {
             m_feeding = false;
             m_graceTimer.stop();
             m_graceTimer.reset();
-            updatePivotState(false);
+            IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, false, "AutoAim/");
 
             SmartDashboard.putBoolean("AutoAim/Aimed", false);
             SmartDashboard.putBoolean("AutoAim/ReadyToFire", false);
@@ -195,42 +195,6 @@ public class AutoAimAndShoot extends Command {
      */
     public boolean isFeedingActive() {
         return m_feeding;
-    }
-
-    /**
-     * Manage intake pivot during feeding: move up until current spike, then back to deploy.
-     * Oscillates: deploy -> stow (until current spike) -> deploy -> repeat
-     */
-    private void updatePivotState(boolean feeding) {
-        if (!feeding) {
-            m_intakePivot.stopMotor();
-            m_intake.stopIntakeMotor();
-            return;
-        }
-
-        // Current-based oscillation: go up until hit piece, then back to deploy
-        double pivotCurrent = m_intakePivot.getCurrent();
-        SmartDashboard.putNumber("AutoAim/pivot current", pivotCurrent);
-        SmartDashboard.putBoolean("AutoAim/pivot going up", m_pivotGoingUp);
-
-        if (m_pivotGoingUp) {
-            // Going up toward stow
-            if (pivotCurrent > MotorConstants.kIntakePivotCurrentThreshold) {
-                // Hit a game piece - switch to going back to deploy
-                m_pivotGoingUp = false;
-            } else {
-                m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotStowSetpoint);
-            }
-        }
-
-        if (!m_pivotGoingUp) {
-            // Returning to deploy
-            m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotDeploySetpoint);
-            if (m_intakePivot.atSetpoint()) {
-                // Reached deploy, start going up again
-                m_pivotGoingUp = true;
-            }
-        }
     }
 
     /**

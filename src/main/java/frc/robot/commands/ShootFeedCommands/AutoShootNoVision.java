@@ -3,6 +3,7 @@ package frc.robot.commands.ShootFeedCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.MotorConstants;
+import frc.robot.IntakePivotOscillator;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.shooterSystem.Spindexer;
@@ -26,8 +27,7 @@ public class AutoShootNoVision extends Command {
     private final double m_flywheelRPM;
     private final double m_topRollerRPM;
 
-    // true = going up (toward stow), false = returning to deploy
-    private boolean m_goingUp;
+    private final IntakePivotOscillator.OscillationState m_pivotState = new IntakePivotOscillator.OscillationState();
 
     public AutoShootNoVision(Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
                               IntakePivot intakePivot, Intake intake, double flywheelRPM, double rollerRPM) {
@@ -47,7 +47,7 @@ public class AutoShootNoVision extends Command {
     public void initialize() {
         m_flywheel.setTargetRPM(m_flywheelRPM);
         m_topRoller.setRPM(m_topRollerRPM);
-        m_goingUp = true; // Start by going up
+        m_pivotState.reset();
     }
 
     @Override
@@ -65,30 +65,7 @@ public class AutoShootNoVision extends Command {
             m_feeder.stopFeederMotor();
         }
 
-        // Intake pivot oscillation with current-based sensing
-        // Go up until current spike, then return to deploy, repeat
-        double pivotCurrent = m_intakePivot.getCurrent();
-        SmartDashboard.putNumber("AutoShootNoVision/pivot current", pivotCurrent);
-        SmartDashboard.putBoolean("AutoShootNoVision/going up", m_goingUp);
-
-        if (m_goingUp) {
-            // Going up toward stow
-            if (pivotCurrent > MotorConstants.kIntakePivotCurrentThreshold) {
-                // Hit a game piece - switch to going back to deploy
-                m_goingUp = false;
-            } else {
-                m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotStowSetpoint);
-            }
-        }
-
-        if (!m_goingUp) {
-            // Returning to deploy
-            m_intakePivot.goToSetpoint(MotorConstants.kIntakePivotDeploySetpoint);
-            if (m_intakePivot.atSetpoint()) {
-                // Reached deploy, start going up again
-                m_goingUp = true;
-            }
-        }
+        IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, true, "AutoShootNoVision/");
     }
 
     @Override
