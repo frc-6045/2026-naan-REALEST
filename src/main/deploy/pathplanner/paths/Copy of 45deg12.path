@@ -1,0 +1,105 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.6454058883101856,
+        "y": 2.420127965856482
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.9668020109953592,
+        "y": 2.7006786024305565
+      },
+      "isLocked": false,
+      "linkedName": "451"
+    },
+    {
+      "anchor": {
+        "x": 5.757903935185185,
+        "y": 2.1875386284722227
+      },
+      "prevControl": {
+        "x": 5.2821336683775355,
+        "y": 2.4962184481072236
+      },
+      "nextControl": {
+        "x": 7.174172887731482,
+        "y": 1.268663122106482
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.416442708333333,
+        "y": 0.9062961516203711
+      },
+      "prevControl": {
+        "x": 7.538311342592593,
+        "y": 0.8546606626157417
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "452"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0547426470588241,
+      "rotationDegrees": 45.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "intake :D",
+      "waypointRelativePos": 0.42379425578034663,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "startIntakeRoller"
+        }
+      }
+    },
+    {
+      "name": "deploy :D",
+      "waypointRelativePos": 1.0155300472653592,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "deploy intake setpoint :C"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.8,
+    "rotation": 90.0
+  },
+  "reversed": false,
+  "folder": "new 45",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 45.0
+  },
+  "useDefaultConstraints": true
+}
