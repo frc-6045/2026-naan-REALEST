@@ -1,0 +1,129 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.091801793981482,
+        "y": 4.854344328703703
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.962644531250001,
+        "y": 4.58009230324074
+      },
+      "isLocked": false,
+      "linkedName": "453"
+    },
+    {
+      "anchor": {
+        "x": 7.53739279513889,
+        "y": 2.8091328125000006
+      },
+      "prevControl": {
+        "x": 8.219111255406633,
+        "y": 3.0694652018152104
+      },
+      "nextControl": {
+        "x": 5.620843532986112,
+        "y": 2.0772473234953717
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.9163416521990744,
+        "y": 3.8683492476851855
+      },
+      "prevControl": {
+        "x": 2.0193501880787044,
+        "y": 2.468351707175926
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "454"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.19183823529411761,
+      "rotationDegrees": -105.60087604476684
+    },
+    {
+      "waypointRelativePos": 0.7013602941176484,
+      "rotationDegrees": -98.40036936645245
+    },
+    {
+      "waypointRelativePos": 1.0445588235294123,
+      "rotationDegrees": 0.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 1.0393334537572243,
+      "constraints": {
+        "maxVelocity": 1.3,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "stow :D",
+      "waypointRelativePos": 1.117097182080923,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "stopIntake"
+              }
+            },
+            {
+              "type": "sequential",
+              "data": {
+                "commands": [
+                  {
+                    "type": "named",
+                    "data": {
+                      "name": "stow intake setpoint :C"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": -90.12798142503968
+  },
+  "reversed": false,
+  "folder": "new 45",
+  "idealStartingState": {
+    "velocity": 1.0,
+    "rotation": 116.51050651144632
+  },
+  "useDefaultConstraints": true
+}
