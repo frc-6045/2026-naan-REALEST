@@ -187,7 +187,7 @@ public final class Constants {
     public static final double kAimI = 0.0; // Integral gain
     public static final double kAimD = 0.01; // Derivative gain
     public static final double kAimToleranceDegrees = 2; // Acceptable aim error (degrees)
-    public static final double kAimMovingToleranceDegrees = 5.0; // Wider tolerance while moving
+    public static final double kAimMovingToleranceDegrees = 10.0; // Wider tolerance while moving
     public static final double kMovingSpeedThresholdMps = 0.3; // Speed above which wider tolerance applies
     public static final double kMaxAutoRotationRadPerSec = 3.0; // Max rotation speed during auto-aim (rad/s)
   }
@@ -200,7 +200,7 @@ public final class Constants {
     // Autonomous auto-aim timing (seconds)
     public static final double kAutoShootFeedDurationSec = 20; // How long to run feeder after auto-fire triggers
     public static final double kAutoShootTimeoutSec = 20.0; // Safety timeout to prevent stalling auto
-    public static final double kFeedingGracePeriodSec = 0.15; // Keeps feeder running through brief aim jitter while moving (~3 cycles at 50Hz)
+    public static final double kFeedingGracePeriodSec = 0.50; // Keeps feeder running through brief aim jitter while moving (~3 cycles at 50Hz)
   }
 
   public static class VelocityCompensationConstants {
