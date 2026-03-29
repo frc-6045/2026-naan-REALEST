@@ -166,6 +166,10 @@ public final class Constants {
   }
 
   public static class VisionPoseConstants {
+    // Trench AprilTags are unreliable for pose estimation (they wiggle when robots hit the trench)
+    public static final boolean kFilterTrenchTags = false;
+    public static final int[] kTrenchAprilTagIDs = {1, 6, 7, 12, 17, 22, 23, 28};
+
     public static final double kMaxAngularVelocityDegPerSec = 360.0; // Reject vision if spinning faster
     public static final double kMaxTagDistanceMeters = 6.7;          // Reject tags beyond this range
     public static final double kBaseStdDevXY = 0.5;                  // Base trust in meters (lower = trust more)
