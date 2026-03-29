@@ -136,6 +136,7 @@ public final class Constants {
     // Limelight mounting configuration (relative to robot center)
     public static final double kLimelightMountHeightMeters = 0.71755; // Height of lens from floor (meters)
     public static final double kLimelightMountAngleDegrees = 0.0; // Angle above horizontal (degrees)
+    public static final double kLimelightYawOffsetDegrees = 0.0; // Horizontal offset (positive = aim right)
 
     // Target configuration
     // HUB AprilTag centers are 44.25in (1.124m) off the floor
@@ -166,6 +167,10 @@ public final class Constants {
   }
 
   public static class VisionPoseConstants {
+    // Trench AprilTags are unreliable for pose estimation (they wiggle when robots hit the trench)
+    public static final boolean kFilterTrenchTags = false;
+    public static final int[] kTrenchAprilTagIDs = {1, 6, 7, 12, 17, 22, 23, 28};
+
     public static final double kMaxAngularVelocityDegPerSec = 360.0; // Reject vision if spinning faster
     public static final double kMaxTagDistanceMeters = 6.7;          // Reject tags beyond this range
     public static final double kBaseStdDevXY = 0.5;                  // Base trust in meters (lower = trust more)

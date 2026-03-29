@@ -68,6 +68,24 @@ public class Swerve extends SubsystemBase {
         // Ensure Limelight is on AprilTag pipeline for MegaTag2 pose estimation
         LimelightHelpers.setPipelineIndex(LimelightConstants.kLimelightName, LimelightConstants.kAprilTagPipeline);
 
+        // Filter out trench AprilTags from pose estimation (they move when robots hit the trench)
+        if (VisionPoseConstants.kFilterTrenchTags) {
+            int[] allIDs = new int[28]; // 2026 field has tags 1-28
+            for (int i = 0; i < 28; i++) allIDs[i] = i + 1;
+
+            // Remove trench tag IDs
+            int[] validIDs = java.util.Arrays.stream(allIDs)
+                    .filter(id -> {
+                        for (int trenchID : VisionPoseConstants.kTrenchAprilTagIDs) {
+                            if (id == trenchID) return false;
+                        }
+                        return true;
+                    })
+                    .toArray();
+
+            LimelightHelpers.SetFiducialIDFiltersOverride(LimelightConstants.kLimelightName, validIDs);
+        }
+
         // Setup PathPlanner
         setupPathPlanner();
     }
