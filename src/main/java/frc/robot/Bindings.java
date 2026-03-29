@@ -100,14 +100,14 @@ public class Bindings {
         /*============================*/
 
         // Intake rollers
-        m_operatorController.leftBumper().whileTrue(new RunIntake(intake, Directions.IN)); //actually out
+        m_operatorController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
 
         // Variable-speed intake via left trigger (proportional to trigger axis)
         m_operatorController.leftTrigger(0.05).whileTrue(
             Commands.runEnd(
                 () -> {
                     double t = m_operatorController.getLeftTriggerAxis();
-                    intake.setSpeed(-t);
+                    intake.setSpeed(t);
                 },
                 () -> intake.setSpeed(0.0),
                 intake
