@@ -138,7 +138,7 @@ public final class Constants {
     // Limelight mounting configuration (relative to robot center)
     public static final double kLimelightMountHeightMeters = 0.71755; // Height of lens from floor (meters)
     public static final double kLimelightMountAngleDegrees = 0.0; // Angle above horizontal (degrees)
-    public static final double kLimelightYawOffsetDegrees = -10.0; // Horizontal offset (positive = aim right)
+    public static final double kLimelightYawOffsetDegrees = 0.0; // Horizontal offset (positive = aim right)
 
     // Target configuration
     // HUB AprilTag centers are 44.25in (1.124m) off the floor
@@ -232,14 +232,14 @@ public final class Constants {
     // Positive = aim further right, Negative = aim further left
     public static final Map<Integer, Double> kYawOffsetByTag = Map.ofEntries(
         // Red hub tags
-        Map.entry(9,  -10.0),
+        Map.entry(9,  -20.0),
         Map.entry(10, -10.0),
         Map.entry(2,  0.0),
         Map.entry(11, 0.0),
         Map.entry(5,  0.0),
         Map.entry(8,  0.0),
         // Blue hub tags
-        Map.entry(25, -10.0),
+        Map.entry(25, -20.0),
         Map.entry(26, -10.0),
         Map.entry(21, 0.0),
         Map.entry(24, 0.0),
@@ -251,15 +251,15 @@ public final class Constants {
     // Positive = more power, Negative = less power
     public static final Map<Integer, Double> kRpmOffsetByTag = Map.ofEntries(
         // Red hub tags
-        Map.entry(9,  -125.0),
-        Map.entry(10, -125.0),
+        Map.entry(9,  0.0),
+        Map.entry(10, 0.0),
         Map.entry(2,  0.0),
         Map.entry(11, 0.0),
         Map.entry(5,  0.0),
         Map.entry(8,  0.0),
         // Blue hub tags
-        Map.entry(25, -125.0),
-        Map.entry(26, -125.0),
+        Map.entry(25, 0.0),
+        Map.entry(26, 0.0),
         Map.entry(21, 0.0),
         Map.entry(24, 0.0),
         Map.entry(18, 0.0),
