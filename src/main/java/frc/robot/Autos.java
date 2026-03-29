@@ -178,6 +178,8 @@ public class Autos {
 
     // Add autos to chooser
     m_autoChooser.addOption("45 degree auto", AutoBuilder.buildAuto("45 degree start"));
+    
+    m_autoChooser.addOption("change 45 degree auto", AutoBuilder.buildAuto("-new45"));
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
