@@ -14,6 +14,7 @@ import frc.robot.LimelightTargeting;
 import frc.robot.ShotCompensation;
 import frc.robot.ShootingLookupTable;
 import frc.robot.Constants.AimConstants;
+import frc.robot.Constants.TagOverrideConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
@@ -112,9 +113,10 @@ public class AutoAimAndShoot extends Command {
                     ShootingConstants.kMinShootingDistanceMeters,
                     ShootingConstants.kMaxShootingDistanceMeters);
 
-            // Look up roller and flywheel RPM from compensated distance
-            double targetRollerRPM = ShootingLookupTable.getRollerRPM(compensatedDistance);
-            double targetRPM = ShootingLookupTable.getFlywheelRPM(compensatedDistance);
+            // Look up roller and flywheel RPM from compensated distance, with per-tag offset
+            double tagRpmOffset = TagOverrideConstants.getRpmOffset(target.lockedTagID);
+            double targetRollerRPM = ShootingLookupTable.getRollerRPM(compensatedDistance) + tagRpmOffset;
+            double targetRPM = ShootingLookupTable.getFlywheelRPM(compensatedDistance) + tagRpmOffset;
             m_lastTargetRPM = targetRPM;
             m_lastTargetRollerRPM = targetRollerRPM;
 
@@ -123,7 +125,10 @@ public class AutoAimAndShoot extends Command {
 
             // Calculate auto-rotation from aim PID (tx -> rad/s)
             // Setpoint is the aim lead angle (0 when stationary, offset when moving)
-            double aimSetpoint = compensation.aimLeadDegrees + LimelightConstants.kLimelightYawOffsetDegrees;
+            double tagYawOffset = TagOverrideConstants.getYawOffset(target.lockedTagID);
+            double aimSetpoint = compensation.aimLeadDegrees
+                    + LimelightConstants.kLimelightYawOffsetDegrees
+                    + tagYawOffset;
             double aimOutput = m_aimPID.calculate(target.txDegrees, aimSetpoint);
             double rotationSpeed = MathUtil.clamp(aimOutput,
                     -AimConstants.kMaxAutoRotationRadPerSec,
@@ -153,6 +158,9 @@ public class AutoAimAndShoot extends Command {
             SmartDashboard.putNumber("AutoAim/RawDistance", target.distanceMeters);
             SmartDashboard.putBoolean("AutoAim/CompActive", compensation.compensationActive);
             SmartDashboard.putNumber("AutoAim/AimTolerance", aimTolerance);
+            SmartDashboard.putNumber("AutoAim/LockedTagID", target.lockedTagID);
+            SmartDashboard.putNumber("AutoAim/TagYawOffset", tagYawOffset);
+            SmartDashboard.putNumber("AutoAim/TagRpmOffset", tagRpmOffset);
         } else {
             // No valid target: drive with zero rotation, keep motors spinning at last RPM
             m_swerve.drive(translation, 0.0, true);

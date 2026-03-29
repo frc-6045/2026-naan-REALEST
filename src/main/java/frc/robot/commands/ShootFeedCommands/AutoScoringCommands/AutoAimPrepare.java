@@ -6,6 +6,7 @@ import frc.robot.LimelightTargeting;
 import frc.robot.ShootingLookupTable;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.MotorConstants;
+import frc.robot.Constants.TagOverrideConstants;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.TopRoller;
 
@@ -41,8 +42,9 @@ public class AutoAimPrepare extends Command {
         LimelightTargeting.TargetingResult target = LimelightTargeting.acquireTarget(m_tagLock);
 
         if (target.hasValidTarget) {
-            double targetRollerRPM = ShootingLookupTable.getRollerRPM(target.distanceMeters);
-            double targetRPM = ShootingLookupTable.getFlywheelRPM(target.distanceMeters);
+            double tagRpmOffset = TagOverrideConstants.getRpmOffset(target.lockedTagID);
+            double targetRollerRPM = ShootingLookupTable.getRollerRPM(target.distanceMeters) + tagRpmOffset;
+            double targetRPM = ShootingLookupTable.getFlywheelRPM(target.distanceMeters) + tagRpmOffset;
             m_lastTargetRPM = targetRPM;
             m_lastTargetRollerRPM = targetRollerRPM;
 

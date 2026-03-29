@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.Map;
+
 import edu.wpi.first.wpilibj.DriverStation;
 
 /**
@@ -223,6 +225,56 @@ public final class Constants {
 
     // Clamp to keep lookup table queries in valid range
     public static final double kMaxDistanceAdjustmentMeters = 1.5;
+  }
+
+  public static class TagOverrideConstants {
+    // Per-AprilTag yaw offset in degrees (added to aim setpoint)
+    // Positive = aim further right, Negative = aim further left
+    public static final Map<Integer, Double> kYawOffsetByTag = Map.ofEntries(
+        // Red hub tags
+        Map.entry(9,  -10.0),
+        Map.entry(10, -10.0),
+        Map.entry(2,  0.0),
+        Map.entry(11, 0.0),
+        Map.entry(5,  0.0),
+        Map.entry(8,  0.0),
+        // Blue hub tags
+        Map.entry(25, -10.0),
+        Map.entry(26, -10.0),
+        Map.entry(21, 0.0),
+        Map.entry(24, 0.0),
+        Map.entry(18, 0.0),
+        Map.entry(27, 0.0)
+    );
+
+    // Per-AprilTag RPM offset (added to BOTH roller and flywheel RPM after lookup)
+    // Positive = more power, Negative = less power
+    public static final Map<Integer, Double> kRpmOffsetByTag = Map.ofEntries(
+        // Red hub tags
+        Map.entry(9,  -125.0),
+        Map.entry(10, -125.0),
+        Map.entry(2,  0.0),
+        Map.entry(11, 0.0),
+        Map.entry(5,  0.0),
+        Map.entry(8,  0.0),
+        // Blue hub tags
+        Map.entry(25, -125.0),
+        Map.entry(26, -125.0),
+        Map.entry(21, 0.0),
+        Map.entry(24, 0.0),
+        Map.entry(18, 0.0),
+        Map.entry(27, 0.0)
+    );
+
+    /** Get yaw offset for a tag ID. Returns 0.0 for unknown tags. */
+    public static double getYawOffset(int tagID) {
+      return kYawOffsetByTag.getOrDefault(tagID, 0.0);
+    }
+
+    /** Get RPM offset for a tag ID. Returns 0.0 for unknown tags. */
+    public static double getRpmOffset(int tagID) {
+      return kRpmOffsetByTag.getOrDefault(tagID, 0.0);
+    }
   }
 
   public enum Directions {

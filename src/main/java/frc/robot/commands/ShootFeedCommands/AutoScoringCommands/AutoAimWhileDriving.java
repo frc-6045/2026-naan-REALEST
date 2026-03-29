@@ -16,6 +16,7 @@ import frc.robot.ShotCompensation;
 import frc.robot.ShootingLookupTable;
 import frc.robot.Constants.AimConstants;
 import frc.robot.Constants.LimelightConstants;
+import frc.robot.Constants.TagOverrideConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
 import frc.robot.IntakePivotOscillator;
@@ -99,11 +100,15 @@ public class AutoAimWhileDriving extends Command {
                     ShootingConstants.kMinShootingDistanceMeters,
                     ShootingConstants.kMaxShootingDistanceMeters);
 
-            double targetRollerRPM = ShootingLookupTable.getRollerRPM(compensatedDistance);
-            double targetRPM = ShootingLookupTable.getFlywheelRPM(compensatedDistance);
+            double tagRpmOffset = TagOverrideConstants.getRpmOffset(target.lockedTagID);
+            double targetRollerRPM = ShootingLookupTable.getRollerRPM(compensatedDistance) + tagRpmOffset;
+            double targetRPM = ShootingLookupTable.getFlywheelRPM(compensatedDistance) + tagRpmOffset;
             m_lastTargetRPM = targetRPM;
             m_lastTargetRollerRPM = targetRollerRPM;
-            m_lastAimLead = compensation.aimLeadDegrees + LimelightConstants.kLimelightYawOffsetDegrees;
+            double tagYawOffset = TagOverrideConstants.getYawOffset(target.lockedTagID);
+            m_lastAimLead = compensation.aimLeadDegrees
+                    + LimelightConstants.kLimelightYawOffsetDegrees
+                    + tagYawOffset;
 
             m_topRoller.setRPM(targetRollerRPM);
             m_flywheel.setTargetRPM(targetRPM);
@@ -130,6 +135,9 @@ public class AutoAimWhileDriving extends Command {
             SmartDashboard.putNumber("AutoAim/RawDistance", target.distanceMeters);
             SmartDashboard.putBoolean("AutoAim/CompActive", compensation.compensationActive);
             SmartDashboard.putNumber("AutoAim/AimTolerance", aimTolerance);
+            SmartDashboard.putNumber("AutoAim/LockedTagID", target.lockedTagID);
+            SmartDashboard.putNumber("AutoAim/TagYawOffset", tagYawOffset);
+            SmartDashboard.putNumber("AutoAim/TagRpmOffset", tagRpmOffset);
         } else {
             // No valid target: keep motors spinning at last known RPM, stop feeding
             m_flywheel.setTargetRPM(m_lastTargetRPM);
