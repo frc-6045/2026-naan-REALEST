@@ -136,7 +136,7 @@ public final class Constants {
     // Limelight mounting configuration (relative to robot center)
     public static final double kLimelightMountHeightMeters = 0.71755; // Height of lens from floor (meters)
     public static final double kLimelightMountAngleDegrees = 0.0; // Angle above horizontal (degrees)
-    public static final double kLimelightYawOffsetDegrees = 0.0; // Horizontal offset (positive = aim right)
+    public static final double kLimelightYawOffsetDegrees = -10.0; // Horizontal offset (positive = aim right)
 
     // Target configuration
     // HUB AprilTag centers are 44.25in (1.124m) off the floor
