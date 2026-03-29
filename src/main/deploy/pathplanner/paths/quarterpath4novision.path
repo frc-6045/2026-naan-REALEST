@@ -70,7 +70,7 @@
     "rotation": 90.0
   },
   "reversed": false,
-  "folder": "quarterpathsnovision",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": -59.042

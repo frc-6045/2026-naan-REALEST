@@ -20,7 +20,7 @@
         "y": 2.778073642730044
       },
       "prevControl": {
-        "x": 1.3089384390533,
+        "x": 1.3089384390533003,
         "y": 2.414524812190211
       },
       "nextControl": null,
@@ -45,7 +45,7 @@
     "rotation": -59.04199999999997
   },
   "reversed": false,
-  "folder": "quarterpathsnovision",
+  "folder": null,
   "idealStartingState": {
     "velocity": 3.0,
     "rotation": 90.0

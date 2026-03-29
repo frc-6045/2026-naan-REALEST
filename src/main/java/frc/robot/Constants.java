@@ -124,7 +124,7 @@ public final class Constants {
 
   public static class SwerveConstants {
     // Maximum speed in meters per second
-    public static final double kMaxSpeedMetersPerSecond = 5.8;
+    public static final double kMaxSpeedMetersPerSecond = 4.688;
     // Maximum angular speed in radians per second
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI * 2;
   }
