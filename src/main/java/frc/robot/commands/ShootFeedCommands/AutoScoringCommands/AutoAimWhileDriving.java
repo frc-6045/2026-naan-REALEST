@@ -103,14 +103,14 @@ public class AutoAimWhileDriving extends Command {
             double targetRPM = ShootingLookupTable.getFlywheelRPM(compensatedDistance);
             m_lastTargetRPM = targetRPM;
             m_lastTargetRollerRPM = targetRollerRPM;
-            m_lastAimLead = compensation.aimLeadDegrees;
+            m_lastAimLead = compensation.aimLeadDegrees + LimelightConstants.kLimelightYawOffsetDegrees;
 
             m_topRoller.setRPM(targetRollerRPM);
             m_flywheel.setTargetRPM(targetRPM);
 
             // Check if all conditions are met (aimed = reached lead angle, not necessarily centered)
             double aimTolerance = compensation.getAimToleranceDegrees();
-            boolean aimed = Math.abs(target.txDegrees - compensation.aimLeadDegrees) < aimTolerance;
+            boolean aimed = Math.abs(target.txDegrees - m_lastAimLead) < aimTolerance;
             boolean topRollerReady = m_topRoller.isAtTargetSpeed(targetRollerRPM);
             boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
             boolean readyToFire = aimed && topRollerReady && flywheelReady;

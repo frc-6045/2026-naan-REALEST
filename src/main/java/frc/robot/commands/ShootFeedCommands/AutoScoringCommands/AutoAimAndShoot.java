@@ -123,7 +123,7 @@ public class AutoAimAndShoot extends Command {
 
             // Calculate auto-rotation from aim PID (tx -> rad/s)
             // Setpoint is the aim lead angle (0 when stationary, offset when moving)
-            double aimSetpoint = compensation.aimLeadDegrees;
+            double aimSetpoint = compensation.aimLeadDegrees + LimelightConstants.kLimelightYawOffsetDegrees;
             double aimOutput = m_aimPID.calculate(target.txDegrees, aimSetpoint);
             double rotationSpeed = MathUtil.clamp(aimOutput,
                     -AimConstants.kMaxAutoRotationRadPerSec,
