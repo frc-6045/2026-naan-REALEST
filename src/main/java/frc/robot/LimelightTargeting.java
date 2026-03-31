@@ -15,10 +15,10 @@ public final class LimelightTargeting {
     public static class TagLockState {
         public int lockedTagID = -1;
 
-        /** Reset lock and clear Limelight priority tag. */
+        /** Reset lock and clear Limelight priority tag on front camera. */
         public void reset() {
             lockedTagID = -1;
-            LimelightHelpers.setPriorityTagID(LimelightConstants.kLimelightName, -1);
+            LimelightHelpers.setPriorityTagID(LimelightConstants.kFrontCamera.name, -1);
         }
     }
 
@@ -50,6 +50,16 @@ public final class LimelightTargeting {
 
     private LimelightTargeting() {} // Prevent instantiation
 
+    /** Check if any camera sees a valid target. */
+    public static boolean anyTargetVisible() {
+        for (LimelightConstants.CameraConfig cam : LimelightConstants.kAllCameras) {
+            if (LimelightHelpers.getTV(cam.name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Run the full per-frame targeting pipeline: tag locking, validation, distance calc.
      *
@@ -57,7 +67,8 @@ public final class LimelightTargeting {
      * @return TargetingResult for this frame
      */
     public static TargetingResult acquireTarget(TagLockState lockState) {
-        String ll = LimelightConstants.kLimelightName;
+        LimelightConstants.CameraConfig cam = LimelightConstants.kFrontCamera;
+        String ll = cam.name;
 
         // Lock onto first valid target to prevent tag-to-tag oscillation
         int detectedID = (int) LimelightHelpers.getFiducialID(ll);
@@ -80,8 +91,8 @@ public final class LimelightTargeting {
             return TargetingResult.noTarget(tx, ty, detectedID, lockState.lockedTagID);
         }
 
-        double angleToTargetRad = Math.toRadians(LimelightConstants.kLimelightMountAngleDegrees + ty);
-        double distance = (LimelightConstants.kTargetHeightMeters - LimelightConstants.kLimelightMountHeightMeters)
+        double angleToTargetRad = Math.toRadians(cam.mountAngleDegrees + ty);
+        double distance = (LimelightConstants.kTargetHeightMeters - cam.mountHeightMeters)
                 / Math.tan(angleToTargetRad);
 
         distance = MathUtil.clamp(distance,

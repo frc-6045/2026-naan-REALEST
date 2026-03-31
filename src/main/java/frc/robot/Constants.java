@@ -132,17 +132,44 @@ public final class Constants {
   }
 
   public static class LimelightConstants {
-    public static final String kLimelightName = "limelight-sabre"; // NetworkTables name
     public static final int kAprilTagPipeline = 0; // Pipeline index for AprilTag detection
-
-    // Limelight mounting configuration (relative to robot center)
-    public static final double kLimelightMountHeightMeters = 0.71755; // Height of lens from floor (meters)
-    public static final double kLimelightMountAngleDegrees = 0.0; // Angle above horizontal (degrees)
-    public static final double kLimelightYawOffsetDegrees = 0.0; // Horizontal offset (positive = aim right)
 
     // Target configuration
     // HUB AprilTag centers are 44.25in (1.124m) off the floor
     public static final double kTargetHeightMeters = 44.25 * 0.0254; // ~1.124m
+
+    /** Per-camera mounting configuration. */
+    public static class CameraConfig {
+      public final String name;
+      public final double mountHeightMeters;
+      public final double mountAngleDegrees;
+      public final double yawOffsetDegrees;
+
+      public CameraConfig(String name, double mountHeightMeters,
+              double mountAngleDegrees, double yawOffsetDegrees) {
+        this.name = name;
+        this.mountHeightMeters = mountHeightMeters;
+        this.mountAngleDegrees = mountAngleDegrees;
+        this.yawOffsetDegrees = yawOffsetDegrees;
+      }
+    }
+
+    // Front camera (used for both pose estimation and targeting/aiming)
+    public static final CameraConfig kFrontCamera = new CameraConfig(
+        "limelight-sabre", // NetworkTables name
+        0.71755,           // Mount height from floor (meters)
+        0.0,               // Mount angle above horizontal (degrees)
+        0.0);              // Yaw offset (positive = aim right)
+
+    // Rear camera (used for pose estimation only -- shooter fires forward)
+    public static final CameraConfig kRearCamera = new CameraConfig(
+        "limelight-rear",  // TODO: set actual NetworkTables name
+        0.50,              // TODO: measure actual mount height (meters)
+        15.0,              // TODO: measure actual mount angle (degrees above horizontal)
+        0.0);              // TODO: measure actual yaw offset
+
+    // All cameras for pose estimation
+    public static final CameraConfig[] kAllCameras = { kFrontCamera, kRearCamera };
 
     // HUB AprilTag IDs -- all four faces of each HUB, 2 tags per face
     private static final int[] kRedAprilTagIDs = {2, 5, 8, 9, 10, 11};

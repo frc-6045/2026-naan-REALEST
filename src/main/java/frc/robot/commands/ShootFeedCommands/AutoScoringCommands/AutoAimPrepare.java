@@ -32,7 +32,7 @@ public class AutoAimPrepare extends Command {
     @Override
     public void initialize() {
         // Set Limelight to AprilTag pipeline
-        LimelightHelpers.setPipelineIndex(LimelightConstants.kLimelightName, LimelightConstants.kAprilTagPipeline);
+        LimelightHelpers.setPipelineIndex(LimelightConstants.kFrontCamera.name, LimelightConstants.kAprilTagPipeline);
 
         m_tagLock.reset();
     }
