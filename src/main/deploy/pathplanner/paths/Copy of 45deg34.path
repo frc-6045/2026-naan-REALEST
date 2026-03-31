@@ -25,7 +25,7 @@
       },
       "nextControl": {
         "x": 4.880071326676175,
-        "y": 2.010099857346648
+        "y": 2.0100998573466478
       },
       "isLocked": false,
       "linkedName": null
@@ -96,7 +96,7 @@
                   {
                     "type": "named",
                     "data": {
-                      "name": "stow intake setpoint :C"
+                      "name": "deploy intake setpoint limited :C"
                     }
                   }
                 ]
