@@ -22,7 +22,6 @@ import frc.robot.Constants.ShootingConstants;
 import frc.robot.commands.AutoCommands.StartRevShooter;
 import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.IntakePivotSetpoint;
-import frc.robot.commands.IntakeCommands.IntakePivotSetpointCurrentLimited;
 import frc.robot.commands.IntakeCommands.RaiseIntakeHalfway;
 import frc.robot.commands.IntakeCommands.StowIntake;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShoot;
@@ -170,7 +169,6 @@ public class Autos {
     ).asProxy());
 
     NamedCommands.registerCommand("deploy intake setpoint :C", new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint));
-    NamedCommands.registerCommand("deploy intake setpoint limited :C", new IntakePivotSetpointCurrentLimited(intakePivot, MotorConstants.kIntakePivotDeploySetpoint));
     NamedCommands.registerCommand("stow intake setpoint :C", new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotStowSetpoint));
 
     // --- Auto Chooser ---
