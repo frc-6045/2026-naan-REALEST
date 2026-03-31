@@ -126,8 +126,8 @@ public class Bindings {
 
         
         // Intake pivot deploy/stow (open-loop)
-        m_operatorController.a().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotStowSetpoint));
-        m_operatorController.b().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint));
+        m_operatorController.b().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotStowSetpoint));
+        m_operatorController.a().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint));
 
         m_operatorController.rightBumper().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotMiddleSetpoint));
 
