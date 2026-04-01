@@ -169,9 +169,10 @@ public class Autos {
       new InstantCommand(() -> topRoller.stopRollerMotor(), topRoller)
     ).asProxy());
 
-    NamedCommands.registerCommand("deploy intake setpoint :C", new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint));
-    NamedCommands.registerCommand("deploy intake setpoint limited :C", new IntakePivotSetpointCurrentLimited(intakePivot, MotorConstants.kIntakePivotDeploySetpoint));
-    NamedCommands.registerCommand("stow intake setpoint :C", new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotStowSetpoint));
+    NamedCommands.registerCommand("deploy intake setpoint :C", new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint).asProxy());
+    NamedCommands.registerCommand("deploy intake setpoint limited :C", new IntakePivotSetpointCurrentLimited(intakePivot, MotorConstants.kIntakePivotDeploySetpoint).asProxy());
+    NamedCommands.registerCommand("stow intake setpoint :C", new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotStowSetpoint).asProxy());
+    NamedCommands.registerCommand("stow intake setpoint limited :C", new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotStowSetpoint).asProxy());
 
     // --- Auto Chooser ---
 
@@ -180,7 +181,7 @@ public class Autos {
 
     // Add autos to chooser
     m_autoChooser.addOption("45 degree auto", AutoBuilder.buildAuto("45 degree start"));
-    
+    m_autoChooser.addOption("test stow deplot", AutoBuilder.buildAuto("New Auto"));
     m_autoChooser.addOption("change 45 degree auto", AutoBuilder.buildAuto("-new45"));
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);

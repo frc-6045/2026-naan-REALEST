@@ -17,6 +17,11 @@ public class IntakePivotSetpointCurrentLimited extends Command {
     }
 
     @Override
+    public void initialize() {
+        System.out.println("INTAKE PIVOT SETPOINT LIMITED");
+    }
+
+    @Override
     public void execute() {
         if (m_Intake.getCurrent() < MotorConstants.kIntakePivotCurrentThreshold)
             m_Intake.goToSetpoint(m_setpoint);

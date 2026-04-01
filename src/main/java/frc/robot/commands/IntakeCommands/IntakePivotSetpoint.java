@@ -17,6 +17,12 @@ public class IntakePivotSetpoint extends Command {
     }
 
     @Override
+    public void initialize() {
+        System.out.println("INTAKE PIVOT SETPOINT");
+    }
+
+
+    @Override
     public void execute() {
         m_Intake.goToSetpoint(m_setpoint);
     }
