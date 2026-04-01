@@ -6,11 +6,11 @@ import frc.robot.subsystems.IntakeSystem.IntakePivot;
 
 import frc.robot.Constants.MotorConstants;
 
-public class IntakePivotSetpoint extends Command {
+public class IntakePivotSetpointCurrentLimited extends Command {
     private final IntakePivot m_Intake;
     private final double m_setpoint;
 
-    public IntakePivotSetpoint(IntakePivot deployIntake, double setpoint) {
+    public IntakePivotSetpointCurrentLimited(IntakePivot deployIntake, double setpoint) {
         m_Intake = deployIntake;
         m_setpoint = setpoint;
         addRequirements(m_Intake);
@@ -18,13 +18,13 @@ public class IntakePivotSetpoint extends Command {
 
     @Override
     public void initialize() {
-        System.out.println("INTAKE PIVOT SETPOINT");
+        System.out.println("INTAKE PIVOT SETPOINT LIMITED");
     }
-
 
     @Override
     public void execute() {
-        m_Intake.goToSetpoint(m_setpoint);
+        if (m_Intake.getCurrent() < MotorConstants.kIntakePivotCurrentThreshold)
+            m_Intake.goToSetpoint(m_setpoint);
     }
 
     @Override

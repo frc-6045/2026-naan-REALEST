@@ -13,7 +13,25 @@
         {
           "type": "named",
           "data": {
-            "name": "autoAimAndShoot"
+            "name": "deploy :D"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "stow :D"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "deploy intake setpoint limited :C"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "stow intake setpoint limited :C"
           }
         }
       ]

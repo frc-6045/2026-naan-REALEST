@@ -100,7 +100,9 @@ public class Bindings {
         /*============================*/
 
         // Intake rollers
-        m_operatorController.leftBumper().whileTrue(new RunIntake(intake, Directions.OUT));
+        m_operatorController.leftBumper().whileTrue(new ParallelCommandGroup(
+            new RunIntake(intake, Directions.OUT),
+            new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotOuttakeSetpoint)));
 
         // Variable-speed intake via left trigger (proportional to trigger axis)
         m_operatorController.leftTrigger(0.05).whileTrue(
@@ -126,8 +128,8 @@ public class Bindings {
 
         
         // Intake pivot deploy/stow (open-loop)
-        m_operatorController.a().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotStowSetpoint));
-        m_operatorController.b().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint));
+        m_operatorController.b().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotStowSetpoint));
+        m_operatorController.a().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint));
 
         m_operatorController.rightBumper().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotMiddleSetpoint));
 
