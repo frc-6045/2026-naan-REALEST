@@ -82,10 +82,10 @@ public final class Constants {
 
     // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
     // TODO: Determine empirically on the robot
-    public static final double kIntakePivotDeploySetpoint = 0.5385;   // Fully down (deployed)
-    public static final double kIntakePivotOuttakeSetpoint = 0.5085;  // a bit up for eject balls
-    public static final double kIntakePivotMiddleSetpoint = 0.3004;   // Halfway — oscillation bottom
-    public static final double kIntakePivotStowSetpoint = 0.1121;     // Fully up (stowed/raised)
+    public static final double kIntakePivotDeploySetpoint = 0.5375;   // Fully down (deployed)
+    public static final double kIntakePivotOuttakeSetpoint = 0.4785;  // a bit up for eject balls
+    public static final double kIntakePivotMiddleSetpoint = 0.3160;   // Halfway — oscillation bottom
+    public static final double kIntakePivotStowSetpoint = 0.1171;     // Fully up (stowed/raised)
 
     // Seconds per oscillation direction (up->middle or middle->up)
     public static final double kIntakePivotOscillationPeriodSec = 0.8;
@@ -172,7 +172,7 @@ public final class Constants {
   public static class VisionPoseConstants {
     // Trench AprilTags are unreliable for pose estimation (they wiggle when robots hit the trench)
     public static final boolean kFilterTrenchTags = true;
-    public static final int[] kTrenchAprilTagIDs = {1, 6, 7, 12, 22, 23, 28, 15, 16, 13, 14, 29, 30, 31, 32};
+    public static final int[] kTrenchAprilTagIDs = {6, 7, 12, 22, 23, 28, 15, 16, 13, 14, 29, 30, 31, 32};
 
     public static final double kMaxAngularVelocityDegPerSec = 360.0; // Reject vision if spinning faster
     public static final double kMaxTagDistanceMeters = 6.7;          // Reject tags beyond this range
