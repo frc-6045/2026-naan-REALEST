@@ -132,6 +132,16 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI * 2;
   }
 
+  public static class FieldConstants {
+    // Hub position (center of field, same for both alliances)
+    // 2026 field is 16.54m x 8.21m, hub is at center
+    public static final double kHubXMeters = 8.27;  // Center of field X
+    public static final double kHubYMeters = 4.105; // Center of field Y
+
+    // Pipeline zone threshold (degrees from robot heading to hub)
+    public static final double kPipelineZoneThresholdDegrees = 30.0;
+  }
+
   public static class LimelightConstants {
     public static final String kLimelightName = "limelight-sabre"; // NetworkTables name
     public static final int kAprilTagPipeline = 0; // Pipeline index for AprilTag detection
