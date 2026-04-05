@@ -82,7 +82,7 @@ public class AutoAimAndShoot extends Command {
     @Override
     public void initialize() {
         // Set Limelight to AprilTag pipeline
-        LimelightHelpers.setPipelineIndex(LimelightConstants.kLimelightName, LimelightConstants.kAprilTagPipeline);
+        LimelightHelpers.setPipelineIndex(LimelightConstants.kFrontCamera.name, LimelightConstants.kAprilTagPipeline);
 
         m_aimPID.reset();
         m_feeding = false;
@@ -127,7 +127,7 @@ public class AutoAimAndShoot extends Command {
             // Setpoint is the aim lead angle (0 when stationary, offset when moving)
             double tagYawOffset = TagOverrideConstants.getYawOffset(target.lockedTagID);
             double aimSetpoint = compensation.aimLeadDegrees
-                    + LimelightConstants.kLimelightYawOffsetDegrees
+                    + LimelightConstants.kFrontCamera.yawOffsetDegrees
                     + tagYawOffset;
             double aimOutput = m_aimPID.calculate(target.txDegrees, aimSetpoint);
             double rotationSpeed = MathUtil.clamp(aimOutput,
@@ -180,7 +180,7 @@ public class AutoAimAndShoot extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        LimelightHelpers.setPipelineIndex(LimelightConstants.kLimelightName, LimelightConstants.kAprilTagPipeline);
+        LimelightHelpers.setPipelineIndex(LimelightConstants.kFrontCamera.name, LimelightConstants.kAprilTagPipeline);
         m_tagLock.reset();
         m_flywheel.stopFlywheelMotor();
         m_topRoller.stopRollerMotor();

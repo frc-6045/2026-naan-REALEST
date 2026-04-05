@@ -71,7 +71,7 @@ public class AutoAimWhileDriving extends Command {
     @Override
     public void initialize() {
         // Set Limelight to AprilTag pipeline
-        LimelightHelpers.setPipelineIndex(LimelightConstants.kLimelightName, LimelightConstants.kAprilTagPipeline);
+        LimelightHelpers.setPipelineIndex(LimelightConstants.kFrontCamera.name, LimelightConstants.kAprilTagPipeline);
 
         m_tagLock.reset();
         m_feeding = false;
@@ -107,7 +107,7 @@ public class AutoAimWhileDriving extends Command {
             m_lastTargetRollerRPM = targetRollerRPM;
             double tagYawOffset = TagOverrideConstants.getYawOffset(target.lockedTagID);
             m_lastAimLead = compensation.aimLeadDegrees
-                    + LimelightConstants.kLimelightYawOffsetDegrees
+                    + LimelightConstants.kFrontCamera.yawOffsetDegrees
                     + tagYawOffset;
 
             m_topRoller.setRPM(targetRollerRPM);

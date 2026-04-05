@@ -7,8 +7,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
-import frc.robot.LimelightHelpers;
+import frc.robot.LimelightTargeting;
 import frc.robot.subsystems.Swerve;
 
 /**
@@ -32,7 +31,6 @@ public class ScanForTarget extends Command {
     private int m_scanPhase;
 
     private final PIDController m_PID = new PIDController(kPIDGain, 0, 0);
-    private final String m_limelightName = Constants.LimelightConstants.kLimelightName;
     private final Timer m_timer = new Timer();
 
     public ScanForTarget(Swerve swerve, DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier) {
@@ -93,8 +91,8 @@ public class ScanForTarget extends Command {
 
     @Override
     public boolean isFinished() {
-        // Target found
-        if (LimelightHelpers.getTV(m_limelightName)) {
+        // Target found on any camera
+        if (LimelightTargeting.anyTargetVisible()) {
             return true;
         }
 
