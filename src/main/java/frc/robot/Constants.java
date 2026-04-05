@@ -160,14 +160,14 @@ public final class Constants {
         "limelight-sabre", // NetworkTables name
         0.71755,           // Mount height from floor (meters)
         0.0,               // Mount angle above horizontal (degrees)
-        0.0);              // Yaw offset (positive = aim right)
+        270.0);              // Yaw offset (positive = aim right)
 
     // Rear camera (used for pose estimation only -- shooter fires forward)
     public static final CameraConfig kRearCamera = new CameraConfig(
-        "limelight-rear",  // TODO: set actual NetworkTables name
-        0.50,              // TODO: measure actual mount height (meters)
-        15.0,              // TODO: measure actual mount angle (degrees above horizontal)
-        0.0);              // TODO: measure actual yaw offset
+        "limelight-rear",  // done: set actual NetworkTables name
+        0.64770,              // done: measure actual mount height (meters)
+        0.0,              // done: measure actual mount angle (degrees above horizontal)
+        136.0);              // done: measure actual yaw offset
 
     // All cameras for pose estimation
     public static final CameraConfig[] kAllCameras = { kFrontCamera, kRearCamera };
