@@ -179,12 +179,15 @@ public class Autos {
     m_autoChooser = new SendableChooser<>();
     m_autoChooser.setDefaultOption("None", null);
 
-    // Add autos to chooser
-    m_autoChooser.addOption("45 degree auto", AutoBuilder.buildAuto("45 degree start"));
-    m_autoChooser.addOption("test stow deplot", AutoBuilder.buildAuto("New Auto"));
-    m_autoChooser.addOption("change 45 degree auto", AutoBuilder.buildAuto("-new45"));
-    m_autoChooser.addOption("long 45 degree auto", AutoBuilder.buildAuto("LONG of -new45"));
-    m_autoChooser.addOption("4607 short 45 degree auto", AutoBuilder.buildAuto("SHORT of -new45"));
+    // Add autos to chooser (right side)
+    m_autoChooser.addOption("RIGHT mid-length", AutoBuilder.buildAuto("-new45"));
+    m_autoChooser.addOption("RIGHT long", AutoBuilder.buildAuto("LONG of -new45"));
+    m_autoChooser.addOption("RIGHT short for with 4607", AutoBuilder.buildAuto("SHORT of -new45"));
+
+    // Add autos to chooser (left side - mirrored)
+    m_autoChooser.addOption("LEFT mid-length", AutoBuilder.buildAuto("LEFT -new45"));
+    m_autoChooser.addOption("LEFT long", AutoBuilder.buildAuto("LEFT LONG of -new45"));
+    m_autoChooser.addOption("LEFT short for with 4607", AutoBuilder.buildAuto("LEFT SHORT of -new45"));
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
