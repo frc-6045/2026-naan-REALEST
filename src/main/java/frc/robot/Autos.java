@@ -183,6 +183,8 @@ public class Autos {
     m_autoChooser.addOption("45 degree auto", AutoBuilder.buildAuto("45 degree start"));
     m_autoChooser.addOption("test stow deplot", AutoBuilder.buildAuto("New Auto"));
     m_autoChooser.addOption("change 45 degree auto", AutoBuilder.buildAuto("-new45"));
+    m_autoChooser.addOption("long 45 degree auto", AutoBuilder.buildAuto("LONG of -new45"));
+    m_autoChooser.addOption("4607 short 45 degree auto", AutoBuilder.buildAuto("SHORT of -new45"));
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
