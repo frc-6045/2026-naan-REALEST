@@ -102,7 +102,8 @@ public class Bindings {
         // Intake rollers
         m_operatorController.leftBumper().whileTrue(new ParallelCommandGroup(
             new RunIntake(intake, Directions.OUT),
-            new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotOuttakeSetpoint)));
+            new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotOuttakeSetpoint),
+            new RunFeeder(feeder, Directions.OUT)));
 
         // Variable-speed intake via left trigger (proportional to trigger axis)
         m_operatorController.leftTrigger(0.05).whileTrue(
