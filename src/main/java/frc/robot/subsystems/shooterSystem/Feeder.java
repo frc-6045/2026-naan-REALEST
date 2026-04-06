@@ -60,6 +60,27 @@ public class Feeder extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Feeder/Speed", -speed);
   }
 
+  /**
+   * skibidi xooks
+   * @param speed
+   * @param runFeeder set true to run feeder
+   * @param runBlackRoller set true to run black roller
+   */
+  public void setSpeed(double speed, boolean runFeeder, boolean runBlackRoller) {
+    double requestedSpeed = speed;
+    speed = MathUtil.clamp(speed, -MotorConstants.kFeederMotorMaximumSpeed, MotorConstants.kFeederMotorMaximumSpeed);
+
+    if (Math.abs(requestedSpeed) > Math.abs(speed)) {
+      String warning = String.format("Feeder speed clamped: requested %.2f, limited to %.2f",
+                                     requestedSpeed, speed);
+      DriverStation.reportWarning(warning, false);
+    }
+
+    if (runFeeder) m_FeederMotor.set(-speed);
+    if (runBlackRoller) m_IntakeBlackRollerMotor.set(speed);
+    SmartDashboard.putNumber("Subsystem: Feeder/Speed", -speed);
+  }
+
   public void stopFeederMotor() {
     m_FeederMotor.stopMotor();
     m_IntakeBlackRollerMotor.stopMotor();

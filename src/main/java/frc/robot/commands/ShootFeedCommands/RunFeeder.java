@@ -15,6 +15,8 @@ import frc.robot.subsystems.shooterSystem.Feeder;
 public class RunFeeder extends Command {
     private final Feeder m_Feeder;
     private final Directions direction;
+    private boolean m_runFeeder = true;
+    private boolean m_runBlackRoller = true;
 
     public RunFeeder(Feeder feed, Directions direction) {
         m_Feeder = feed;
@@ -22,12 +24,20 @@ public class RunFeeder extends Command {
         addRequirements(m_Feeder);
     }
 
+    public RunFeeder(Feeder feed, Directions direction, boolean feeder, boolean blackRoller) {
+        m_Feeder = feed;
+        this.direction = direction;
+        m_runFeeder = feeder;
+        m_runBlackRoller = blackRoller;
+        addRequirements(m_Feeder);
+    }
+
     @Override
     public void initialize() {
         if (direction==Directions.IN) {
-            m_Feeder.setSpeed(MotorConstants.kFeederSpeed);
+            m_Feeder.setSpeed(MotorConstants.kFeederSpeed, m_runFeeder, m_runBlackRoller);
         } else if (direction==Directions.OUT) {
-            m_Feeder.setSpeed(-MotorConstants.kFeederSpeed);
+            m_Feeder.setSpeed(-MotorConstants.kFeederSpeed, m_runFeeder, m_runBlackRoller);
         } else{
             System.out.println("This is sus.");
         }
