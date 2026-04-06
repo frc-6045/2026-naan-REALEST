@@ -44,9 +44,9 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 public class Swerve extends SubsystemBase {
     private final SwerveDrive m_swerveDrive;
 
-    // Vision pose correction telemetry
-    private boolean m_lastVisionAccepted = false;
-    private String m_lastVisionRejectReason = "No data yet";
+    // Vision pose correction telemetry (one entry per camera)
+    private boolean[] m_lastVisionAccepted = new boolean[LimelightConstants.kAllCameras.length];
+    private String[] m_lastVisionRejectReason = new String[LimelightConstants.kAllCameras.length];
 
     public Swerve() {
         // Set telemetry verbosity before creating swerve drive
@@ -65,16 +65,14 @@ public class Swerve extends SubsystemBase {
         m_swerveDrive.setAngularVelocityCompensation(true, true, 0.1);
         m_swerveDrive.setModuleEncoderAutoSynchronize(true, 1);
 
-        // Ensure Limelight is on AprilTag pipeline for MegaTag2 pose estimation
-        LimelightHelpers.setPipelineIndex(LimelightConstants.kLimelightName, LimelightConstants.kAprilTagPipeline);
-
-        // Filter out trench AprilTags from pose estimation (they move when robots hit the trench)
+        // Initialize all cameras: set pipeline and optional tag filtering
+        int[] validIDs = null;
         if (VisionPoseConstants.kFilterTrenchTags) {
             int[] allIDs = new int[28]; // 2026 field has tags 1-28
             for (int i = 0; i < 28; i++) allIDs[i] = i + 1;
 
             // Remove trench tag IDs
-            int[] validIDs = java.util.Arrays.stream(allIDs)
+            validIDs = java.util.Arrays.stream(allIDs)
                     .filter(id -> {
                         for (int trenchID : VisionPoseConstants.kTrenchAprilTagIDs) {
                             if (id == trenchID) return false;
@@ -82,8 +80,18 @@ public class Swerve extends SubsystemBase {
                         return true;
                     })
                     .toArray();
+        }
 
-            LimelightHelpers.SetFiducialIDFiltersOverride(LimelightConstants.kLimelightName, validIDs);
+        for (LimelightConstants.CameraConfig cam : LimelightConstants.kAllCameras) {
+            LimelightHelpers.setPipelineIndex(cam.name, LimelightConstants.kAprilTagPipeline);
+            if (validIDs != null) {
+                LimelightHelpers.SetFiducialIDFiltersOverride(cam.name, validIDs);
+            }
+        }
+
+        // Initialize telemetry arrays
+        for (int i = 0; i < m_lastVisionRejectReason.length; i++) {
+            m_lastVisionRejectReason[i] = "No data yet";
         }
 
         // Setup PathPlanner
@@ -331,46 +339,55 @@ public class Swerve extends SubsystemBase {
 
     /**
      * Feeds Limelight MegaTag2 vision pose estimates into the YAGSL pose estimator.
-     * Runs every cycle to correct odometry drift (e.g., after crossing bumps).
+     * Runs every cycle for each camera to correct odometry drift.
      */
     private void updateVisionPose() {
-        String limelightName = LimelightConstants.kLimelightName;
-
-        // Feed pose estimator heading to Limelight for MegaTag2
         double headingDeg = getPose().getRotation().getDegrees();
         double angularVelDegPerSec = Math.toDegrees(getRobotVelocity().omegaRadiansPerSecond);
-        LimelightHelpers.SetRobotOrientation(limelightName,
+
+        for (int i = 0; i < LimelightConstants.kAllCameras.length; i++) {
+            updateVisionPoseForCamera(LimelightConstants.kAllCameras[i], headingDeg, angularVelDegPerSec, i);
+        }
+    }
+
+    /**
+     * Process a single camera's MegaTag2 pose estimate and feed it into the pose estimator.
+     */
+    private void updateVisionPoseForCamera(LimelightConstants.CameraConfig cam,
+            double headingDeg, double angularVelDegPerSec, int index) {
+        // Feed pose estimator heading to Limelight for MegaTag2
+        LimelightHelpers.SetRobotOrientation(cam.name,
             headingDeg, 0, 0, 0, 0, 0);
 
         // Get MegaTag2 pose estimate (uses gyro-constrained solver)
         LimelightHelpers.PoseEstimate mt2 =
-            LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+            LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cam.name);
 
         // Null check
         if (mt2 == null) {
-            m_lastVisionAccepted = false;
-            m_lastVisionRejectReason = "Null estimate";
+            m_lastVisionAccepted[index] = false;
+            m_lastVisionRejectReason[index] = "Null estimate";
             return;
         }
 
         // Must see at least one tag
         if (mt2.tagCount == 0) {
-            m_lastVisionAccepted = false;
-            m_lastVisionRejectReason = "No tags visible";
+            m_lastVisionAccepted[index] = false;
+            m_lastVisionRejectReason[index] = "No tags visible";
             return;
         }
 
         // Reject if spinning too fast (MegaTag2 degrades with high angular velocity)
         if (Math.abs(angularVelDegPerSec) > VisionPoseConstants.kMaxAngularVelocityDegPerSec) {
-            m_lastVisionAccepted = false;
-            m_lastVisionRejectReason = "Spinning too fast (" + (int) angularVelDegPerSec + " deg/s)";
+            m_lastVisionAccepted[index] = false;
+            m_lastVisionRejectReason[index] = "Spinning too fast (" + (int) angularVelDegPerSec + " deg/s)";
             return;
         }
 
         // Reject if tags are too far away
         if (mt2.avgTagDist > VisionPoseConstants.kMaxTagDistanceMeters) {
-            m_lastVisionAccepted = false;
-            m_lastVisionRejectReason = "Tags too far (" + String.format("%.1f", mt2.avgTagDist) + " m)";
+            m_lastVisionAccepted[index] = false;
+            m_lastVisionRejectReason[index] = "Tags too far (" + String.format("%.1f", mt2.avgTagDist) + " m)";
             return;
         }
 
@@ -378,8 +395,8 @@ public class Swerve extends SubsystemBase {
         double x = mt2.pose.getX();
         double y = mt2.pose.getY();
         if (x < -1.0 || x > 17.5 || y < -1.0 || y > 9.2) {
-            m_lastVisionAccepted = false;
-            m_lastVisionRejectReason = "Pose off field";
+            m_lastVisionAccepted[index] = false;
+            m_lastVisionRejectReason[index] = "Pose off field";
             return;
         }
 
@@ -401,16 +418,21 @@ public class Swerve extends SubsystemBase {
         // Feed into YAGSL pose estimator
         m_swerveDrive.addVisionMeasurement(mt2.pose, mt2.timestampSeconds, stdDevs);
 
-        m_lastVisionAccepted = true;
-        m_lastVisionRejectReason = "Accepted (" + mt2.tagCount + " tags, "
+        m_lastVisionAccepted[index] = true;
+        m_lastVisionRejectReason[index] = "Accepted (" + mt2.tagCount + " tags, "
             + String.format("%.1f", mt2.avgTagDist) + " m, stdDev=" + String.format("%.2f", xyStdDev) + ")";
     }
 
     @Override
     public void periodic() {
-        // Vision pose correction (fixes odometry drift after bump crossings)
+        // Vision pose correction from all cameras
         updateVisionPose();
-        SmartDashboard.putBoolean("Vision/Accepted", m_lastVisionAccepted);
-        SmartDashboard.putString("Vision/Status", m_lastVisionRejectReason);
+
+        // Per-camera telemetry
+        for (int i = 0; i < LimelightConstants.kAllCameras.length; i++) {
+            String prefix = "Vision/" + LimelightConstants.kAllCameras[i].name + "/";
+            SmartDashboard.putBoolean(prefix + "Accepted", m_lastVisionAccepted[i]);
+            SmartDashboard.putString(prefix + "Status", m_lastVisionRejectReason[i]);
+        }
     }
 }
