@@ -30,6 +30,7 @@ public class Feeder extends SubsystemBase {
 
     // Initialize SmartDashboard values
     SmartDashboard.putNumber("Subsystem: Feeder/Speed", 0);
+    SmartDashboard.putNumber("Subsystem: Feeder/Current", 0);
   }
 
   private void updateMotorSettings(SparkFlex motor, boolean inverted) {
@@ -93,5 +94,6 @@ public class Feeder extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Subsystem: Feeder/Current", m_FeederMotor.getOutputCurrent());
   }
 }

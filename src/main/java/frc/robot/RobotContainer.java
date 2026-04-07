@@ -56,6 +56,10 @@ public class RobotContainer {
     );
   }
 
+  public double getRobotCurrentDraw() {
+    return m_Feeder.getCurrent()+m_Spindexer.getCurrent()+m_Intake.getCurrent()+m_IntakePivot.getCurrent()+m_Flywheel.getAvgCurrent()+m_TopRoller.getCurrent();
+  }
+
   public Command getAutonomousCommand() {
     return m_Autos.getAutonomousCommand();
   }

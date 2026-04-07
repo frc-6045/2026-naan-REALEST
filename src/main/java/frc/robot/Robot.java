@@ -46,6 +46,7 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     //SmartDashboard.putData(CommandScheduler.getInstance());
+    SmartDashboard.putNumber("ROBOT current draw", m_robotContainer.getRobotCurrentDraw());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

@@ -46,6 +46,7 @@ public class TopRoller extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Roller/Target RPM", 0);
     SmartDashboard.putNumber("Subsystem: Roller/Speed", 0);
     SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", 0);
+    SmartDashboard.putNumber("Subsystem: Roller/Current", 0);
 
     // Initialize PIDF tuning values
     SmartDashboard.putNumber("Subsystem: Roller/PIDF/P", MotorConstants.kRollerP);
@@ -65,7 +66,7 @@ public class TopRoller extends SubsystemBase {
 
   private void updateTopRollerMotorSettings() {
     m_rollerConfig
-        .idleMode(IdleMode.kBrake)
+        .idleMode(IdleMode.kCoast)
         .inverted(true)
         .smartCurrentLimit(MotorConstants.kTopRollerCurrentLimit);
     m_rollerConfig.encoder
@@ -120,9 +121,14 @@ public class TopRoller extends SubsystemBase {
     return Math.abs(currentVelocity - targetRPM) < MotorConstants.kRollerRPMTolerance;
   }
 
+  public double getCurrent() {
+    return m_Motor.getOutputCurrent();
+  }
+
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", getRPM());
+    SmartDashboard.putNumber("Subsystem: Roller/Current", m_Motor.getOutputCurrent());
 
     // // Live PIDF tuning - only reconfigure if values changed
     // double tunedP = SmartDashboard.getNumber("Subsystem: Roller/PIDF/P", MotorConstants.kRollerP);

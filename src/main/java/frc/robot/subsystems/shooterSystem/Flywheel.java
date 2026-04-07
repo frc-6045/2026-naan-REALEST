@@ -54,6 +54,8 @@ public class Flywheel extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Flywheel/Velocity (RPM)", 0);
     SmartDashboard.putNumber("Subsystem: Flywheel/Motor 1 Velocity", 0);
     SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Velocity", 0);
+    SmartDashboard.putNumber("Subsystem: Flywheel/Motor 1 Current", 0);
+    SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Current", 0);
 
     // Initialize PIDF tuning values
     SmartDashboard.putNumber("Subsystem: Flywheel/PIDF/P", MotorConstants.kShooterP);
@@ -73,7 +75,7 @@ public class Flywheel extends SubsystemBase {
 
   private void updateMotorSettings() {
     m_config
-        .idleMode(IdleMode.kBrake)
+        .idleMode(IdleMode.kCoast)
         .openLoopRampRate(0.167)
         .closedLoopRampRate(0.167)
         .smartCurrentLimit(MotorConstants.kShooterCurrentLimit);
@@ -125,9 +127,16 @@ public class Flywheel extends SubsystemBase {
     return Math.abs(currentVelocity - targetRPM) < MotorConstants.kShooterRPMTolerance;
   }
 
+  public double getAvgCurrent() {
+    return (m_FlywheelMotor1.getOutputCurrent()+m_FlywheelMotor2.getOutputCurrent())/2;
+  }
+
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Flywheel/Velocity (RPM)", getRPM());
+
+    SmartDashboard.putNumber("Subsystem: Flywheel/Motor 1 Current", m_FlywheelMotor1.getOutputCurrent());
+    SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Current", m_FlywheelMotor2.getOutputCurrent());
 
     // // Live PIDF tuning - only reconfigure if values changed
     // double tunedP = SmartDashboard.getNumber("Subsystem: Flywheel/PIDF/P", MotorConstants.kShooterP);
