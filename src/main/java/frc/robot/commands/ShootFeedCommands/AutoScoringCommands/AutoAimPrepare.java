@@ -1,14 +1,14 @@
 package frc.robot.commands.ShootFeedCommands.AutoScoringCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.LimelightHelpers;
-import frc.robot.LimelightTargeting;
-import frc.robot.ShootingLookupTable;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.TagOverrideConstants;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.TopRoller;
+import frc.robot.util.LimelightHelpers;
+import frc.robot.util.LimelightTargeting;
+import frc.robot.util.ShootingLookupTable;
 
 /**
  * Lightweight auto-aim prep command for autonomous use.

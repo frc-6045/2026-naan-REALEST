@@ -3,13 +3,13 @@ package frc.robot.commands.ShootFeedCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.MotorConstants;
-import frc.robot.IntakePivotOscillator;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.TopRoller;
+import frc.robot.util.IntakePivotOscillator;
 
 /**
  * Command for shooting while pushed up against the tower.
@@ -26,6 +26,9 @@ public class TowerShot extends Command {
     private final Intake m_intake;
     private final IntakePivotOscillator.OscillationState m_pivotState = new IntakePivotOscillator.OscillationState();
 
+    private final double m_flywheelRPM;
+    private final double m_rollerRPM;
+
     public TowerShot(Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
                      IntakePivot intakePivot, Intake intake) {
         m_flywheel = flywheel;
@@ -35,13 +38,31 @@ public class TowerShot extends Command {
         m_intakePivot = intakePivot;
         m_intake = intake;
 
+        m_flywheelRPM = MotorConstants.kTowerShotFlywheelRPM;
+        m_rollerRPM = MotorConstants.kTowerShotTopRollerRPM;
+
+        addRequirements(m_flywheel, m_topRoller, m_feeder, m_spindexer, m_intakePivot, m_intake);
+    }
+
+    public TowerShot(Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
+                     IntakePivot intakePivot, Intake intake, double flyRPM, double rolRPM) {
+        m_flywheel = flywheel;
+        m_topRoller = topRoller;
+        m_feeder = feeder;
+        m_spindexer = spindexer;
+        m_intakePivot = intakePivot;
+        m_intake = intake;
+
+        m_flywheelRPM = flyRPM;
+        m_rollerRPM = rolRPM;
+
         addRequirements(m_flywheel, m_topRoller, m_feeder, m_spindexer, m_intakePivot, m_intake);
     }
 
     @Override
     public void initialize() {
-        m_flywheel.setTargetRPM(MotorConstants.kTowerShotFlywheelRPM);
-        m_topRoller.setRPM(MotorConstants.kTowerShotTopRollerRPM);
+        m_flywheel.setTargetRPM(m_flywheelRPM);
+        m_topRoller.setRPM(m_rollerRPM);
         m_pivotState.reset();
     }
 
