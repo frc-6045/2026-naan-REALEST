@@ -261,7 +261,7 @@ public final class Constants {
     public static final Map<Integer, Double> kYawOffsetByTag = Map.ofEntries(
         // Red hub tags
         Map.entry(9,  -20.0),
-        Map.entry(10, -10.0),
+        Map.entry(10, -8.0),
         Map.entry(2,  0.0),
         Map.entry(11, 0.0),
         Map.entry(5,  0.0),
