@@ -260,19 +260,19 @@ public final class Constants {
     // Positive = aim further right, Negative = aim further left
     public static final Map<Integer, Double> kYawOffsetByTag = Map.ofEntries(
         // Red hub tags
-        Map.entry(9,  -20.0),
-        Map.entry(10, -10.0),
-        Map.entry(2,  5.0),
+        Map.entry(9,  -9.0),
+        Map.entry(10, -12.0),
+        Map.entry(2,  -3.0),
         Map.entry(11, 0.0),
         Map.entry(5,  -14.0),
-        Map.entry(8,  0.0),
+        Map.entry(8,  -3.0),
         // Blue hub tags
-        Map.entry(25, -20.0),
-        Map.entry(26, -15.0),
-        Map.entry(21, 5.0),
+        Map.entry(25, -9.0),
+        Map.entry(26, -12.0),
+        Map.entry(21, -3.0),
         Map.entry(24, 0.0),
         Map.entry(18, -14.0),
-        Map.entry(27, 0.0)
+        Map.entry(27, -3.0)
     );
 
     // Per-AprilTag RPM offset (added to BOTH roller and flywheel RPM after lookup)
