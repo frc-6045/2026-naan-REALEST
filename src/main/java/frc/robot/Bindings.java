@@ -5,7 +5,9 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -122,7 +124,6 @@ public class Bindings {
 
         // Rev shooter
         m_operatorController.rightTrigger(0.5).whileTrue(new RevShooter(flywheel, topRoller));
-        m_operatorController.rightTrigger(0.5).whileTrue(Commands.run(() -> swerve.lock(), swerve));
 
         // Feed to shooter
         m_operatorController.x().whileTrue(new RunFeeder(feeder, Directions.IN));
@@ -165,14 +166,33 @@ public class Bindings {
 
         //Shooting at variable speed
 
-        m_QFTController.pov(90).whileTrue(
-               Commands.runOnce(() -> topRoller.increaseTargetRPM(100))
+        m_QFTController.pov(0).onTrue(
+            new InstantCommand(()->{SmartDashboard.putNumber("Subsystem: Roller/Target RPM Input", 
+                    SmartDashboard.getNumber("Subsystem: Roller/Target RPM Input", 67)+100
+                );})
         );
     
-       // m_QFTController.pov(270).whileTrue(
-        //    Commands.runOnce(() -> topRoller.decreaseTargetRPM(100))
-     //  );
+        m_QFTController.pov(180).onTrue(
+            new InstantCommand(()->{SmartDashboard.putNumber("Subsystem: Roller/Target RPM Input", 
+                    SmartDashboard.getNumber("Subsystem: Roller/Target RPM Input", 67)-100
+                );})
+        );
 
+        m_QFTController.pov(90).onTrue(
+            new InstantCommand(()->{SmartDashboard.putNumber("Subsystem: Flywheel/Target RPM Input", 
+                    SmartDashboard.getNumber("Subsystem: Flywheel/Target RPM Input", 67)+100
+                );})
+        );
+    
+        m_QFTController.pov(270).onTrue(
+            new InstantCommand(()->{SmartDashboard.putNumber("Subsystem: Flywheel/Target RPM Input", 
+                    SmartDashboard.getNumber("Subsystem: Flywheel/Target RPM Input", 67)-100
+                );})
+        );
+
+        m_QFTController.rightTrigger(0.5).whileTrue(new RevShooter(flywheel, topRoller));
+        m_QFTController.x().whileTrue(new RunFeeder(feeder, Directions.IN));
+        m_QFTController.pov(90).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerSpeed));
 
     }
 }

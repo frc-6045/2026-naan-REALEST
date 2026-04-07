@@ -44,7 +44,7 @@ public class RobotContainer {
   public RobotContainer() {
     m_pdh.setSwitchableChannel(true);
     m_Autos = new Autos(m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve);
-    Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve, m_QFTController);
+    Bindings.configureBindings(m_driverController, m_operatorController, m_QFTController, m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve);
 
     DriverStation.silenceJoystickConnectionWarning(true);
 
