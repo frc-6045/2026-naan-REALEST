@@ -261,17 +261,17 @@ public final class Constants {
     public static final Map<Integer, Double> kYawOffsetByTag = Map.ofEntries(
         // Red hub tags
         Map.entry(9,  -20.0),
-        Map.entry(10, -8.0),
-        Map.entry(2,  0.0),
+        Map.entry(10, -10.0),
+        Map.entry(2,  5.0),
         Map.entry(11, 0.0),
-        Map.entry(5,  0.0),
+        Map.entry(5,  -14.0),
         Map.entry(8,  0.0),
         // Blue hub tags
         Map.entry(25, -20.0),
-        Map.entry(26, -10.0),
-        Map.entry(21, 0.0),
+        Map.entry(26, -15.0),
+        Map.entry(21, 5.0),
         Map.entry(24, 0.0),
-        Map.entry(18, 0.0),
+        Map.entry(18, -14.0),
         Map.entry(27, 0.0)
     );
 
@@ -280,7 +280,7 @@ public final class Constants {
     public static final Map<Integer, Double> kRpmOffsetByTag = Map.ofEntries(
         // Red hub tags
         Map.entry(9,  0.0),
-        Map.entry(10, 0.0),
+        Map.entry(10, 25.0),
         Map.entry(2,  0.0),
         Map.entry(11, 0.0),
         Map.entry(5,  0.0),
