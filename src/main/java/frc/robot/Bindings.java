@@ -36,6 +36,7 @@ public class Bindings {
     public static void configureBindings(
         CommandXboxController m_driverController,
         CommandXboxController m_operatorController,
+        CommandXboxController m_QFTController,
         Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve
     ) {
 
@@ -157,6 +158,21 @@ public class Bindings {
         /*============================*/
 
         //m_testController.a().whileTrue(new IntakePivotSetpoint(intakePivot, 0));
+        
+        /*==============================*/
+        /*       Quinns Fun Time        */
+        /*==============================*/
+
+        //Shooting at variable speed
+
+        m_QFTController.pov(90).whileTrue(
+               Commands.runOnce(() -> topRoller.increaseTargetRPM(100))
+        );
+    
+       // m_QFTController.pov(270).whileTrue(
+        //    Commands.runOnce(() -> topRoller.decreaseTargetRPM(100))
+     //  );
+
 
     }
 }

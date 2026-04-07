@@ -35,6 +35,8 @@ public class RobotContainer {
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
   private final CommandXboxController m_operatorController =
       new CommandXboxController(OperatorConstants.kOperatorControllerPort);
+  private final CommandXboxController m_QFTController = 
+      new CommandXboxController(OperatorConstants.kQFTControllerPort);
   // private final CommandXboxController m_testController =
   //     new CommandXboxController(OperatorConstants.kTestControllerPort);
 
@@ -42,7 +44,7 @@ public class RobotContainer {
   public RobotContainer() {
     m_pdh.setSwitchableChannel(true);
     m_Autos = new Autos(m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve);
-    Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve);
+    Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve, m_QFTController);
 
     DriverStation.silenceJoystickConnectionWarning(true);
 
