@@ -78,14 +78,14 @@ public final class Constants {
     public static final int kIntakePivotCurrentLimit = 50;
     public static final int kShooterCurrentLimit = 60;
     public static final int kTopRollerCurrentLimit = 60;
-    public static final int kSpindexerCurrentLimit = 80;
+    public static final int kSpindexerCurrentLimit = 90;
 
     // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
     // TODO: Determine empirically on the robot
-    public static final double kIntakePivotDeploySetpoint = 0.5375;   // Fully down (deployed)
-    public static final double kIntakePivotOuttakeSetpoint = 0.4785;  // a bit up for eject balls
-    public static final double kIntakePivotMiddleSetpoint = 0.3160;   // Halfway — oscillation bottom
-    public static final double kIntakePivotStowSetpoint = 0.1171;     // Fully up (stowed/raised)
+    public static final double kIntakePivotDeploySetpoint = 0.5424;   // Fully down (deployed)
+    public static final double kIntakePivotOuttakeSetpoint = 0.5023;  // a bit up for eject balls
+    public static final double kIntakePivotMiddleSetpoint = 0.3316;   // Halfway — oscillation bottom
+    public static final double kIntakePivotStowSetpoint = 0.1462;     // Fully up (stowed/raised)
 
     // Seconds per oscillation direction (up->middle or middle->up)
     public static final double kIntakePivotOscillationPeriodSec = 0.8;
@@ -260,15 +260,15 @@ public final class Constants {
     // Positive = aim further right, Negative = aim further left
     public static final Map<Integer, Double> kYawOffsetByTag = Map.ofEntries(
         // Red hub tags
-        Map.entry(9,  -9.0),
-        Map.entry(10, -12.0),
+        Map.entry(9,  -6.0),
+        Map.entry(10, -6.0),
         Map.entry(2,  -3.0),
         Map.entry(11, 0.0),
         Map.entry(5,  -14.0),
         Map.entry(8,  -3.0),
         // Blue hub tags
-        Map.entry(25, -9.0),
-        Map.entry(26, -12.0),
+        Map.entry(25, -6.0),
+        Map.entry(26, -6.0),
         Map.entry(21, -3.0),
         Map.entry(24, 0.0),
         Map.entry(18, -14.0),
@@ -279,15 +279,15 @@ public final class Constants {
     // Positive = more power, Negative = less power
     public static final Map<Integer, Double> kRpmOffsetByTag = Map.ofEntries(
         // Red hub tags
-        Map.entry(9,  0.0),
-        Map.entry(10, 25.0),
+        Map.entry(9,  -40.0),
+        Map.entry(10, -75.0),
         Map.entry(2,  0.0),
         Map.entry(11, 0.0),
         Map.entry(5,  0.0),
         Map.entry(8,  0.0),
         // Blue hub tags
-        Map.entry(25, 0.0),
-        Map.entry(26, 0.0),
+        Map.entry(25, -40.0),
+        Map.entry(26, -75.0),
         Map.entry(21, 0.0),
         Map.entry(24, 0.0),
         Map.entry(18, 0.0),
