@@ -78,7 +78,7 @@ public final class Constants {
     public static final int kIntakePivotCurrentLimit = 50;
     public static final int kShooterCurrentLimit = 60;
     public static final int kTopRollerCurrentLimit = 60;
-    public static final int kSpindexerCurrentLimit = 90;
+    public static final int kSpindexerCurrentLimit = 80;
 
     // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
     // TODO: Determine empirically on the robot
