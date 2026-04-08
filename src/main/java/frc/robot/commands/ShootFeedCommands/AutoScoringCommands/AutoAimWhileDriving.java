@@ -10,16 +10,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.LimelightHelpers;
-import frc.robot.LimelightTargeting;
-import frc.robot.ShotCompensation;
-import frc.robot.ShootingLookupTable;
 import frc.robot.Constants.AimConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.TagOverrideConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
-import frc.robot.IntakePivotOscillator;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.Swerve;
@@ -27,6 +22,11 @@ import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.shooterSystem.TopRoller;
+import frc.robot.util.IntakePivotOscillator;
+import frc.robot.util.LimelightHelpers;
+import frc.robot.util.LimelightTargeting;
+import frc.robot.util.ShootingLookupTable;
+import frc.robot.util.ShotCompensation;
 
 /**
  * Auto-aim command that runs in parallel with PathPlanner paths.

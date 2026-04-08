@@ -1,8 +1,10 @@
-package frc.robot;
+package frc.robot.util;
 
 import edu.wpi.first.math.MathUtil;
+import frc.robot.Constants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.ShootingConstants;
+import frc.robot.Constants.LimelightConstants.CameraConfig;
 
 /**
  * Stateless utility for Limelight AprilTag targeting.

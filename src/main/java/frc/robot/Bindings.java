@@ -8,19 +8,15 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.Directions;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.commands.IntakeCommands.IntakePivotSetpoint;
 import frc.robot.commands.IntakeCommands.RunIntake;
-import frc.robot.commands.IntakeCommands.RunIntakePivot;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.ShootFeedCommands.RunFeeder;
 import frc.robot.commands.ShootFeedCommands.TowerShot;
-import frc.robot.commands.ShootFeedCommands.ShooterOpenLoop;
-import frc.robot.commands.ShootFeedCommands.TopRollerOpenLoop;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShoot;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.ScanForTarget;
 import frc.robot.commands.SpindexerCommands.RunSpindexer;
@@ -51,27 +47,6 @@ public class Bindings {
 
         // Intake rollers
        // m_driverController.rightBumper().whileTrue(new RunIntake(intake, Directions.IN));
-
-        // m_driverController.rightTrigger(0.05).whileTrue(
-        //     Commands.runEnd(
-        //         () -> {
-        //             double t = m_driverController.getRightTriggerAxis();
-        //             intake.setSpeed(t);
-        //         },
-        //         () -> intake.setSpeed(0.0),
-        //         intake
-        //     )
-        // );
-        // m_driverController.leftTrigger(0.05).whileTrue(
-        //     Commands.runEnd(
-        //         () -> {
-        //             double t = -m_driverController.getLeftTriggerAxis();
-        //             intake.setSpeed(t);
-        //         },
-        //         () -> intake.setSpeed(0.0),
-        //         intake
-        //     )
-        // );
 
         // Auto-aim and auto-shoot (driver retains left stick translational control)
         // After shooting ends, intake pivot returns to deploy position automatically
@@ -134,18 +109,10 @@ public class Bindings {
 
         m_operatorController.rightBumper().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotMiddleSetpoint));
 
-        // Hub shot (D-pad up)
-        //m_operatorController.pov(0).whileTrue(new HubShot(flywheel, topRoller, feeder, spindexer));
-        // m_operatorController.pov(0).whileTrue(new TopRollerOpenLoop(topRoller, () -> MotorConstants.kTopRollerSpeed));
-        // m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, () -> -MotorConstants.kTopRollerSpeed));
-
         //shoot while parked against the trench
-        // m_operatorController.pov(180).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerSpeed));
-        // m_operatorController.pov(180).whileTrue(new RunFeeder(feeder, Directions.IN));
-        // m_operatorController.pov(180).whileTrue(new ShooterOpenLoop(flywheel, () -> {return 2440;}));
-        // m_operatorController.pov(180).whileTrue(new TopRollerOpenLoop(topRoller, () -> {return 2725;}));
         m_operatorController.pov(180).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake));
-        
+        // in front of trength
+        m_operatorController.pov(0).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake, MotorConstants.kTowerShotFrontFlywheelRPM, MotorConstants.kTowerShotFrontTopRollerRPM));
 
         // Spindexer CW (normal direction)
         m_operatorController.pov(90).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerSpeed));

@@ -4,7 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants.VelocityCompensationConstants;
-import frc.robot.ShotCompensation.CompensationResult;
+import frc.robot.util.ShotCompensation;
+import frc.robot.util.ShotCompensation.CompensationResult;
 
 import org.junit.jupiter.api.Test;
 

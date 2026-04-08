@@ -7,8 +7,8 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.LimelightTargeting;
 import frc.robot.subsystems.Swerve;
+import frc.robot.util.LimelightTargeting;
 
 /**
  * Scans left and right to find a Limelight target.
