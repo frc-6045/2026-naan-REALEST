@@ -1,0 +1,121 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.418002853067047,
+        "y": 5.334335235378032
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.711868758915834,
+        "y": 5.386089871611982
+      },
+      "isLocked": false,
+      "linkedName": "wow"
+    },
+    {
+      "anchor": {
+        "x": 6.471526390870184,
+        "y": 5.567231098430813
+      },
+      "prevControl": {
+        "x": 5.937586314673829,
+        "y": 5.458047236438207
+      },
+      "nextControl": {
+        "x": 6.7164579293109155,
+        "y": 5.617316440368913
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.292084337349398,
+        "y": 6.97355421686747
+      },
+      "prevControl": {
+        "x": 6.292084337349398,
+        "y": 6.72355421686747
+      },
+      "nextControl": {
+        "x": 6.292084337349398,
+        "y": 7.34008078113114
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.53,
+        "y": 7.482152639087018
+      },
+      "prevControl": {
+        "x": 7.282512626584708,
+        "y": 7.517507978146346
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "cool"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0547426470588241,
+      "rotationDegrees": -45.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "intake :D",
+      "waypointRelativePos": 0.42379425578034663,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "startIntakeRoller"
+        }
+      }
+    },
+    {
+      "name": "deploy :D",
+      "waypointRelativePos": 1.0155300472653592,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "deploy intake setpoint :C"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.8,
+    "rotation": -90.0
+  },
+  "reversed": false,
+  "folder": "new 45",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -45.0
+  },
+  "useDefaultConstraints": false
+}
