@@ -12,8 +12,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.Directions;
 import frc.robot.Constants.MotorConstants;
+import frc.robot.commands.IntakeCommands.DeployIntake;
 import frc.robot.commands.IntakeCommands.IntakePivotSetpoint;
 import frc.robot.commands.IntakeCommands.RunIntake;
+import frc.robot.commands.IntakeCommands.StowIntake;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.ShootFeedCommands.RunFeeder;
 import frc.robot.commands.ShootFeedCommands.TowerShot;
@@ -118,7 +120,22 @@ public class Bindings {
         m_operatorController.pov(90).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerSpeed));
 
         // Spindexer CCW (reverse)
-        m_operatorController.y().whileTrue(new RunSpindexer(spindexer, -MotorConstants.kSpindexerSpeed));
+        //m_operatorController.y().whileTrue(new RunSpindexer(spindexer, -MotorConstants.kSpindexerSpeed));
+
+        m_operatorController.pov(270).whileTrue(new DeployIntake(intakePivot));
+        m_operatorController.y().whileTrue(new StowIntake(intakePivot));
+
+        m_operatorController.back().whileTrue(new SequentialCommandGroup(
+            new ScanForTarget(swerve,
+                () -> -MathUtil.applyDeadband(m_operatorController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_operatorController.getLeftX(), ControllerConstants.kDeadband)),
+            new AutoAimAndShoot(
+                swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+                () -> -MathUtil.applyDeadband(m_operatorController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_operatorController.getLeftX(), ControllerConstants.kDeadband)
+            )
+        ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint())));
 
         /*============================*/
         /*       Test Bindings        */
