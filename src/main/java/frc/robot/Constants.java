@@ -176,9 +176,9 @@ public final class Constants {
     public static final CameraConfig[] kAllCameras = { kFrontCamera, kRearCamera };
 
     // HUB AprilTag IDs -- all four faces of each HUB, 2 tags per face
-    private static final int[] kRedAprilTagIDs = {2, 5, 8, 9, 10, 11};
+private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     //private static final int[] kRedAprilTagIDs = {10};
-    private static final int[] kBlueAprilTagIDs = {18, 21, 24, 25, 26, 27};
+    private static final int[] kBlueAprilTagIDs = {24, 25, 26, 27};
     //private static final int[] kBlueAprilTagIDs = {4};
 
     /** Get the valid target AprilTag IDs for the current alliance. */
