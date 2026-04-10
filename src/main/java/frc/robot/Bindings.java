@@ -99,7 +99,7 @@ public class Bindings {
 
         // Rev shooter
         m_operatorController.rightTrigger(0.5).whileTrue(new RevShooter(flywheel, topRoller));
-        m_operatorController.rightTrigger(0.5).whileTrue(Commands.run(() -> swerve.lock(), swerve));
+        m_operatorController.rightTrigger(0.5).whileTrue(Commands.run(() -> swerve.setLockAngles(), swerve));
 
         // Feed to shooter
         m_operatorController.x().whileTrue(new RunFeeder(feeder, Directions.IN));
