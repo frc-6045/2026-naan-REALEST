@@ -72,4 +72,8 @@ public class RobotContainer {
   public void setMotorBrake(boolean brake) {
     m_Swerve.setMotorBrake(brake);
   }
+
+  public void resetHeadingFromVision() {
+    m_Swerve.resetHeadingFromVision();
+  }
 }
