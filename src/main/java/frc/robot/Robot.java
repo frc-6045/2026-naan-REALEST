@@ -90,6 +90,8 @@ public class Robot extends TimedRobot {
     // Enable brake mode for teleop
     m_robotContainer.setMotorBrake(true);
 
+    m_robotContainer.resetHeadingFromVision();
+
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove

@@ -304,6 +304,52 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
+     * Resets heading using MegaTag1 vision (independent heading, unlike MegaTag2).
+     * Picks the best estimate across all cameras. Falls back to alliance-based reset
+     * if no valid vision data is available.
+     */
+    public void resetHeadingFromVision() {
+        LimelightHelpers.PoseEstimate best = null;
+        String bestCamName = null;
+
+        for (LimelightConstants.CameraConfig cam : LimelightConstants.kAllCameras) {
+            LimelightHelpers.PoseEstimate mt1 =
+                LimelightHelpers.getBotPoseEstimate_wpiBlue(cam.name);
+
+            if (mt1 == null || mt1.tagCount == 0) {
+                continue;
+            }
+
+            if (mt1.avgTagDist > VisionPoseConstants.kMaxTagDistanceMeters) {
+                continue;
+            }
+
+            double x = mt1.pose.getX();
+            double y = mt1.pose.getY();
+            if (x < -1.0 || x > 17.5 || y < -1.0 || y > 9.2) {
+                continue;
+            }
+
+            // Prefer the estimate with more tags, or closer tags as a tiebreaker
+            if (best == null
+                    || mt1.tagCount > best.tagCount
+                    || (mt1.tagCount == best.tagCount && mt1.avgTagDist < best.avgTagDist)) {
+                best = mt1;
+                bestCamName = cam.name;
+            }
+        }
+
+        if (best != null) {
+            resetOdometry(best.pose);
+            SmartDashboard.putString("Vision/HeadingReset",
+                "Used " + bestCamName + " heading=" + String.format("%.1f", best.pose.getRotation().getDegrees()) + "°");
+        } else {
+            zeroGyroWithAlliance();
+            SmartDashboard.putString("Vision/HeadingReset", "Fell back to alliance reset (no tags visible)");
+        }
+    }
+
+    /**
      * Locks the swerve modules in an X pattern to prevent movement.
      */
     public void lock() {
