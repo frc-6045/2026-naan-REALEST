@@ -82,10 +82,10 @@ public final class Constants {
 
     // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
     // TODO: Determine empirically on the robot
-    public static final double kIntakePivotDeploySetpoint = 0.5667540431022644;   // Fully down (deployed)
-    public static final double kIntakePivotOuttakeSetpoint = 0.5248531699180603;  // a bit up for eject balls
-    public static final double kIntakePivotMiddleSetpoint = 0.3512010872364044;   // Halfway — oscillation bottom
-    public static final double kIntakePivotStowSetpoint = 0.18437336385250092;     // Fully up (stowed/raised)
+    public static final double kIntakePivotDeploySetpoint = 0.6800587177276611;   // Fully down (deployed)
+    public static final double kIntakePivotOuttakeSetpoint = 0.6311483979225159;  // a bit up for eject balls
+    public static final double kIntakePivotMiddleSetpoint = 0.4526956081390381;   // Halfway — oscillation bottom
+    public static final double kIntakePivotStowSetpoint = 0.2809354066848755;     // Fully up (stowed/raised)
 
     // Seconds per oscillation direction (up->middle or middle->up)
     public static final double kIntakePivotOscillationPeriodSec = 0.8;
@@ -264,14 +264,14 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final Map<Integer, Double> kYawOffsetByTag = Map.ofEntries(
         // Red hub tags
         Map.entry(9,  -6.0),
-        Map.entry(10, -6.0),
+        Map.entry(10, -4.0),
         Map.entry(2,  -3.0),
         Map.entry(11, 0.0),
         Map.entry(5,  -14.0),
         Map.entry(8,  -3.0),
         // Blue hub tags
         Map.entry(25, -6.0),
-        Map.entry(26, -6.0),
+        Map.entry(26, -4.0),
         Map.entry(21, -3.0),
         Map.entry(24, 0.0),
         Map.entry(18, -9.0),
@@ -283,14 +283,14 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final Map<Integer, Double> kRpmOffsetByTag = Map.ofEntries(
         // Red hub tags
         Map.entry(9,  -40.0),
-        Map.entry(10, -75.0),
+        Map.entry(10, -50.0),
         Map.entry(2,  0.0),
         Map.entry(11, 0.0),
         Map.entry(5,  0.0),
         Map.entry(8,  0.0),
         // Blue hub tags
         Map.entry(25, -40.0),
-        Map.entry(26, -75.0),
+        Map.entry(26, -50.0),
         Map.entry(21, 0.0),
         Map.entry(24, 0.0),
         Map.entry(18, 0.0),
