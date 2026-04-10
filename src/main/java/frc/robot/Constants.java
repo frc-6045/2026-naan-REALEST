@@ -264,14 +264,14 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final Map<Integer, Double> kYawOffsetByTag = Map.ofEntries(
         // Red hub tags
         Map.entry(9,  -6.0),
-        Map.entry(10, -4.0),
+        Map.entry(10, -6.0),
         Map.entry(2,  -3.0),
         Map.entry(11, 0.0),
         Map.entry(5,  -14.0),
         Map.entry(8,  -3.0),
         // Blue hub tags
         Map.entry(25, -6.0),
-        Map.entry(26, -4.0),
+      Map.entry(26, -6.0),
         Map.entry(21, -3.0),
         Map.entry(24, 0.0),
         Map.entry(18, -9.0),
