@@ -186,13 +186,13 @@ public class AutoAimAndShoot extends Command {
     public void end(boolean interrupted) {
         LimelightHelpers.setPipelineIndex(LimelightConstants.kFrontCamera.name, LimelightConstants.kAprilTagPipeline);
         m_tagLock.reset();
+        m_swerve.drive(new Translation2d(), 0.0, true);
         m_flywheel.stopFlywheelMotor();
         m_topRoller.stopRollerMotor();
         m_feeder.stopFeederMotor();
         m_spindexer.stopSpindexerMotor();
         m_intakePivot.stopMotor();
         m_intake.stopIntakeMotor();
-        // Swerve default command auto-resumes
         SmartDashboard.putBoolean("AutoAim/ReadyToFire", false);
     }
 
