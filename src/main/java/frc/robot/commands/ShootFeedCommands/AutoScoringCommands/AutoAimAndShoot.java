@@ -146,7 +146,7 @@ public class AutoAimAndShoot extends Command {
 
             // Lock swerve in X pattern while feeding to resist defense; otherwise drive normally
             if (m_feeding) {
-                m_swerve.lock();
+                m_swerve.setLockAngles();
             } else {
                 m_swerve.drive(translation, rotationSpeed, true);
             }

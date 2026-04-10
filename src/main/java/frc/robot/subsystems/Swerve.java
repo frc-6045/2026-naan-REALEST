@@ -357,6 +357,18 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
+     * Points the swerve modules into an X pattern without actively driving them.
+     * Relies on brake mode to resist movement, reducing current draw compared to lock().
+     */
+    public void setLockAngles() {
+        var modules = m_swerveDrive.getModules();
+        modules[0].setAngle(45.0);
+        modules[1].setAngle(-45.0);
+        modules[2].setAngle(-45.0);
+        modules[3].setAngle(45.0);
+    }
+
+    /**
      * Sets the motor idle mode (brake or coast).
      *
      * @param brake true for brake mode, false for coast mode
