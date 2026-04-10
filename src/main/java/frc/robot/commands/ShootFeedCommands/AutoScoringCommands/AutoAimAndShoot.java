@@ -134,9 +134,6 @@ public class AutoAimAndShoot extends Command {
                     -AimConstants.kMaxAutoRotationRadPerSec,
                     AimConstants.kMaxAutoRotationRadPerSec);
 
-            // Drive: driver translation + auto rotation, field-relative
-            m_swerve.drive(translation, rotationSpeed, true);
-
             // Check if all conditions are met (aimed = reached lead angle, not necessarily centered)
             double aimTolerance = compensation.getAimToleranceDegrees();
             boolean aimed = Math.abs(target.txDegrees - aimSetpoint) < aimTolerance;
@@ -146,6 +143,13 @@ public class AutoAimAndShoot extends Command {
 
             updateFeedState(readyToFire);
             IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, m_feeding, "AutoAim/");
+
+            // Lock swerve in X pattern while feeding to resist defense; otherwise drive normally
+            if (m_feeding) {
+                m_swerve.lock();
+            } else {
+                m_swerve.drive(translation, rotationSpeed, true);
+            }
 
             // Telemetry
             SmartDashboard.putBoolean("AutoAim/Aimed", aimed);
