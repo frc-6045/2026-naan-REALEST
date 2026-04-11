@@ -183,12 +183,14 @@ public class Autos {
     m_autoChooser.addOption("RIGHT long", AutoBuilder.buildAuto("LONG of -new45"));
     m_autoChooser.addOption("RIGHT short for with 4607", AutoBuilder.buildAuto("SHORT of -new45"));
     m_autoChooser.addOption("RIGHT small mid-length", AutoBuilder.buildAuto("small -new45 right"));
+    m_autoChooser.addOption("RIGHT small short", AutoBuilder.buildAuto("Copy short small -new45 right"));
 
     // Add autos to chooser (left side - mirrored)
     m_autoChooser.addOption("LEFT mid-length", AutoBuilder.buildAuto("LEFT -new45"));
     m_autoChooser.addOption("LEFT long", AutoBuilder.buildAuto("LEFT LONG of -new45"));
     m_autoChooser.addOption("LEFT short for with 4607", AutoBuilder.buildAuto("LEFT SHORT of -new45"));
     m_autoChooser.addOption("LEFT small mid-length", AutoBuilder.buildAuto("small -new45 left"));
+    m_autoChooser.addOption("LEFT small short", AutoBuilder.buildAuto("Copy short small -new45 left"));
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
