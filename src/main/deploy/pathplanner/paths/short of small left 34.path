@@ -1,0 +1,121 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.53,
+        "y": 4.5
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.0019131877008745,
+        "y": 4.704041094477768
+      },
+      "isLocked": false,
+      "linkedName": "asdf"
+    },
+    {
+      "anchor": {
+        "x": 5.928102710413694,
+        "y": 5.34827389443652
+      },
+      "prevControl": {
+        "x": 6.90733990659425,
+        "y": 5.384228466195778
+      },
+      "nextControl": {
+        "x": 5.678271056725729,
+        "y": 5.339100846113506
+      },
+      "isLocked": false,
+      "linkedName": "LEFT2"
+    },
+    {
+      "anchor": {
+        "x": 2.3570328102710407,
+        "y": 5.34827389443652
+      },
+      "prevControl": {
+        "x": 3.1204136947218246,
+        "y": 5.517476462196863
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "LEFT3"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.7356076759061694,
+      "rotationDegrees": -90.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.6536124240378137,
+      "maxWaypointRelativePos": 1.7825793382849362,
+      "constraints": {
+        "maxVelocity": 3.5,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "stow :D",
+      "waypointRelativePos": 1.117097182080923,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "stopIntake"
+              }
+            },
+            {
+              "type": "sequential",
+              "data": {
+                "commands": [
+                  {
+                    "type": "named",
+                    "data": {
+                      "name": "deploy intake setpoint limited :C"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": -128.1406827566192
+  },
+  "reversed": false,
+  "folder": "new 45",
+  "idealStartingState": {
+    "velocity": 1.0,
+    "rotation": -88.75463573323158
+  },
+  "useDefaultConstraints": false
+}
