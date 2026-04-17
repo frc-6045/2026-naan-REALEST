@@ -1,5 +1,7 @@
 package frc.robot.commands.ShootFeedCommands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.MotorConstants;
@@ -26,8 +28,13 @@ public class TowerShot extends Command {
     private final Intake m_intake;
     private final IntakePivotOscillator.OscillationState m_pivotState = new IntakePivotOscillator.OscillationState();
 
-    private final double m_flywheelRPM;
-    private final double m_rollerRPM;
+    private double m_flywheelRPM;
+    private double m_rollerRPM;
+
+    private DoubleSupplier flyRPMSupplier;
+    private DoubleSupplier rolRPMSupplier;
+
+    private boolean isSupplier = false;
 
     public TowerShot(Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
                      IntakePivot intakePivot, Intake intake) {
@@ -59,8 +66,29 @@ public class TowerShot extends Command {
         addRequirements(m_flywheel, m_topRoller, m_feeder, m_spindexer, m_intakePivot, m_intake);
     }
 
+    public TowerShot(Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
+                     IntakePivot intakePivot, Intake intake, DoubleSupplier flyRPM, DoubleSupplier rolRPM) {
+        m_flywheel = flywheel;
+        m_topRoller = topRoller;
+        m_feeder = feeder;
+        m_spindexer = spindexer;
+        m_intakePivot = intakePivot;
+        m_intake = intake;
+
+        flyRPMSupplier = flyRPM;
+        rolRPMSupplier = rolRPM;
+
+        isSupplier = true;
+
+        addRequirements(m_flywheel, m_topRoller, m_feeder, m_spindexer, m_intakePivot, m_intake);
+    }
+
     @Override
     public void initialize() {
+        if (isSupplier) {
+            m_flywheelRPM=flyRPMSupplier.getAsDouble();
+            m_rollerRPM=rolRPMSupplier.getAsDouble();
+        }
         m_flywheel.setTargetRPM(m_flywheelRPM);
         m_topRoller.setRPM(m_rollerRPM);
         m_pivotState.reset();

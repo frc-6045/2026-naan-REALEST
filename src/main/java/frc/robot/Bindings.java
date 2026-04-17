@@ -82,17 +82,20 @@ public class Bindings {
             new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotOuttakeSetpoint),
             new RunFeeder(feeder, Directions.OUT, false, true)));
 
-        // Variable-speed intake via left trigger (proportional to trigger axis)
-        m_operatorController.leftTrigger(0.05).whileTrue(
-            Commands.runEnd(
-                () -> {
-                    double t = m_operatorController.getLeftTriggerAxis();
-                    intake.setSpeed(t);
-                },
-                () -> intake.setSpeed(0.0),
-                intake
-            )
-        );
+        // // Variable-speed intake via left trigger (proportional to trigger axis)
+        // m_operatorController.leftTrigger(0.05).whileTrue(
+        //     Commands.runEnd(
+        //         () -> {
+        //             double t = m_operatorController.getLeftTriggerAxis();
+        //             intake.setSpeed(t);
+        //         },
+        //         () -> intake.setSpeed(0.0),
+        //         intake
+        //     )
+        // );
+
+        m_operatorController.leftTrigger(.1).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+            ()->flywheel.getTargetRPMFromDashboard(), ()-> roller.getTargetRPMFromDashboard()));
 
         // Reset Gyro (operator backup)
         m_operatorController.start().onTrue(Commands.runOnce(() -> swerve.zeroGyroWithAlliance()));

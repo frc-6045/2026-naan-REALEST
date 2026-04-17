@@ -61,12 +61,13 @@ public class IntakePivot extends SubsystemBase {
     double requestedSpeed = speed;
     speed = MathUtil.clamp(speed, -MotorConstants.kIntakePivotMotorMaximumSpeed, MotorConstants.kIntakePivotMotorMaximumSpeed);
 
-    // Alert if speed was clamped (configuration issue)
-    if (Math.abs(requestedSpeed) > Math.abs(speed)) {
-      String warning = String.format("Intake pivot speed clamped: requested %.2f, limited to %.2f",
-                                     requestedSpeed, speed);
-      DriverStation.reportWarning(warning, false);
-    }
+    // This message is kinda annoying
+    // // Alert if speed was clamped (configuration issue)
+    // if (Math.abs(requestedSpeed) > Math.abs(speed)) {
+    //   String warning = String.format("Intake pivot speed clamped: requested %.2f, limited to %.2f",
+    //                                  requestedSpeed, speed);
+    //   DriverStation.reportWarning(warning, false);
+    // }
 
     // Apply limit enforcement based on current position
     speed = applyLimits(speed);
