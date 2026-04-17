@@ -115,8 +115,8 @@ public final class Constants {
     // Shooter Target Speed (RPM)
     public static final double kShooterTargetRPM = 2200.0; // Target shooter wheel speed in RPM
     public static final double kRollerTargetRPM = 2400; // Target shooter wheel speed in RPM
-    public static final double kShooterRPMTolerance = 600.0; // Acceptable RPM tolerance before feeding
-    public static final double kRollerRPMTolerance = 600.0; // Acceptable roller RPM tolerance before feeding
+    public static final double kShooterRPMTolerance = 670.0; // Acceptable RPM tolerance before feeding
+    public static final double kRollerRPMTolerance = 670.0; // Acceptable roller RPM tolerance before feeding
 
     // Tower Shot Constants
     public static final double kTowerShotFlywheelRPM = 2700.0; // Target flywheel RPM for tower shot
