@@ -19,6 +19,7 @@ import frc.robot.commands.IntakeCommands.StowIntake;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.ShootFeedCommands.RunFeeder;
 import frc.robot.commands.ShootFeedCommands.TowerShot;
+import frc.robot.commands.ShootFeedCommands.AutoFeedingCommands.AutoAimAndFeed;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShoot;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.ScanForTarget;
 import frc.robot.commands.SpindexerCommands.RunSpindexer;
@@ -62,6 +63,19 @@ public class Bindings {
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)),
             new AutoAimAndShoot(
+                swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
+            )
+        ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint())));
+
+        // Auto-aim and auto-feed: lob game pieces back toward our alliance zone off feeding AprilTags
+        m_driverController.leftBumper().whileTrue(new SequentialCommandGroup(
+            new ScanForTarget(swerve,
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)),
+            new AutoAimAndFeed(
                 swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)

@@ -1,5 +1,7 @@
 package frc.robot.util;
 
+import java.util.function.IntPredicate;
+
 import edu.wpi.first.math.MathUtil;
 import frc.robot.Constants;
 import frc.robot.Constants.LimelightConstants;
@@ -63,19 +65,28 @@ public final class LimelightTargeting {
     }
 
     /**
-     * Run the full per-frame targeting pipeline: tag locking, validation, distance calc.
+     * Run the full per-frame targeting pipeline against the scoring tag set.
      *
      * @param lockState Mutable lock state owned by the calling command
      * @return TargetingResult for this frame
      */
     public static TargetingResult acquireTarget(TagLockState lockState) {
+        return acquireTarget(lockState, LimelightConstants::isValidTagID);
+    }
+
+    /**
+     * Run the full per-frame targeting pipeline with a custom tag-ID validator.
+     * Lets callers (e.g. the feeding command) reuse the lock/distance logic against a
+     * different tag set without duplicating code.
+     */
+    public static TargetingResult acquireTarget(TagLockState lockState, IntPredicate validator) {
         LimelightConstants.CameraConfig cam = LimelightConstants.kFrontCamera;
         String ll = cam.name;
 
         // Lock onto first valid target to prevent tag-to-tag oscillation
         int detectedID = (int) LimelightHelpers.getFiducialID(ll);
 
-        if (lockState.lockedTagID == -1 && LimelightConstants.isValidTagID(detectedID)) {
+        if (lockState.lockedTagID == -1 && validator.test(detectedID)) {
             lockState.lockedTagID = detectedID;
             LimelightHelpers.setPriorityTagID(ll, lockState.lockedTagID);
         }
@@ -84,9 +95,8 @@ public final class LimelightTargeting {
         double tx = LimelightHelpers.getTX(ll);
         double ty = LimelightHelpers.getTY(ll);
 
-        // Valid when: Limelight sees a target, tag ID is a scoring target, and matches lock
         boolean validTarget = hasTarget
-                && LimelightConstants.isValidTagID(detectedID)
+                && validator.test(detectedID)
                 && (lockState.lockedTagID == -1 || detectedID == lockState.lockedTagID);
 
         if (!validTarget) {
