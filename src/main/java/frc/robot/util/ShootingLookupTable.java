@@ -12,6 +12,32 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
  * 83        | 2.108    | 4500       | 1200         | 11.8
  * 117       | 2.972    | 4500       | 1600         | 11.8
  */
+
+
+
+
+
+//////////NEW VALUES!!!!
+/// these are for the "up" position of shooter
+/// 
+/// toproller    shooter    distance (hub edge to front of frame)
+///   -700         3000        5ft
+///   2075         2375        10ft
+///   2575         2575        15ft
+/// 
+/// 
+//////////END OF NEW VALUES!!!!
+
+
+
+
+
+
+
+
+
+
+
 public class ShootingLookupTable {
     private static final InterpolatingDoubleTreeMap m_rollerRPMMap = new InterpolatingDoubleTreeMap();
     private static final InterpolatingDoubleTreeMap m_flywheelRPMMap = new InterpolatingDoubleTreeMap();
