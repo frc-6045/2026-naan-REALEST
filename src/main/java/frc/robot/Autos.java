@@ -179,18 +179,18 @@ public class Autos {
     m_autoChooser.setDefaultOption("None", null);
 
     // Add autos to chooser (right side)
-    m_autoChooser.addOption("RIGHT mid-length", AutoBuilder.buildAuto("-new45"));
-    m_autoChooser.addOption("RIGHT long", AutoBuilder.buildAuto("LONG of -new45"));
-    m_autoChooser.addOption("RIGHT short for with 4607", AutoBuilder.buildAuto("SHORT of -new45"));
-    m_autoChooser.addOption("RIGHT small mid-length", AutoBuilder.buildAuto("small -new45 right"));
-    m_autoChooser.addOption("RIGHT small short", AutoBuilder.buildAuto("Copy short small -new45 right"));
+    m_autoChooser.addOption("RIGHT mid-length", AutoBuilder.buildAuto("RIGHT mid-length"));
+    m_autoChooser.addOption("RIGHT long", AutoBuilder.buildAuto("RIGHT long"));
+    m_autoChooser.addOption("RIGHT short", AutoBuilder.buildAuto("RIGHT short"));
+    m_autoChooser.addOption("RIGHT small mid-length", AutoBuilder.buildAuto("RIGHT small mid-length"));
+    m_autoChooser.addOption("RIGHT small short", AutoBuilder.buildAuto("RIGHT small short"));
 
     // Add autos to chooser (left side - mirrored)
-    m_autoChooser.addOption("LEFT mid-length", AutoBuilder.buildAuto("LEFT -new45"));
-    m_autoChooser.addOption("LEFT long", AutoBuilder.buildAuto("LEFT LONG of -new45"));
-    m_autoChooser.addOption("LEFT short for with 4607", AutoBuilder.buildAuto("LEFT SHORT of -new45"));
-    m_autoChooser.addOption("LEFT small mid-length", AutoBuilder.buildAuto("small -new45 left"));
-    m_autoChooser.addOption("LEFT small short", AutoBuilder.buildAuto("Copy short small -new45 left"));
+    m_autoChooser.addOption("LEFT mid-length", AutoBuilder.buildAuto("LEFT mid-length"));
+    m_autoChooser.addOption("LEFT long", AutoBuilder.buildAuto("LEFT long"));
+    m_autoChooser.addOption("LEFT short", AutoBuilder.buildAuto("LEFT short"));
+    m_autoChooser.addOption("LEFT small mid-length", AutoBuilder.buildAuto("LEFT small mid-length"));
+    m_autoChooser.addOption("LEFT small short", AutoBuilder.buildAuto("LEFT small short"));
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
