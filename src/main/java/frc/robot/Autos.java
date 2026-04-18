@@ -137,7 +137,7 @@ public class Autos {
             .until(() -> intakePivot.atSetpoint()));
     }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake)).asProxy());
 
-    NamedCommands.registerCommand("autoAimAndShoot5Second", Commands.defer(() -> {
+    NamedCommands.registerCommand("autoAimAndShoot7Second", Commands.defer(() -> {
       Timer feedTimer = new Timer();
       AutoAimAndShoot cmd = new AutoAimAndShoot(
           swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake, () -> 0.0, () -> 0.0);
@@ -151,7 +151,7 @@ public class Autos {
         }
         return false;
       }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
-        .withTimeout(5)
+        .withTimeout(7)
         .andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
             .until(() -> intakePivot.atSetpoint()));
     }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake)).asProxy());
@@ -191,6 +191,8 @@ public class Autos {
     m_autoChooser.addOption("LEFT short", AutoBuilder.buildAuto("LEFT short"));
     m_autoChooser.addOption("LEFT small mid-length", AutoBuilder.buildAuto("LEFT small mid-length"));
     m_autoChooser.addOption("LEFT small short", AutoBuilder.buildAuto("LEFT small short"));
+
+    m_autoChooser.addOption("CENTER depot", AutoBuilder.buildAuto("CENTER depot"));
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
