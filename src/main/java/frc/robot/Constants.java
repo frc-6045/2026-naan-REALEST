@@ -223,10 +223,26 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final double kMaxAutoRotationRadPerSec = 3.0; // Max rotation speed during auto-aim (rad/s)
   }
 
+  public static class ShooterGeometryConstants {
+    // Offset from robot center to shooter in robot-relative coords
+    // X = forward (negative = behind center), Y = left (positive = left of center)
+    // TODO: Measure on robot
+    public static final double kShooterOffsetX = -0.15; // meters behind robot center
+    public static final double kShooterOffsetY = 0.10;  // meters left of robot center
+
+    // Shooter firing direction relative to robot heading
+    // 90 degrees = shooter points to the robot's left
+    public static final double kShooterAngleOffsetDegrees = 90.0;
+  }
+
   public static class ShootingConstants {
     // Valid shooting distance range (meters)
     public static final double kMinShootingDistanceMeters = 1.0;
     public static final double kMaxShootingDistanceMeters = 7.0;
+
+    // Valid feeding distance range (meters) - longer range than shooting
+    public static final double kMinFeedingDistanceMeters = 7.0;
+    public static final double kMaxFeedingDistanceMeters = 15.0;
 
     // Autonomous auto-aim timing (seconds)
     public static final double kAutoShootFeedDurationSec = 20; // How long to run feeder after auto-fire triggers
