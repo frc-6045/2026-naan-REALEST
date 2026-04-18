@@ -88,7 +88,7 @@ public class RPMLookupTable {
 
         // ===== SHOOTING DOWN DATA =====
         // TODO: Tune values for "down" position of shooter (FEEDING SHOOTER POSITION)
-        double shootingDownOffset = 0;
+        double shootingDownOffset = 100;
 
         
 //////////NEW VALUES!!!!
