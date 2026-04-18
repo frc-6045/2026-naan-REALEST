@@ -190,8 +190,44 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
 
     /** Check if a detected AprilTag ID is in our valid scoring target list. */
     public static boolean isValidTagID(int id) {
-      for (int validID : getTargetAprilTagIDs()) {
-        if (id == validID) {
+      return contains(getTargetAprilTagIDs(), id);
+    }
+
+    // Feeding AprilTag IDs -- used by AutoAimAndFeed to lob game pieces back into our zone.
+    // Midfield tags: aim just OVER them (measured distance + small bump).
+    // Opponent-zone tags: lob all the way back using a fixed ~45 ft feed distance.
+    private static final int[] kRedMidfieldFeedTagIDs = {1, 6};
+    private static final int[] kBlueMidfieldFeedTagIDs = {17, 22};
+    private static final int[] kRedOpponentZoneFeedTagIDs = {23, 28};
+    private static final int[] kBlueOpponentZoneFeedTagIDs = {7, 12};
+
+    public static int[] getMidfieldFeedTagIDs() {
+      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
+          ? kRedMidfieldFeedTagIDs
+          : kBlueMidfieldFeedTagIDs;
+    }
+
+    public static int[] getOpponentZoneFeedTagIDs() {
+      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
+          ? kRedOpponentZoneFeedTagIDs
+          : kBlueOpponentZoneFeedTagIDs;
+    }
+
+    public static boolean isMidfieldFeedTag(int id) {
+      return contains(getMidfieldFeedTagIDs(), id);
+    }
+
+    public static boolean isOpponentZoneFeedTag(int id) {
+      return contains(getOpponentZoneFeedTagIDs(), id);
+    }
+
+    public static boolean isValidFeedTagID(int id) {
+      return isMidfieldFeedTag(id) || isOpponentZoneFeedTag(id);
+    }
+
+    private static boolean contains(int[] array, int value) {
+      for (int v : array) {
+        if (v == value) {
           return true;
         }
       }
@@ -248,6 +284,19 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final double kAutoShootFeedDurationSec = 20; // How long to run feeder after auto-fire triggers
     public static final double kAutoShootTimeoutSec = 20.0; // Safety timeout to prevent stalling auto
     public static final double kFeedingGracePeriodSec = 0.50; // Keeps feeder running through brief aim jitter while moving (~3 cycles at 50Hz)
+  }
+
+  public static class FeedingConstants {
+    // Added to the Limelight-measured distance for midfield feed tags so the ball
+    // clears just over the tag instead of smacking into it.
+    public static final double kMidfieldDistanceBumpMeters = 0.61; // ~2 ft
+
+    // Used regardless of measured distance when feeding from the opponent zone --
+    // we always want a full-field lob, which matches the 45 ft entry in FeedingLookupTable.
+    public static final double kOpponentZoneFeedDistanceMeters = 0.0254 * 12 * 45; // ~13.72 m
+
+    // Feeding can tolerate slightly sloppier aim than scoring.
+    public static final double kFeedAimToleranceDegrees = 3.0;
   }
 
   public static class VelocityCompensationConstants {
