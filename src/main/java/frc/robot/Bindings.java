@@ -182,7 +182,20 @@ public class Bindings {
             )
         ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
             .until(() -> intakePivot.atSetpoint())));
-        
+
+        // TRENCH TAG FEED
+        m_testController.leftTrigger(.1).whileTrue(new SequentialCommandGroup(
+        new ScanForTarget(swerve,
+            () -> -MathUtil.applyDeadband(m_testController.getLeftY(), ControllerConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(m_testController.getLeftX(), ControllerConstants.kDeadband)),
+        new AutoAimAndFeed(
+            swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+            () -> -MathUtil.applyDeadband(m_testController.getLeftY(), ControllerConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(m_testController.getLeftX(), ControllerConstants.kDeadband)
+        )
+        ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint())));
+            
         // AUTO SCORE SELF HUB
         m_testController.rightBumper().whileTrue(new SequentialCommandGroup(
             new ScanForTarget(swerve,

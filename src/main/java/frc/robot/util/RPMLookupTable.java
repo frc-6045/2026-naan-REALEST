@@ -15,8 +15,8 @@ public class RPMLookupTable {
 
     // Shooter position enum for SendableChooser
     public enum ShooterPosition {
-        UP("Shooter Up"),
-        DOWN("Shooter Down");
+        UP("Shooter Up (FEEDING MODE)"),
+        DOWN("Shooter Down (NONFEEDING MODE)");
 
         private final String m_displayName;
 
@@ -65,7 +65,7 @@ public class RPMLookupTable {
 
     static {
         // ===== SHOOTING UP DATA =====
-        // Values tuned for "up" position of shooter
+        // Values tuned for "up" position of shooter (NONFEEDING SHOOTER POSITION)
         double shootingUpOffset = 100;
 
         m_shootingUpRollerMap.put(0.0254 * 45, 1850.0 + shootingUpOffset);
@@ -87,7 +87,7 @@ public class RPMLookupTable {
         m_shootingUpFlywheelMap.put(0.0254 * 135, 2825.0 + shootingUpOffset);
 
         // ===== SHOOTING DOWN DATA =====
-        // TODO: Tune values for "down" position of shooter
+        // TODO: Tune values for "down" position of shooter (FEEDING SHOOTER POSITION)
         double shootingDownOffset = 0;
 
         m_shootingDownRollerMap.put(0.0254 * 45, 1800.0 + shootingDownOffset);
@@ -107,7 +107,7 @@ public class RPMLookupTable {
         m_shootingDownFlywheelMap.put(0.0254 * 135, 2800.0 + shootingDownOffset);
 
         // ===== FEEDING UP DATA =====
-        // Values tuned for "up" position of shooter
+        // Values tuned for "up" position of shooter (NONFEEDING SHOOTER POSITION)
         double feedingUpOffset = 0;
 
         m_feedingUpRollerMap.put(0.0254 * 12 * 30, 2250.0 + feedingUpOffset);   // 30 feet
@@ -117,7 +117,7 @@ public class RPMLookupTable {
         m_feedingUpFlywheelMap.put(0.0254 * 12 * 45, 5250.0 + feedingUpOffset); // 45 feet
 
         // ===== FEEDING DOWN DATA =====
-        // TODO: Tune values for "down" position of shooter
+        // TODO: Tune values for "down" position of shooter (FEEDING SHOOTER POSITION)
         double feedingDownOffset = 0;
 
         m_feedingDownRollerMap.put(0.0254 * 12 * 30, 2200.0 + feedingDownOffset);   // 30 feet

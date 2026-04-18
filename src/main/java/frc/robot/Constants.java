@@ -81,11 +81,11 @@ public final class Constants {
     public static final int kSpindexerCurrentLimit = 90;
 
     // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
-    // TODO: Determine empirically on the robot
-    public static final double kIntakePivotDeploySetpoint = 0.8418624401092529;   // Fully down (deployed)
-    public static final double kIntakePivotOuttakeSetpoint = 0.7764841914176941;  // a bit up for eject balls
-    public static final double kIntakePivotMiddleSetpoint = 0.6458311676979065;   // Halfway — oscillation bottom
-    public static final double kIntakePivotStowSetpoint = 0.4517042338848114;     // Fully up (stowed/raised)
+    public static final double kIntakePivotEncoderOffset = 0; 
+    public static final double kIntakePivotDeploySetpoint = 0.9151458144187927;   // Fully down (deployed)
+    public static final double kIntakePivotOuttakeSetpoint = 0.8566184043884277;  // a bit up for eject balls
+    public static final double kIntakePivotMiddleSetpoint = 0.7082022428512573;   // Halfway — oscillation bottom
+    public static final double kIntakePivotStowSetpoint = 0.5258023738861084;     // Fully up (stowed/raised)
 
     // Seconds per oscillation direction (up->middle or middle->up)
     public static final double kIntakePivotOscillationPeriodSec = 0.8;
@@ -168,7 +168,7 @@ public final class Constants {
     // Rear camera (used for pose estimation only -- shooter fires forward)
     public static final CameraConfig kRearCamera = new CameraConfig(
         "limelight-rear",  // done: set actual NetworkTables name
-        0.64770,              // done: measure actual mount height (meters)
+        0.6477,              // done: measure actual mount height (meters)
         0.0,              // done: measure actual mount angle (degrees above horizontal)
         0.0);              // done: measure actual yaw offset
 
