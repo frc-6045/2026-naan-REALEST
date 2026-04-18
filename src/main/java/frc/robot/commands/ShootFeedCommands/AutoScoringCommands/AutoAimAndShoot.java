@@ -24,7 +24,7 @@ import frc.robot.subsystems.shooterSystem.TopRoller;
 import frc.robot.util.IntakePivotOscillator;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightTargeting;
-import frc.robot.util.ShootingLookupTable;
+import frc.robot.util.RPMLookupTable;
 import frc.robot.util.ShotCompensation;
 import frc.robot.subsystems.shooterSystem.Spindexer;
 
@@ -115,8 +115,8 @@ public class AutoAimAndShoot extends Command {
 
             // Look up roller and flywheel RPM from compensated distance, with per-tag offset
             double tagRpmOffset = TagOverrideConstants.getRpmOffset(target.lockedTagID);
-            double targetRollerRPM = ShootingLookupTable.getRollerRPM(compensatedDistance) + tagRpmOffset;
-            double targetRPM = ShootingLookupTable.getFlywheelRPM(compensatedDistance) + tagRpmOffset;
+            double targetRollerRPM = RPMLookupTable.getShootingRollerRPM(compensatedDistance) + tagRpmOffset;
+            double targetRPM = RPMLookupTable.getShootingFlywheelRPM(compensatedDistance) + tagRpmOffset;
             m_lastTargetRPM = targetRPM;
             m_lastTargetRollerRPM = targetRollerRPM;
 

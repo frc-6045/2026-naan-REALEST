@@ -1,6 +1,7 @@
 package frc.robot.commands.ShootFeedCommands.allisonplayswithposestuff;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.DoubleUnaryOperator;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -23,8 +24,8 @@ import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.shooterSystem.TopRoller;
-import frc.robot.util.FeedingLookupTable;
 import frc.robot.util.IntakePivotOscillator;
+import frc.robot.util.RPMLookupTable;
 import frc.robot.util.ShotCompensation;
 
 /**
@@ -37,7 +38,7 @@ import frc.robot.util.ShotCompensation;
  * When active:
  * - Calculates distance from shooter to target pose
  * - Auto-rotates robot to align shooter with target
- * - Adjusts RPM based on distance using FeedingLookupTable
+ * - Adjusts RPM based on distance using the provided lookup functions (defaults to FeedingLookupTable)
  * - Auto-feeds when conditions are met (aimed, RPM in tolerance)
  * - Oscillates intake pivot to agitate game pieces
  */
@@ -55,12 +56,18 @@ public class FeedToPoseOnField extends Command {
     private final DoubleSupplier m_translationXSupplier;
     private final DoubleSupplier m_translationYSupplier;
 
+    private final DoubleUnaryOperator m_rollerRPMFunc;
+    private final DoubleUnaryOperator m_flywheelRPMFunc;
+
     private final PIDController m_aimPID;
 
     private boolean m_feeding = false;
     private final Timer m_graceTimer = new Timer();
     private final IntakePivotOscillator.OscillationState m_pivotState = new IntakePivotOscillator.OscillationState();
 
+    /**
+     * Create a FeedToPoseOnField command with default feeding lookup tables.
+     */
     public FeedToPoseOnField(
             Translation2d targetPose,
             Swerve swerve,
@@ -72,6 +79,32 @@ public class FeedToPoseOnField extends Command {
             Intake intake,
             DoubleSupplier translationXSupplier,
             DoubleSupplier translationYSupplier) {
+        this(targetPose, swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+                translationXSupplier, translationYSupplier,
+                RPMLookupTable::getFeedingRollerRPM,
+                RPMLookupTable::getFeedingFlywheelRPM);
+    }
+
+    /**
+     * Create a FeedToPoseOnField command with custom RPM lookup functions.
+     *
+     * @param targetPose Field position to aim at
+     * @param rollerRPMFunc Function that takes distance (meters) and returns roller RPM
+     * @param flywheelRPMFunc Function that takes distance (meters) and returns flywheel RPM
+     */
+    public FeedToPoseOnField(
+            Translation2d targetPose,
+            Swerve swerve,
+            Flywheel flywheel,
+            TopRoller topRoller,
+            Feeder feeder,
+            Spindexer spindexer,
+            IntakePivot intakePivot,
+            Intake intake,
+            DoubleSupplier translationXSupplier,
+            DoubleSupplier translationYSupplier,
+            DoubleUnaryOperator rollerRPMFunc,
+            DoubleUnaryOperator flywheelRPMFunc) {
         m_targetPose = targetPose;
         m_swerve = swerve;
         m_flywheel = flywheel;
@@ -82,28 +115,14 @@ public class FeedToPoseOnField extends Command {
         m_intake = intake;
         m_translationXSupplier = translationXSupplier;
         m_translationYSupplier = translationYSupplier;
+        m_rollerRPMFunc = rollerRPMFunc;
+        m_flywheelRPMFunc = flywheelRPMFunc;
 
         m_aimPID = new PIDController(AimConstants.kAimP, AimConstants.kAimI, AimConstants.kAimD);
         m_aimPID.setTolerance(AimConstants.kAimToleranceDegrees);
         m_aimPID.enableContinuousInput(-180, 180);
 
         addRequirements(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake);
-    }
-
-    public FeedToPoseOnField(
-        Translation2d targetPose,
-            Swerve swerve,
-            Flywheel flywheel,
-            TopRoller topRoller,
-            Feeder feeder,
-            Spindexer spindexer,
-            IntakePivot intakePivot,
-            Intake intake,
-            DoubleSupplier translationXSupplier,
-            DoubleSupplier translationYSupplier,
-            
-    ) {
-        FeedToPoseOnField();
     }
 
     @Override
@@ -158,9 +177,9 @@ public class FeedToPoseOnField extends Command {
                 ShootingConstants.kMinFeedingDistanceMeters,
                 ShootingConstants.kMaxFeedingDistanceMeters);
 
-        // Look up roller and flywheel RPM from compensated distance
-        double targetRollerRPM = FeedingLookupTable.getRollerRPM(compensatedDistance);
-        double targetRPM = FeedingLookupTable.getFlywheelRPM(compensatedDistance);
+        // Look up roller and flywheel RPM from compensated distance using provided functions
+        double targetRollerRPM = m_rollerRPMFunc.applyAsDouble(compensatedDistance);
+        double targetRPM = m_flywheelRPMFunc.applyAsDouble(compensatedDistance);
 
         m_topRoller.setRPM(targetRollerRPM);
         m_flywheel.setTargetRPM(targetRPM);
