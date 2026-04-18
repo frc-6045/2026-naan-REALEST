@@ -192,6 +192,8 @@ public class Autos {
     m_autoChooser.addOption("LEFT small mid-length", AutoBuilder.buildAuto("LEFT small mid-length"));
     m_autoChooser.addOption("LEFT small short", AutoBuilder.buildAuto("LEFT small short"));
 
+    m_autoChooser.addOption("CENTER depot", AutoBuilder.buildAuto("CENTER depot"));
+
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
 
