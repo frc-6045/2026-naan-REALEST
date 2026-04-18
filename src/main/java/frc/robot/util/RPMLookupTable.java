@@ -15,8 +15,8 @@ public class RPMLookupTable {
 
     // Shooter position enum for SendableChooser
     public enum ShooterPosition {
-        UP("Shooter Up (FEEDING MODE)"),
-        DOWN("Shooter Down (NONFEEDING MODE)");
+        UP("Shooter Up (NONFEEDING MODE)"),
+        DOWN("Shooter Down (FEEDING MODE)");
 
         private final String m_displayName;
 
@@ -90,21 +90,26 @@ public class RPMLookupTable {
         // TODO: Tune values for "down" position of shooter (FEEDING SHOOTER POSITION)
         double shootingDownOffset = 0;
 
-        m_shootingDownRollerMap.put(0.0254 * 45, 1800.0 + shootingDownOffset);
-        m_shootingDownRollerMap.put(0.0254 * 60, 1900.0 + shootingDownOffset);
-        m_shootingDownRollerMap.put(0.0254 * 75, 2000.0 + shootingDownOffset);
-        m_shootingDownRollerMap.put(0.0254 * 90, 2100.0 + shootingDownOffset);
-        m_shootingDownRollerMap.put(0.0254 * 104, 2500.0 + shootingDownOffset);
-        m_shootingDownRollerMap.put(0.0254 * 120, 2700.0 + shootingDownOffset);
-        m_shootingDownRollerMap.put(0.0254 * 135, 2800.0 + shootingDownOffset);
+        
+//////////NEW VALUES!!!!
+/// these are for the "up" position of shooter
+/// 
+/// toproller    shooter    distance (hub edge to front of frame)
+///   -700         3000        5ft
+///   2075         2375        10ft
+///   2575         2575        15ft
+/// 
+/// 
+//////////END OF NEW VALUES!!!!
 
-        m_shootingDownFlywheelMap.put(0.0254 * 45, 2000.0 + shootingDownOffset);
-        m_shootingDownFlywheelMap.put(0.0254 * 60, 2100.0 + shootingDownOffset);
-        m_shootingDownFlywheelMap.put(0.0254 * 75, 2200.0 + shootingDownOffset);
-        m_shootingDownFlywheelMap.put(0.0254 * 90, 2300.0 + shootingDownOffset);
-        m_shootingDownFlywheelMap.put(0.0254 * 104, 2250.0 + shootingDownOffset);
-        m_shootingDownFlywheelMap.put(0.0254 * 120, 2600.0 + shootingDownOffset);
-        m_shootingDownFlywheelMap.put(0.0254 * 135, 2800.0 + shootingDownOffset);
+        m_shootingDownRollerMap.put(0.0254 * 5*12, -700 + shootingDownOffset);
+        m_shootingDownRollerMap.put(0.0254 * 10*12, 2075 + shootingDownOffset);
+        m_shootingDownRollerMap.put(0.0254 * 15*12, 2575 + shootingDownOffset);
+
+        m_shootingDownFlywheelMap.put(0.0254 * 5*12, 3000 + shootingDownOffset);
+        m_shootingDownFlywheelMap.put(0.0254 * 10*12, 2375.0 + shootingDownOffset);
+        m_shootingDownFlywheelMap.put(0.0254 * 15*12, 2575.0 + shootingDownOffset);
+
 
         // ===== FEEDING UP DATA =====
         // Values tuned for "up" position of shooter (NONFEEDING SHOOTER POSITION)
