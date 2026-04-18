@@ -118,7 +118,7 @@ public class FeedToPoseOnField extends Command {
         m_rollerRPMFunc = rollerRPMFunc;
         m_flywheelRPMFunc = flywheelRPMFunc;
 
-        m_aimPID = new PIDController(AimConstants.kAimP, AimConstants.kAimI, AimConstants.kAimD);
+        m_aimPID = new PIDController(.05, 0, 0);
         m_aimPID.setTolerance(AimConstants.kAimToleranceDegrees);
         m_aimPID.enableContinuousInput(-180, 180);
 

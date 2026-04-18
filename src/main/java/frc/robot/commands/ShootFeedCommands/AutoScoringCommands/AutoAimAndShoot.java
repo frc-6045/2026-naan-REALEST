@@ -122,6 +122,8 @@ public class AutoAimAndShoot extends Command {
 
             m_topRoller.setRPM(targetRollerRPM);
             m_flywheel.setTargetRPM(targetRPM);
+            SmartDashboard.putNumber("toproller autoaim target RPM", targetRollerRPM);
+            SmartDashboard.putNumber("flywheel autoaim target RPM", targetRPM);
 
             // Calculate auto-rotation from aim PID (tx -> rad/s)
             // Setpoint is the aim lead angle (0 when stationary, offset when moving)

@@ -113,8 +113,8 @@ public final class Constants {
     public static final double kRollerIZone = 400.0; // I term only active within this RPM error range
 
     // Shooter Target Speed (RPM)
-    public static final double kShooterTargetRPM = 2200.0; // Target shooter wheel speed in RPM
-    public static final double kRollerTargetRPM = 2400; // Target shooter wheel speed in RPM
+    public static final double kShooterTargetRPM = 3200.0; // Target shooter wheel speed in RPM
+    public static final double kRollerTargetRPM = 5300; // Target shooter wheel speed in RPM
     public static final double kShooterRPMTolerance = 670.0; // Acceptable RPM tolerance before feeding
     public static final double kRollerRPMTolerance = 670.0; // Acceptable roller RPM tolerance before feeding
 

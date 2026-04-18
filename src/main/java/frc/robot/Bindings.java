@@ -51,8 +51,8 @@ public class Bindings {
         // Back: Lock wheels in X pattern
         m_driverController.back().whileTrue(Commands.run(() -> swerve.lock(), swerve));
 
-        m_driverController.leftTrigger(.1).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake,
-            ()->flywheel.getTargetRPMFromDashboard(), ()-> topRoller.getTargetRPMFromDashboard()));
+        // m_driverController.leftTrigger(.1).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+        //     ()->flywheel.getTargetRPMFromDashboard(), ()-> topRoller.getTargetRPMFromDashboard()));
 
 
 
@@ -85,14 +85,18 @@ public class Bindings {
             )
         ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
             .until(() -> intakePivot.atSetpoint())));
-        //m_driverController.rightTrigger().whileTrue(Commands.run(() -> swerve.lock(), swerve));
-        // m_driverController.rightTrigger(0.5).whileTrue(
-        //     new AutoAimAndShoot(
-        //         swerve, flywheel, topRoller, feeder, spindexer,
-        //         () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
-        //         () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
-        //     )
-        // );
+
+        m_driverController.leftTrigger(.1).whileTrue(new SequentialCommandGroup(
+            new ScanForTarget(swerve,
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)),
+            new AutoAimAndFeed(
+                swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
+            )
+        ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint())));
 
         /*============================*/
         /*     Operator Bindings      */
