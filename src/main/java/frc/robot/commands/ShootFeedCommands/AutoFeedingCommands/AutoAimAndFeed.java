@@ -22,7 +22,7 @@ import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.shooterSystem.TopRoller;
-import frc.robot.util.FeedingLookupTable;
+import frc.robot.util.RPMLookupTable;
 import frc.robot.util.IntakePivotOscillator;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightTargeting;
@@ -118,8 +118,8 @@ public class AutoAimAndFeed extends Command {
                         ShootingConstants.kMaxShootingDistanceMeters);
             }
 
-            double targetRollerRPM = FeedingLookupTable.getRollerRPM(feedDistance);
-            double targetRPM = FeedingLookupTable.getFlywheelRPM(feedDistance);
+            double targetRollerRPM = RPMLookupTable.getFeedingRollerRPM(feedDistance);
+            double targetRPM = RPMLookupTable.getFeedingFlywheelRPM(feedDistance);
             m_lastTargetRPM = targetRPM;
             m_lastTargetRollerRPM = targetRollerRPM;
 

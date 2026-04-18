@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -22,6 +23,8 @@ import frc.robot.commands.ShootFeedCommands.TowerShot;
 import frc.robot.commands.ShootFeedCommands.AutoFeedingCommands.AutoAimAndFeed;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShoot;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.ScanForTarget;
+import frc.robot.commands.ShootFeedCommands.allisonplayswithposestuff.AutoScorePose;
+import frc.robot.commands.ShootFeedCommands.allisonplayswithposestuff.FeedToPoseOnField;
 import frc.robot.commands.SpindexerCommands.RunSpindexer;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
@@ -157,11 +160,63 @@ public class Bindings {
         ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
             .until(() -> intakePivot.atSetpoint())));
 
+    }
+
+    public static void configureTestBindings(
+        CommandXboxController m_testController,
+        Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve
+    ) {
         /*============================*/
         /*       Test Bindings        */
         /*============================*/
 
-        //m_testController.a().whileTrue(new IntakePivotSetpoint(intakePivot, 0));
+        // AUTO AIM AND SHOOT
+        m_testController.rightTrigger(.1).whileTrue(new SequentialCommandGroup(
+            new ScanForTarget(swerve,
+                () -> -MathUtil.applyDeadband(m_testController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_testController.getLeftX(), ControllerConstants.kDeadband)),
+            new AutoAimAndShoot(
+                swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+                () -> -MathUtil.applyDeadband(m_testController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_testController.getLeftX(), ControllerConstants.kDeadband)
+            )
+        ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint())));
+        
+        // AUTO SCORE SELF HUB
+        m_testController.rightBumper().whileTrue(new SequentialCommandGroup(
+            new ScanForTarget(swerve,
+                () -> -MathUtil.applyDeadband(m_testController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_testController.getLeftX(), ControllerConstants.kDeadband)),
+            new AutoScorePose(
+                new Translation2d(4.636, 4.017),
+                swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+                () -> -MathUtil.applyDeadband(m_testController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_testController.getLeftX(), ControllerConstants.kDeadband)
+            )
+        ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint())));
 
+        // AUTO SCORE ON OTHER HUB FOR SOME REASON
+        m_testController.leftBumper().whileTrue(new SequentialCommandGroup(
+            new ScanForTarget(swerve,
+                () -> -MathUtil.applyDeadband(m_testController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_testController.getLeftX(), ControllerConstants.kDeadband)),
+            new AutoScorePose(
+                new Translation2d(2*8.267-4.636, 4.017),
+                swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+                () -> -MathUtil.applyDeadband(m_testController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_testController.getLeftX(), ControllerConstants.kDeadband)
+            )
+        ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint())));
+
+        // Feed to pose on field (target: 12.469, 1.346)
+        m_testController.y().whileTrue(new FeedToPoseOnField(
+            new Translation2d(12.469, 1.346),
+            swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+            () -> -MathUtil.applyDeadband(m_testController.getLeftY(), ControllerConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(m_testController.getLeftX(), ControllerConstants.kDeadband)
+        ));
     }
 }

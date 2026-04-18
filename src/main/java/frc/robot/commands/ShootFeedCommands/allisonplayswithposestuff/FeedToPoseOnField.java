@@ -122,6 +122,12 @@ public class FeedToPoseOnField extends Command {
         m_aimPID.setTolerance(AimConstants.kAimToleranceDegrees);
         m_aimPID.enableContinuousInput(-180, 180);
 
+        // Initialize dashboard PID tuning values
+        SmartDashboard.putNumber("FeedToPose/PID/kP", AimConstants.kAimP);
+        SmartDashboard.putNumber("FeedToPose/PID/kI", AimConstants.kAimI);
+        SmartDashboard.putNumber("FeedToPose/PID/kD", AimConstants.kAimD);
+        SmartDashboard.putNumber("FeedToPose/PID/Tolerance", AimConstants.kAimToleranceDegrees);
+
         addRequirements(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake);
     }
 
@@ -136,6 +142,14 @@ public class FeedToPoseOnField extends Command {
 
     @Override
     public void execute() {
+        // Update PID gains from dashboard for interactive tuning
+        double kP = SmartDashboard.getNumber("FeedToPose/PID/kP", AimConstants.kAimP);
+        double kI = SmartDashboard.getNumber("FeedToPose/PID/kI", AimConstants.kAimI);
+        double kD = SmartDashboard.getNumber("FeedToPose/PID/kD", AimConstants.kAimD);
+        double tolerance = SmartDashboard.getNumber("FeedToPose/PID/Tolerance", AimConstants.kAimToleranceDegrees);
+        m_aimPID.setPID(kP, kI, kD);
+        m_aimPID.setTolerance(tolerance);
+
         // Get shooter pose accounting for offset from robot center
         Pose2d shooterPose = getShooterPose();
         Translation2d shooterTranslation = shooterPose.getTranslation();
