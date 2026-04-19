@@ -237,14 +237,14 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
 
   public static class VisionPoseConstants {
     // Trench AprilTags are unreliable for pose estimation (they wiggle when robots hit the trench)
-    public static final boolean kFilterTrenchTags = true;
+    public static final boolean kFilterTrenchTags = false;
     public static final int[] kTrenchAprilTagIDs = {7, 12, 23, 28, 15, 16, 13, 14, 29, 30, 31, 32};
 
     public static final double kMaxAngularVelocityDegPerSec = 360.0; // Reject vision if spinning faster
     public static final double kMaxTagDistanceMeters = 6.7;          // Reject tags beyond this range
-    public static final double kBaseStdDevXY = 0.5;                  // Base trust in meters (lower = trust more)
-    public static final double kBaseStdDevTheta = 9999999;           // Near-infinite: don't correct heading from vision
-    public static final double kStdDevScalePerMeter = 0.5;           // Trust decreases linearly with distance
+    public static final double kBaseStdDevXY = 01.5;                  // Base trust in meters (lower = trust more)
+    public static final double kBaseStdDevTheta = 10;           // Near-infinite: don't correct heading from vision
+    public static final double kStdDevScalePerMeter = 0.005;           // Trust decreases linearly with distance
     public static final double kMultiTagDivisor = 2.0;               // 2+ tags visible = double the trust
   }
 

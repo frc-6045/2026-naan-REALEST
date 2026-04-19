@@ -403,9 +403,10 @@ public class Swerve extends SubsystemBase {
         double headingDeg = getPose().getRotation().getDegrees();
         double angularVelDegPerSec = Math.toDegrees(getRobotVelocity().omegaRadiansPerSecond);
 
-        for (int i = 0; i < LimelightConstants.kAllCameras.length; i++) {
-            updateVisionPoseForCamera(LimelightConstants.kAllCameras[i], headingDeg, angularVelDegPerSec, i);
-        }
+        // for (int i = 0; i < LimelightConstants.kAllCameras.length; i++) {
+        //     updateVisionPoseForCamera(LimelightConstants.kAllCameras[i], headingDeg, angularVelDegPerSec, i);
+        // }
+        updateVisionPoseForCamera(LimelightConstants.kAllCameras[0], headingDeg, angularVelDegPerSec, 0);
     }
 
     /**
