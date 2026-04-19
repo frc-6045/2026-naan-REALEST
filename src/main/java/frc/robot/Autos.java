@@ -184,6 +184,7 @@ public class Autos {
     m_autoChooser.addOption("RIGHT short", AutoBuilder.buildAuto("RIGHT short"));
     m_autoChooser.addOption("RIGHT small mid-length", AutoBuilder.buildAuto("RIGHT small mid-length"));
     m_autoChooser.addOption("RIGHT small short", AutoBuilder.buildAuto("RIGHT small short"));
+    m_autoChooser.addOption("RIGHT double bump", AutoBuilder.buildAuto("RIGHT double bump"));
 
     // Add autos to chooser (left side - mirrored)
     m_autoChooser.addOption("LEFT mid-length", AutoBuilder.buildAuto("LEFT mid-length"));
@@ -191,9 +192,7 @@ public class Autos {
     m_autoChooser.addOption("LEFT short", AutoBuilder.buildAuto("LEFT short"));
     m_autoChooser.addOption("LEFT small mid-length", AutoBuilder.buildAuto("LEFT small mid-length"));
     m_autoChooser.addOption("LEFT small short", AutoBuilder.buildAuto("LEFT small short"));
-
-
-    m_autoChooser.addOption("skibdi", AutoBuilder.buildAuto("RIGHT double bump"));
+    m_autoChooser.addOption("LEFT double bump", AutoBuilder.buildAuto("LEFT double bump"));
 
     m_autoChooser.addOption("CENTER depot", AutoBuilder.buildAuto("CENTER depot"));
 
