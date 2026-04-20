@@ -112,7 +112,7 @@ public double applyLimits(double speed) {
   @Override
   public void periodic() {
     double limitedSpeed = m_RampLimiter.calculate(m_TargetSpeed);
-    // m_IntakeDeployMotor.set(limitedSpeed);
+    m_IntakeDeployMotor.set(limitedSpeed);
 
     double position = getAbsoluteEncoderReading();
     SmartDashboard.putNumber("Subsystem: Intake Pivot/Speed", limitedSpeed);
