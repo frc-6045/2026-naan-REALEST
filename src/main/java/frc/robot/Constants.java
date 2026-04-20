@@ -161,14 +161,14 @@ public final class Constants {
     // Front camera (used for both pose estimation and targeting/aiming)
     public static final CameraConfig kFrontCamera = new CameraConfig(
         "limelight-sabre", // NetworkTables name
-        0.71755,           // Mount height from floor (meters)
+        0.64135,           // Mount height from floor (meters)
         0.0,               // Mount angle above horizontal (degrees)
         0.0);              // Yaw offset (positive = aim right)
 
     // Rear camera (used for pose estimation only -- shooter fires forward)
     public static final CameraConfig kRearCamera = new CameraConfig(
         "limelight-rear",  // done: set actual NetworkTables name
-        0.64770,              // done: measure actual mount height (meters)
+        0.64135,              // done: measure actual mount height (meters)
         0.0,              // done: measure actual mount angle (degrees above horizontal)
         0.0);              // done: measure actual yaw offset
 
