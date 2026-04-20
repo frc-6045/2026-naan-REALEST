@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "rightdouble12"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "rightdouble23"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "rightdouble34"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "autoAimAndShoot7Second"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "r double - depot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "depot23"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "depot34"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
