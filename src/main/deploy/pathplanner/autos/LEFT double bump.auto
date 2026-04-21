@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "leftdouble12"
+            "pathName": "LEFT double bump a"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "leftdouble23"
+            "pathName": "LEFT double bump b"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "leftdouble34"
+            "pathName": "LEFT double bump c"
           }
         },
         {
@@ -31,19 +31,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "l double - depot"
+            "pathName": "LEFT double bump d"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "depot23"
+            "pathName": "CENTER depot b"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "depot34"
+            "pathName": "CENTER depot c"
           }
         }
       ]
