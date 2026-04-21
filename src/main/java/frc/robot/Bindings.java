@@ -72,6 +72,10 @@ public class Bindings {
         //     )
         // );
 
+//feeder shot
+        m_driverController.leftTrigger().whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake, MotorConstants.kFeederShotFlywheelRPM, MotorConstants.kFeederShotTopRollerRPM));
+
+
         /*============================*/
         /*     Operator Bindings      */
         /*============================*/
