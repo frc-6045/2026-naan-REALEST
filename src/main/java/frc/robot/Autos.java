@@ -26,6 +26,8 @@ import frc.robot.commands.IntakeCommands.IntakePivotSetpointCurrentLimited;
 import frc.robot.commands.IntakeCommands.RaiseIntakeHalfway;
 import frc.robot.commands.IntakeCommands.StowIntake;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShoot;
+import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShootSide;
+import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShootSide.ApproachSide;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimPrepare;
 import frc.robot.commands.SpindexerCommands.StopSpindexer;
 import frc.robot.subsystems.IntakeSystem.Intake;
@@ -152,6 +154,90 @@ public class Autos {
         return false;
       }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
         .withTimeout(5)
+        .andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint()));
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake)).asProxy());
+
+    // Side-prioritized auto-aim commands (for LEFT/RIGHT approach autos)
+    // LEFT side approach - prioritizes left-facing hub tag
+    NamedCommands.registerCommand("autoAimAndShootLeftSide", Commands.defer(() -> {
+      Timer feedTimer = new Timer();
+      AutoAimAndShootSide cmd = new AutoAimAndShootSide(
+          ApproachSide.LEFT,
+          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake, () -> 0.0, () -> 0.0);
+
+      return cmd.until(() -> {
+        if (cmd.isFeedingActive()) {
+          if (!feedTimer.isRunning()) {
+            feedTimer.start();
+          }
+          return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
+        }
+        return false;
+      }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
+        .withTimeout(ShootingConstants.kAutoShootTimeoutSec)
+        .andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint()));
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake)).asProxy());
+
+    // RIGHT side approach - prioritizes right-facing hub tag
+    NamedCommands.registerCommand("autoAimAndShootRightSide", Commands.defer(() -> {
+      Timer feedTimer = new Timer();
+      AutoAimAndShootSide cmd = new AutoAimAndShootSide(
+          ApproachSide.RIGHT,
+          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake, () -> 0.0, () -> 0.0);
+
+      return cmd.until(() -> {
+        if (cmd.isFeedingActive()) {
+          if (!feedTimer.isRunning()) {
+            feedTimer.start();
+          }
+          return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
+        }
+        return false;
+      }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
+        .withTimeout(ShootingConstants.kAutoShootTimeoutSec)
+        .andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint()));
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake)).asProxy());
+
+    // 7-second timeout variants for double bump autos
+    NamedCommands.registerCommand("autoAimAndShoot7SecondLeftSide", Commands.defer(() -> {
+      Timer feedTimer = new Timer();
+      AutoAimAndShootSide cmd = new AutoAimAndShootSide(
+          ApproachSide.LEFT,
+          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake, () -> 0.0, () -> 0.0);
+
+      return cmd.until(() -> {
+        if (cmd.isFeedingActive()) {
+          if (!feedTimer.isRunning()) {
+            feedTimer.start();
+          }
+          return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
+        }
+        return false;
+      }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
+        .withTimeout(7)
+        .andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint()));
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake)).asProxy());
+
+    NamedCommands.registerCommand("autoAimAndShoot7SecondRightSide", Commands.defer(() -> {
+      Timer feedTimer = new Timer();
+      AutoAimAndShootSide cmd = new AutoAimAndShootSide(
+          ApproachSide.RIGHT,
+          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake, () -> 0.0, () -> 0.0);
+
+      return cmd.until(() -> {
+        if (cmd.isFeedingActive()) {
+          if (!feedTimer.isRunning()) {
+            feedTimer.start();
+          }
+          return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
+        }
+        return false;
+      }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
+        .withTimeout(7)
         .andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
             .until(() -> intakePivot.atSetpoint()));
     }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake)).asProxy());

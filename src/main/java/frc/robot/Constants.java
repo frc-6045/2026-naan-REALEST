@@ -202,6 +202,31 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     }
   }
 
+  /** AprilTag IDs for side-approach autonomous routines. */
+  public static class SideTagConstants {
+    // LEFT-side approach (robot comes from left side of field)
+    public static final int kRedLeftSideTag = 8;
+    public static final int kBlueLeftSideTag = 24;
+
+    // RIGHT-side approach (robot comes from right side of field)
+    public static final int kRedRightSideTag = 11;
+    public static final int kBlueRightSideTag = 27;
+
+    /** Get the priority tag ID for LEFT-side approach based on current alliance. */
+    public static int getLeftSidePriorityTag() {
+      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
+          ? kRedLeftSideTag
+          : kBlueLeftSideTag;
+    }
+
+    /** Get the priority tag ID for RIGHT-side approach based on current alliance. */
+    public static int getRightSidePriorityTag() {
+      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
+          ? kRedRightSideTag
+          : kBlueRightSideTag;
+    }
+  }
+
   public static class VisionPoseConstants {
     // Trench AprilTags are unreliable for pose estimation (they wiggle when robots hit the trench)
     public static final boolean kFilterTrenchTags = true;
