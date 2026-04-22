@@ -17,26 +17,26 @@ public class ShootingLookupTable {
     private static final InterpolatingDoubleTreeMap m_flywheelRPMMap = new InterpolatingDoubleTreeMap();
 
     static {
-        double offset = 100;
+        double offset = 00;
         // Distance (meters) -> Roller RPM
-        m_rollerRPMMap.put(0.0254*104, 2575.0+offset);   // these values are wrong45 inches
-        m_rollerRPMMap.put(0.0254*45, 1850.0+offset);   // 83 inches
-        m_rollerRPMMap.put(0.0254*60, 1950.0+offset);   // 117 inches
-                m_rollerRPMMap.put(0.0254*75, 2035.0+offset);   // 117 inches
-                        m_rollerRPMMap.put(0.0254*90, 2175.0+offset);   // 117 inches
-                                        m_rollerRPMMap.put(0.0254*120, 2725.0+offset);   // 117 inches
-                                                m_rollerRPMMap.put(0.0254*135, 2825.0+offset);   // 117 inches
-        m_rollerRPMMap.put(0.0254*82, 2240.0+offset);
+        m_rollerRPMMap.put(0.0254*45, 500.0+offset);   // 83 inches
+        m_rollerRPMMap.put(0.0254*60, 1500.0+offset);   // 117 inches
+                m_rollerRPMMap.put(0.0254*75, 1700+offset);   // 117 inches
+                        m_rollerRPMMap.put(0.0254*90, 1800.0+offset);   // 117 inches
+                                        m_rollerRPMMap.put(0.0254*120, 1900.0+offset);   // 117 inches
+                                        
+        m_rollerRPMMap.put(0.0254*135, 2050+offset);
+        
+        m_rollerRPMMap.put(0.0254*150, 2200+offset);
 
         // Distance (meters) -> Flywheel RPM
-        m_flywheelRPMMap.put(0.0254*104, 2290.0+offset);  // 45 inches
-        m_flywheelRPMMap.put(0.0254*45, 2050.00+offset);  // 83 inches
-        m_flywheelRPMMap.put(0.0254*60, 2150.0+offset);  // 117 inches
-        m_flywheelRPMMap.put(0.0254*75, 2235.0+offset);  // 117 inches
-        m_flywheelRPMMap.put(0.0254*90, 2375.0+offset);  // 117 inches
-        m_flywheelRPMMap.put(0.0254*120, 2625.0+offset);  // 117 inches
-        m_flywheelRPMMap.put(0.0254*135, 2825.0+offset);  // 117 inches
-        m_flywheelRPMMap.put(0.0254*82, 2150.0+offset);  // 117 inches
+        m_flywheelRPMMap.put(0.0254*45, 2600.00+offset);  // 83 inches
+        m_flywheelRPMMap.put(0.0254*60, 2300+offset);  // 117 inches
+        m_flywheelRPMMap.put(0.0254*75, 2300.0+offset);  // 117 inches
+        m_flywheelRPMMap.put(0.0254*90, 2400.0+offset);  // 117 inches
+        m_flywheelRPMMap.put(0.0254*120, 2500.0+offset);  // 117 inches
+        m_flywheelRPMMap.put(0.0254*135, 2650.0+offset);  // 117 inches
+        m_flywheelRPMMap.put(0.0254*150, 2700.0+offset);  // 117 inches
         
     }
 
