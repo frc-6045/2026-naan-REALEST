@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -36,6 +37,10 @@ public class Bindings {
         CommandXboxController m_operatorController,
         Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve
     ) {
+
+        // Initialize SmartDashboard tuning values
+        SmartDashboard.putNumber("TuneShot/Flywheel RPM", MotorConstants.kTowerShotFlywheelRPM);
+        SmartDashboard.putNumber("TuneShot/TopRoller RPM", MotorConstants.kTowerShotTopRollerRPM);
 
         /*============================*/
         /*      Driver Bindings       */
@@ -75,6 +80,9 @@ public class Bindings {
 //feeder shot
         m_driverController.leftTrigger().whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake, MotorConstants.kFeederShotFlywheelRPM, MotorConstants.kFeederShotTopRollerRPM));
 
+        m_driverController.x().whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+            () -> SmartDashboard.getNumber("TuneShot/Flywheel RPM", MotorConstants.kTowerShotFlywheelRPM),
+            () -> SmartDashboard.getNumber("TuneShot/TopRoller RPM", MotorConstants.kTowerShotTopRollerRPM)));
 
         /*============================*/
         /*     Operator Bindings      */

@@ -97,8 +97,8 @@ public class TowerShot extends Command {
     @Override
     public void execute() {
         // Shooter logic - feed when ready
-        boolean flyReady = m_flywheel.isAtTargetSpeed(MotorConstants.kTowerShotFlywheelRPM);
-        boolean rolReady = m_topRoller.isAtTargetSpeed(MotorConstants.kTowerShotTopRollerRPM);
+        boolean flyReady = m_flywheel.isAtTargetSpeed(m_flywheelRPM);
+        boolean rolReady = m_topRoller.isAtTargetSpeed(m_rollerRPM);
         SmartDashboard.putBoolean("TowerShot/flywheel ready", flyReady);
         SmartDashboard.putBoolean("TowerShot/roller ready", rolReady);
         if (flyReady && rolReady) {
