@@ -7,13 +7,19 @@
         {
           "type": "named",
           "data": {
-            "name": "smallShortStartDelay"
+            "name": "autoDelay1"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "LEFT small short a"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "autoDelay2"
           }
         },
         {
@@ -25,7 +31,7 @@
         {
           "type": "named",
           "data": {
-            "name": "smallShortMidDelay"
+            "name": "autoDelay3"
           }
         },
         {

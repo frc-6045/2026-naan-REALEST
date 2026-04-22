@@ -43,8 +43,9 @@ public class Autos {
     private final SendableChooser<Command> m_autoChooser;
 
     // SmartDashboard keys for small short auto delay configuration
-    private static final String kSmallShortStartDelayKey = "SmallShort/StartDelaySec";
-    private static final String kSmallShortMidDelayKey = "SmallShort/MidDelaySec";
+    private static final String kAutoDelay1Key = "autoDelay1";
+    private static final String kAutoDelay2Key = "autoDelay2";
+    private static final String kAutoDelay3Key = "autoDelay3";
 
   /**
    * TO REGISTER A COMMAND IN PATHPLANNER
@@ -59,19 +60,22 @@ public class Autos {
     // PathPlanner AutoBuilder is configured in Swerve subsystem
 
     // Initialize SmartDashboard delay values for small short autos
-    SmartDashboard.putNumber(kSmallShortStartDelayKey, 0.0);
-    SmartDashboard.putNumber(kSmallShortMidDelayKey, 0.0);
+    SmartDashboard.putNumber(kAutoDelay1Key, 0.0);
+    SmartDashboard.putNumber(kAutoDelay2Key, 0.0);
+    SmartDashboard.putNumber(kAutoDelay3Key, 0.0);
 
     // --- Register NamedCommands for PathPlanner ---
 
     NamedCommands.registerCommand("print1", new InstantCommand(()->{System.out.println("Auto troubleshoot print 1!");}));
     NamedCommands.registerCommand("print2", new InstantCommand(()->{System.out.println("Auto troubleshoot print 2!");}));
 
-    // Small short auto delays - configurable via SmartDashboard
-    NamedCommands.registerCommand("smallShortStartDelay", Commands.defer(() ->
-      Commands.waitSeconds(SmartDashboard.getNumber(kSmallShortStartDelayKey, 0.0)), Set.of()));
-    NamedCommands.registerCommand("smallShortMidDelay", Commands.defer(() ->
-      Commands.waitSeconds(SmartDashboard.getNumber(kSmallShortMidDelayKey, 0.0)), Set.of()));
+    // Auto delays - configurable via SmartDashboard, use in PathPlanner as named commands
+    NamedCommands.registerCommand("autoDelay1", Commands.defer(() ->
+      Commands.waitSeconds(SmartDashboard.getNumber(kAutoDelay1Key, 0.0)), Set.of()));
+    NamedCommands.registerCommand("autoDelay2", Commands.defer(() ->
+      Commands.waitSeconds(SmartDashboard.getNumber(kAutoDelay2Key, 0.0)), Set.of()));
+    NamedCommands.registerCommand("autoDelay3", Commands.defer(() ->
+      Commands.waitSeconds(SmartDashboard.getNumber(kAutoDelay3Key, 0.0)), Set.of()));
 
     // Intake commands
     NamedCommands.registerCommand("deployIntake", new DeployIntake(intakePivot));
