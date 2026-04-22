@@ -42,6 +42,10 @@ public class Autos {
 
     private final SendableChooser<Command> m_autoChooser;
 
+    // SmartDashboard keys for small short auto delay configuration
+    private static final String kSmallShortStartDelayKey = "SmallShort/StartDelaySec";
+    private static final String kSmallShortMidDelayKey = "SmallShort/MidDelaySec";
+
   /**
    * TO REGISTER A COMMAND IN PATHPLANNER
    * NamedCommands.registerCommand("autoCommandName", new exampleCommand(parameters));
@@ -54,10 +58,20 @@ public class Autos {
   public Autos(Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve) {
     // PathPlanner AutoBuilder is configured in Swerve subsystem
 
+    // Initialize SmartDashboard delay values for small short autos
+    SmartDashboard.putNumber(kSmallShortStartDelayKey, 0.0);
+    SmartDashboard.putNumber(kSmallShortMidDelayKey, 0.0);
+
     // --- Register NamedCommands for PathPlanner ---
 
     NamedCommands.registerCommand("print1", new InstantCommand(()->{System.out.println("Auto troubleshoot print 1!");}));
     NamedCommands.registerCommand("print2", new InstantCommand(()->{System.out.println("Auto troubleshoot print 2!");}));
+
+    // Small short auto delays - configurable via SmartDashboard
+    NamedCommands.registerCommand("smallShortStartDelay", Commands.defer(() ->
+      Commands.waitSeconds(SmartDashboard.getNumber(kSmallShortStartDelayKey, 0.0)), Set.of()));
+    NamedCommands.registerCommand("smallShortMidDelay", Commands.defer(() ->
+      Commands.waitSeconds(SmartDashboard.getNumber(kSmallShortMidDelayKey, 0.0)), Set.of()));
 
     // Intake commands
     NamedCommands.registerCommand("deployIntake", new DeployIntake(intakePivot));

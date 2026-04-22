@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "smallShortStartDelay"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "RIGHT small short a"
@@ -14,6 +20,12 @@
           "type": "path",
           "data": {
             "pathName": "RIGHT small short b"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "smallShortMidDelay"
           }
         },
         {
