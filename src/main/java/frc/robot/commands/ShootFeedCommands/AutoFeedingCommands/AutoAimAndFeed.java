@@ -93,9 +93,6 @@ public class AutoAimAndFeed extends Command {
     public void initialize() {
         LimelightHelpers.setPipelineIndex(LimelightConstants.kFrontCamera.name, LimelightConstants.kAprilTagPipeline);
 
-        // Resync gyro-drifted heading against fresh MegaTag1 vision before aim PID starts.
-        m_swerve.seedHeadingFromVision();
-
         m_aimPID.reset();
         m_feeding = false;
         m_hasLockedTag = false;
