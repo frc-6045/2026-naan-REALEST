@@ -31,6 +31,7 @@ import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.shooterSystem.TopRoller;
+import frc.robot.commands.ShootFeedCommands.FeedShot;
 
 public class Bindings {
     public static void configureBindings(
