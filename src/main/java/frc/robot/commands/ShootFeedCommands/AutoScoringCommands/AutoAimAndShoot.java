@@ -56,7 +56,7 @@ public class AutoAimAndShoot extends Command {
     private final Timer m_graceTimer = new Timer();
     private final IntakePivotOscillator.OscillationState m_pivotState = new IntakePivotOscillator.OscillationState();
 
-    private final LimelightTargeting.TagLockState m_tagLock = new LimelightTargeting.TagLockState();
+    protected final LimelightTargeting.TagLockState m_tagLock = new LimelightTargeting.TagLockState();
 
     public AutoAimAndShoot(
             Swerve swerve, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,

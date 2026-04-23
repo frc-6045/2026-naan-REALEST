@@ -26,6 +26,8 @@ import frc.robot.commands.IntakeCommands.IntakePivotSetpointCurrentLimited;
 import frc.robot.commands.IntakeCommands.RaiseIntakeHalfway;
 import frc.robot.commands.IntakeCommands.StowIntake;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShoot;
+import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShootSide;
+import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShootSide.ApproachSide;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimPrepare;
 import frc.robot.commands.SpindexerCommands.StopSpindexer;
 import frc.robot.subsystems.IntakeSystem.Intake;
@@ -40,6 +42,11 @@ public class Autos {
 
     private final SendableChooser<Command> m_autoChooser;
 
+    // SmartDashboard keys for small short auto delay configuration
+    private static final String kAutoDelay1Key = "autoDelay1";
+    private static final String kAutoDelay2Key = "autoDelay2";
+    private static final String kAutoDelay3Key = "autoDelay3";
+
   /**
    * TO REGISTER A COMMAND IN PATHPLANNER
    * NamedCommands.registerCommand("autoCommandName", new exampleCommand(parameters));
@@ -52,10 +59,23 @@ public class Autos {
   public Autos(Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve) {
     // PathPlanner AutoBuilder is configured in Swerve subsystem
 
+    // Initialize SmartDashboard delay values for small short autos
+    SmartDashboard.putNumber(kAutoDelay1Key, 0.0);
+    SmartDashboard.putNumber(kAutoDelay2Key, 0.0);
+    SmartDashboard.putNumber(kAutoDelay3Key, 0.0);
+
     // --- Register NamedCommands for PathPlanner ---
 
     NamedCommands.registerCommand("print1", new InstantCommand(()->{System.out.println("Auto troubleshoot print 1!");}));
     NamedCommands.registerCommand("print2", new InstantCommand(()->{System.out.println("Auto troubleshoot print 2!");}));
+
+    // Auto delays - configurable via SmartDashboard, use in PathPlanner as named commands
+    NamedCommands.registerCommand("autoDelay1", Commands.defer(() ->
+      Commands.waitSeconds(SmartDashboard.getNumber(kAutoDelay1Key, 0.0)), Set.of()));
+    NamedCommands.registerCommand("autoDelay2", Commands.defer(() ->
+      Commands.waitSeconds(SmartDashboard.getNumber(kAutoDelay2Key, 0.0)), Set.of()));
+    NamedCommands.registerCommand("autoDelay3", Commands.defer(() ->
+      Commands.waitSeconds(SmartDashboard.getNumber(kAutoDelay3Key, 0.0)), Set.of()));
 
     // Intake commands
     NamedCommands.registerCommand("deployIntake", new DeployIntake(intakePivot));
@@ -156,6 +176,90 @@ public class Autos {
             .until(() -> intakePivot.atSetpoint()));
     }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake)).asProxy());
 
+    // Side-prioritized auto-aim commands (for LEFT/RIGHT approach autos)
+    // LEFT side approach - prioritizes left-facing hub tag
+    NamedCommands.registerCommand("autoAimAndShootLeftSide", Commands.defer(() -> {
+      Timer feedTimer = new Timer();
+      AutoAimAndShootSide cmd = new AutoAimAndShootSide(
+          ApproachSide.LEFT,
+          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake, () -> 0.0, () -> 0.0);
+
+      return cmd.until(() -> {
+        if (cmd.isFeedingActive()) {
+          if (!feedTimer.isRunning()) {
+            feedTimer.start();
+          }
+          return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
+        }
+        return false;
+      }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
+        .withTimeout(ShootingConstants.kAutoShootTimeoutSec)
+        .andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint()));
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake)).asProxy());
+
+    // RIGHT side approach - prioritizes right-facing hub tag
+    NamedCommands.registerCommand("autoAimAndShootRightSide", Commands.defer(() -> {
+      Timer feedTimer = new Timer();
+      AutoAimAndShootSide cmd = new AutoAimAndShootSide(
+          ApproachSide.RIGHT,
+          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake, () -> 0.0, () -> 0.0);
+
+      return cmd.until(() -> {
+        if (cmd.isFeedingActive()) {
+          if (!feedTimer.isRunning()) {
+            feedTimer.start();
+          }
+          return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
+        }
+        return false;
+      }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
+        .withTimeout(ShootingConstants.kAutoShootTimeoutSec)
+        .andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint()));
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake)).asProxy());
+
+    // 7-second timeout variants for double bump autos
+    NamedCommands.registerCommand("autoAimAndShoot7SecondLeftSide", Commands.defer(() -> {
+      Timer feedTimer = new Timer();
+      AutoAimAndShootSide cmd = new AutoAimAndShootSide(
+          ApproachSide.LEFT,
+          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake, () -> 0.0, () -> 0.0);
+
+      return cmd.until(() -> {
+        if (cmd.isFeedingActive()) {
+          if (!feedTimer.isRunning()) {
+            feedTimer.start();
+          }
+          return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
+        }
+        return false;
+      }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
+        .withTimeout(7)
+        .andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint()));
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake)).asProxy());
+
+    NamedCommands.registerCommand("autoAimAndShoot7SecondRightSide", Commands.defer(() -> {
+      Timer feedTimer = new Timer();
+      AutoAimAndShootSide cmd = new AutoAimAndShootSide(
+          ApproachSide.RIGHT,
+          swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake, () -> 0.0, () -> 0.0);
+
+      return cmd.until(() -> {
+        if (cmd.isFeedingActive()) {
+          if (!feedTimer.isRunning()) {
+            feedTimer.start();
+          }
+          return feedTimer.hasElapsed(ShootingConstants.kAutoShootFeedDurationSec);
+        }
+        return false;
+      }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
+        .withTimeout(7)
+        .andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint()));
+    }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake)).asProxy());
+
     // Aim while driving -- overrides PathPlanner rotation to aim at target, spins up + feeds
     // NamedCommands.registerCommand("autoAimWhileDriving", Commands.defer(
     //   () -> new AutoAimWhileDriving(swerve, flywheel, topRoller, feeder, spindexer)
@@ -178,19 +282,24 @@ public class Autos {
     m_autoChooser = new SendableChooser<>();
     m_autoChooser.setDefaultOption("None", null);
 
-    // Add autos to chooser (right side)
+    // Right-side autos
     m_autoChooser.addOption("RIGHT mid-length", AutoBuilder.buildAuto("RIGHT mid-length"));
-    m_autoChooser.addOption("RIGHT long", AutoBuilder.buildAuto("RIGHT long"));
     m_autoChooser.addOption("RIGHT short", AutoBuilder.buildAuto("RIGHT short"));
+    m_autoChooser.addOption("RIGHT long", AutoBuilder.buildAuto("RIGHT long"));
     m_autoChooser.addOption("RIGHT small mid-length", AutoBuilder.buildAuto("RIGHT small mid-length"));
     m_autoChooser.addOption("RIGHT small short", AutoBuilder.buildAuto("RIGHT small short"));
+    m_autoChooser.addOption("RIGHT double bump", AutoBuilder.buildAuto("RIGHT double bump"));
 
-    // Add autos to chooser (left side - mirrored)
+    // Left-side autos (mirrored)
     m_autoChooser.addOption("LEFT mid-length", AutoBuilder.buildAuto("LEFT mid-length"));
-    m_autoChooser.addOption("LEFT long", AutoBuilder.buildAuto("LEFT long"));
     m_autoChooser.addOption("LEFT short", AutoBuilder.buildAuto("LEFT short"));
+    m_autoChooser.addOption("LEFT long", AutoBuilder.buildAuto("LEFT long"));
     m_autoChooser.addOption("LEFT small mid-length", AutoBuilder.buildAuto("LEFT small mid-length"));
     m_autoChooser.addOption("LEFT small short", AutoBuilder.buildAuto("LEFT small short"));
+    m_autoChooser.addOption("LEFT double bump", AutoBuilder.buildAuto("LEFT double bump"));
+
+    // Center
+    m_autoChooser.addOption("CENTER depot", AutoBuilder.buildAuto("CENTER depot"));
 
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }

@@ -18,10 +18,18 @@ public final class LimelightTargeting {
     /** Mutable tag-lock state owned by each command instance. */
     public static class TagLockState {
         public int lockedTagID = -1;
+        public int priorityTagID = -1;
 
-        /** Reset lock and clear Limelight priority tag on front camera. */
+        /** Set a priority tag to lock onto first if visible. Also sets Limelight hardware priority. */
+        public void setPriorityTag(int tagID) {
+            priorityTagID = tagID;
+            LimelightHelpers.setPriorityTagID(LimelightConstants.kFrontCamera.name, tagID);
+        }
+
+        /** Reset lock, clear priority, and clear Limelight priority tag on front camera. */
         public void reset() {
             lockedTagID = -1;
+            priorityTagID = -1;
             LimelightHelpers.setPriorityTagID(LimelightConstants.kFrontCamera.name, -1);
         }
     }
@@ -86,7 +94,15 @@ public final class LimelightTargeting {
         // Lock onto first valid target to prevent tag-to-tag oscillation
         int detectedID = (int) LimelightHelpers.getFiducialID(ll);
 
-        if (lockState.lockedTagID == -1 && validator.test(detectedID)) {
+        // Priority tag locking: if priority is set and that tag is detected, lock immediately
+        if (lockState.lockedTagID == -1 && lockState.priorityTagID != -1
+                && detectedID == lockState.priorityTagID
+                && validator.test(detectedID)) {
+            lockState.lockedTagID = detectedID;
+            LimelightHelpers.setPriorityTagID(ll, lockState.lockedTagID);
+        }
+        // Default behavior: lock onto first valid target
+        else if (lockState.lockedTagID == -1 && validator.test(detectedID)) {
             lockState.lockedTagID = detectedID;
             LimelightHelpers.setPriorityTagID(ll, lockState.lockedTagID);
         }

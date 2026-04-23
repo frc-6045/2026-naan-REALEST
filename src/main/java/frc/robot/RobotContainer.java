@@ -12,6 +12,7 @@ import frc.robot.subsystems.shooterSystem.TopRoller;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.shooterSystem.Spindexer;
+import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -29,6 +30,7 @@ public class RobotContainer {
   private final TopRoller m_TopRoller = new TopRoller();
   private final Feeder m_Feeder = new Feeder();
   private final Swerve m_Swerve = new Swerve();
+  private final LEDs m_LEDs = new LEDs();
   private final PowerDistribution m_pdh = new PowerDistribution(1, ModuleType.kRev);
 
   private final CommandXboxController m_driverController =
@@ -42,7 +44,7 @@ public class RobotContainer {
   public RobotContainer() {
     m_pdh.setSwitchableChannel(true);
     m_Autos = new Autos(m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve);
-    Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve);
+    Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve, m_LEDs);
 
     DriverStation.silenceJoystickConnectionWarning(true);
 
@@ -75,5 +77,13 @@ public class RobotContainer {
 
   public void resetHeadingFromVision() {
     m_Swerve.resetHeadingFromVision();
+  }
+
+  /**
+   * Gets the LED subsystem for robot state updates.
+   * @return The LEDs subsystem
+   */
+  public LEDs getLEDs() {
+    return m_LEDs;
   }
 }

@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.DrivebaseConstants;
+import frc.robot.subsystems.LEDs.LEDState;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -56,6 +57,9 @@ public class Robot extends TimedRobot {
     m_robotContainer.setMotorBrake(true);
     m_disabledTimer.reset();
     m_disabledTimer.start();
+
+    // Set LED state to disabled (smooth green/orange transition)
+    m_robotContainer.getLEDs().setState(LEDState.DISABLED);
   }
 
   @Override
@@ -73,6 +77,9 @@ public class Robot extends TimedRobot {
     // Enable brake mode for autonomous
     m_robotContainer.setMotorBrake(true);
 
+    // Set LED state to enabled (RSL-synced flashing)
+    m_robotContainer.getLEDs().setState(LEDState.ENABLED);
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -89,6 +96,9 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     // Enable brake mode for teleop
     m_robotContainer.setMotorBrake(true);
+
+    // Set LED state to enabled (RSL-synced flashing)
+    m_robotContainer.getLEDs().setState(LEDState.ENABLED);
 
     m_robotContainer.resetHeadingFromVision();
 

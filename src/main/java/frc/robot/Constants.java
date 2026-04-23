@@ -7,6 +7,7 @@ package frc.robot;
 import java.util.Map;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -82,10 +83,10 @@ public final class Constants {
 
     // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
     // TODO: Determine empirically on the robot
-    public static final double kIntakePivotDeploySetpoint = 0.8418624401092529;   // Fully down (deployed)
-    public static final double kIntakePivotOuttakeSetpoint = 0.7764841914176941;  // a bit up for eject balls
-    public static final double kIntakePivotMiddleSetpoint = 0.6458311676979065;   // Halfway — oscillation bottom
-    public static final double kIntakePivotStowSetpoint = 0.4517042338848114;     // Fully up (stowed/raised)
+    public static final double kIntakePivotDeploySetpoint = 0.725833535194397;   // Fully down (deployed)
+    public static final double kIntakePivotOuttakeSetpoint = 0.6731676459312439;  // a bit up for eject balls
+    public static final double kIntakePivotMiddleSetpoint = 0.4819125533103943;   // Halfway — oscillation bottom
+    public static final double kIntakePivotStowSetpoint = 0.3160654306411743;     // Fully up (stowed/raised)
 
     // Seconds per oscillation direction (up->middle or middle->up)
     public static final double kIntakePivotOscillationPeriodSec = 0.8;
@@ -123,8 +124,11 @@ public final class Constants {
     public static final double kTowerShotTopRollerRPM = 2950.0; // Target top roller RPM for tower shot
     public static final double kTowerShotSpinUpDelaySec = 1.0; // Delay before feeding (seconds)
 
-    public static final double kTowerShotFrontFlywheelRPM = 2450.0; // Target flywheel RPM for tower shot front
-    public static final double kTowerShotFrontTopRollerRPM = 2700.0; // Target top roller RPM for tower shot front
+    public static final double kTowerShotFrontFlywheelRPM = 2400.0; // Target flywheel RPM for tower shot front
+    public static final double kTowerShotFrontTopRollerRPM = 1800.0; // Target top roller RPM for tower shot front
+
+    public static final double kFeederShotFlywheelRPM = 5250; //for feeding
+    public static final double kFeederShotTopRollerRPM = 3250; //also for feeding
 
   }
 
@@ -161,14 +165,14 @@ public final class Constants {
     // Front camera (used for both pose estimation and targeting/aiming)
     public static final CameraConfig kFrontCamera = new CameraConfig(
         "limelight-sabre", // NetworkTables name
-        0.71755,           // Mount height from floor (meters)
+        0.64135,           // Mount height from floor (meters)
         0.0,               // Mount angle above horizontal (degrees)
         0.0);              // Yaw offset (positive = aim right)
 
     // Rear camera (used for pose estimation only -- shooter fires forward)
     public static final CameraConfig kRearCamera = new CameraConfig(
         "limelight-rear",  // done: set actual NetworkTables name
-        0.64770,              // done: measure actual mount height (meters)
+        0.64135,              // done: measure actual mount height (meters)
         0.0,              // done: measure actual mount angle (degrees above horizontal)
         0.0);              // done: measure actual yaw offset
 
@@ -232,6 +236,31 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
         }
       }
       return false;
+    }
+  }
+
+  /** AprilTag IDs for side-approach autonomous routines. */
+  public static class SideTagConstants {
+    // LEFT-side approach (robot comes from left side of field)
+    public static final int kRedLeftSideTag = 8;
+    public static final int kBlueLeftSideTag = 24;
+
+    // RIGHT-side approach (robot comes from right side of field)
+    public static final int kRedRightSideTag = 11;
+    public static final int kBlueRightSideTag = 27;
+
+    /** Get the priority tag ID for LEFT-side approach based on current alliance. */
+    public static int getLeftSidePriorityTag() {
+      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
+          ? kRedLeftSideTag
+          : kBlueLeftSideTag;
+    }
+
+    /** Get the priority tag ID for RIGHT-side approach based on current alliance. */
+    public static int getRightSidePriorityTag() {
+      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
+          ? kRedRightSideTag
+          : kBlueRightSideTag;
     }
   }
 
@@ -361,6 +390,19 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     IN,
     OUT,
     TOGGLE
+  }
+
+  public static class LEDConstants {
+    // Hardware - adjust these for your setup
+    public static final int kLEDPort = 8;      // PWM port
+    public static final int kLEDCount = 250;    // Number of LEDs in strip
+
+    // Animation timing
+    public static final double kGradientPeriodSec = 2.0;  // Time for full green->orange->green cycle
+
+    // Colors
+    public static final Color kGreen = Color.kGreen;
+    public static final Color kOrange = Color.kOrange;
   }
 
 }

@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -28,6 +29,7 @@ import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
+import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.shooterSystem.TopRoller;
 
@@ -35,8 +37,12 @@ public class Bindings {
     public static void configureBindings(
         CommandXboxController m_driverController,
         CommandXboxController m_operatorController,
-        Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve
+        Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve, LEDs leds
     ) {
+
+        // Initialize SmartDashboard tuning values
+        SmartDashboard.putNumber("TuneShot/Flywheel RPM", MotorConstants.kTowerShotFlywheelRPM);
+        SmartDashboard.putNumber("TuneShot/TopRoller RPM", MotorConstants.kTowerShotTopRollerRPM);
 
         /*============================*/
         /*      Driver Bindings       */
@@ -91,6 +97,13 @@ public class Bindings {
         //     )
         // );
 
+//feeder shot
+        m_driverController.leftTrigger().whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake, MotorConstants.kFeederShotFlywheelRPM, MotorConstants.kFeederShotTopRollerRPM));
+
+        m_driverController.x().whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+            () -> SmartDashboard.getNumber("TuneShot/Flywheel RPM", MotorConstants.kTowerShotFlywheelRPM),
+            () -> SmartDashboard.getNumber("TuneShot/TopRoller RPM", MotorConstants.kTowerShotTopRollerRPM)));
+
         /*============================*/
         /*     Operator Bindings      */
         /*============================*/
@@ -132,7 +145,7 @@ public class Bindings {
         m_operatorController.rightBumper().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotMiddleSetpoint));
 
         //shoot while parked against the trench
-        m_operatorController.pov(180).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake));
+        //not exist anymore
         // in front of trength
         m_operatorController.pov(0).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake, MotorConstants.kTowerShotFrontFlywheelRPM, MotorConstants.kTowerShotFrontTopRollerRPM));
 
