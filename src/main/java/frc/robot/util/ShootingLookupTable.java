@@ -17,7 +17,7 @@ public class ShootingLookupTable {
     private static final InterpolatingDoubleTreeMap m_flywheelRPMMap = new InterpolatingDoubleTreeMap();
 
     static {
-        double offset = 00;
+        double offset = -50;
         // Distance (meters) -> Roller RPM
         m_rollerRPMMap.put(0.0254*45, 500.0+offset);   // 83 inches
         m_rollerRPMMap.put(0.0254*60, 1500.0+offset);   // 117 inches
