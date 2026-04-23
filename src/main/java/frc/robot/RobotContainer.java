@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.Constants.ControllerConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
@@ -43,6 +44,11 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     m_pdh.setSwitchableChannel(true);
+
+    // Force AprilTag field layout to parse during startup rather than on the first auto-aim
+    // execute() — avoids a one-time mid-match loop overrun.
+    FieldConstants.kFieldLayout.getTags().size();
+
     m_Autos = new Autos(m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve);
     Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve, m_LEDs);
 

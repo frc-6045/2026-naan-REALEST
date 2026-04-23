@@ -1,6 +1,5 @@
 package frc.robot.commands.ShootFeedCommands.AutoFeedingCommands;
 
-import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -29,7 +28,6 @@ import frc.robot.util.FeedingLookupTable;
 import frc.robot.util.IntakePivotOscillator;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightTargeting;
-import frc.robot.util.PoseAim;
 import frc.robot.util.ShotCompensation;
 
 /**
@@ -63,6 +61,10 @@ public class AutoAimAndFeed extends Command {
 
     private final LimelightTargeting.TagLockState m_tagLock = new LimelightTargeting.TagLockState();
 
+    // Cached target translation for the currently locked tag; avoids per-cycle Optional/Pose2d chain.
+    private int m_cachedTagID = -1;
+    private Translation2d m_cachedTagTranslation = null;
+
     public AutoAimAndFeed(
             Swerve swerve, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
             IntakePivot intakePivot, Intake intake,
@@ -94,27 +96,28 @@ public class AutoAimAndFeed extends Command {
         m_graceTimer.reset();
         m_tagLock.reset();
         m_pivotState.reset();
+        m_cachedTagID = -1;
+        m_cachedTagTranslation = null;
     }
 
     @Override
     public void execute() {
-        LimelightTargeting.acquireTarget(m_tagLock, LimelightConstants::isValidFeedTagID);
-        int lockedTag = m_tagLock.lockedTagID;
-        Optional<Translation2d> targetOpt = (lockedTag != -1)
-                ? FieldConstants.getTagTranslation(lockedTag)
-                : Optional.empty();
+        int lockedTag = LimelightTargeting
+                .acquireTarget(m_tagLock, LimelightConstants::isValidFeedTagID)
+                .lockedTagID;
+        Translation2d targetTranslation = lockedTagTranslation(lockedTag);
 
         double translationX = m_translationXSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
         double translationY = m_translationYSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
         Translation2d translation = new Translation2d(translationX, translationY);
 
-        if (targetOpt.isPresent()) {
-            Translation2d targetTranslation = targetOpt.get();
+        if (targetTranslation != null) {
             Pose2d robotPose = m_swerve.getPose();
             double headingDeg = robotPose.getRotation().getDegrees();
 
-            double bearingDeg = PoseAim.targetBearingDegrees(robotPose, targetTranslation);
-            double poseDistance = PoseAim.distanceMeters(robotPose, targetTranslation);
+            Translation2d toTarget = targetTranslation.minus(robotPose.getTranslation());
+            double bearingDeg = toTarget.getAngle().getDegrees();
+            double poseDistance = toTarget.getNorm();
 
             ChassisSpeeds fieldVelocity = m_swerve.getFieldVelocity();
             ShotCompensation.CompensationResult compensation =
@@ -213,6 +216,18 @@ public class AutoAimAndFeed extends Command {
 
     public boolean isFeedingActive() {
         return m_feeding;
+    }
+
+    /** Look up the locked tag's field translation, caching across cycles while the lock is held. */
+    private Translation2d lockedTagTranslation(int lockedTag) {
+        if (lockedTag == -1) {
+            return null;
+        }
+        if (lockedTag != m_cachedTagID) {
+            m_cachedTagID = lockedTag;
+            m_cachedTagTranslation = FieldConstants.getTagTranslation(lockedTag).orElse(null);
+        }
+        return m_cachedTagTranslation;
     }
 
     private void updateFeedState(boolean readyToFire) {

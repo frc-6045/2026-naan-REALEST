@@ -1,6 +1,5 @@
 package frc.robot.commands.ShootFeedCommands.AutoScoringCommands;
 
-import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -27,7 +26,6 @@ import frc.robot.subsystems.shooterSystem.TopRoller;
 import frc.robot.util.IntakePivotOscillator;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightTargeting;
-import frc.robot.util.PoseAim;
 import frc.robot.util.ShootingLookupTable;
 import frc.robot.util.ShotCompensation;
 import frc.robot.subsystems.shooterSystem.Spindexer;
@@ -62,6 +60,10 @@ public class AutoAimAndShoot extends Command {
 
     protected final LimelightTargeting.TagLockState m_tagLock = new LimelightTargeting.TagLockState();
 
+    // Cached target translation for the currently locked tag; avoids per-cycle Optional/Pose2d chain.
+    private int m_cachedTagID = -1;
+    private Translation2d m_cachedTagTranslation = null;
+
     public AutoAimAndShoot(
             Swerve swerve, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
             IntakePivot intakePivot, Intake intake,
@@ -85,7 +87,6 @@ public class AutoAimAndShoot extends Command {
 
     @Override
     public void initialize() {
-        // Set Limelight to AprilTag pipeline
         LimelightHelpers.setPipelineIndex(LimelightConstants.kFrontCamera.name, LimelightConstants.kAprilTagPipeline);
 
         m_aimPID.reset();
@@ -94,29 +95,28 @@ public class AutoAimAndShoot extends Command {
         m_graceTimer.reset();
         m_tagLock.reset();
         m_pivotState.reset();
+        m_cachedTagID = -1;
+        m_cachedTagTranslation = null;
     }
 
     @Override
     public void execute() {
-        // Still drive Limelight to establish which tag we want to hit; once lockedTagID is set
-        // we aim via pose even if the Limelight momentarily loses sight of the tag.
-        LimelightTargeting.acquireTarget(m_tagLock);
-        int lockedTag = m_tagLock.lockedTagID;
-        Optional<Translation2d> targetOpt = (lockedTag != -1)
-                ? FieldConstants.getTagTranslation(lockedTag)
-                : Optional.empty();
+        // Limelight still decides which tag we lock; once locked, aim is driven by pose so we
+        // keep rotating toward the known field location even if the tag blinks out of sight.
+        int lockedTag = LimelightTargeting.acquireTarget(m_tagLock).lockedTagID;
+        Translation2d targetTranslation = lockedTagTranslation(lockedTag);
 
         double translationX = m_translationXSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
         double translationY = m_translationYSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
         Translation2d translation = new Translation2d(translationX, translationY);
 
-        if (targetOpt.isPresent()) {
-            Translation2d targetTranslation = targetOpt.get();
+        if (targetTranslation != null) {
             Pose2d robotPose = m_swerve.getPose();
             double headingDeg = robotPose.getRotation().getDegrees();
 
-            double bearingDeg = PoseAim.targetBearingDegrees(robotPose, targetTranslation);
-            double distance = PoseAim.distanceMeters(robotPose, targetTranslation);
+            Translation2d toTarget = targetTranslation.minus(robotPose.getTranslation());
+            double bearingDeg = toTarget.getAngle().getDegrees();
+            double distance = toTarget.getNorm();
 
             ChassisSpeeds fieldVelocity = m_swerve.getFieldVelocity();
             ShotCompensation.CompensationResult compensation =
@@ -135,8 +135,6 @@ public class AutoAimAndShoot extends Command {
             m_topRoller.setRPM(targetRollerRPM);
             m_flywheel.setTargetRPM(targetRPM);
 
-            // Desired heading: face the target, corrected for camera yaw offset and velocity lead.
-            // Per-tag yaw offsets dropped — pose-based aim uses the true tag location.
             double desiredHeadingDeg = bearingDeg
                     - LimelightConstants.kFrontCamera.yawOffsetDegrees
                     - compensation.aimLeadDegrees;
@@ -178,7 +176,6 @@ public class AutoAimAndShoot extends Command {
             SmartDashboard.putNumber("AutoAim/LockedTagID", lockedTag);
             SmartDashboard.putNumber("AutoAim/TagRpmOffset", tagRpmOffset);
         } else {
-            // No tag ever locked (or field layout doesn't know this tag): idle motors, no rotation.
             m_swerve.drive(translation, 0.0, true);
             m_flywheel.setTargetRPM(m_lastTargetRPM);
             m_topRoller.setRPM(m_lastTargetRollerRPM);
@@ -221,10 +218,18 @@ public class AutoAimAndShoot extends Command {
         return m_feeding;
     }
 
-    /**
-     * Manage feeder state machine: feed when ready, grace period on brief aim loss, stop otherwise.
-     * Extracted to reduce nesting depth in execute().
-     */
+    /** Look up the locked tag's field translation, caching across cycles while the lock is held. */
+    private Translation2d lockedTagTranslation(int lockedTag) {
+        if (lockedTag == -1) {
+            return null;
+        }
+        if (lockedTag != m_cachedTagID) {
+            m_cachedTagID = lockedTag;
+            m_cachedTagTranslation = FieldConstants.getTagTranslation(lockedTag).orElse(null);
+        }
+        return m_cachedTagTranslation;
+    }
+
     private void updateFeedState(boolean readyToFire) {
         if (readyToFire) {
             m_feeder.setSpeed(MotorConstants.kFeederSpeed);
