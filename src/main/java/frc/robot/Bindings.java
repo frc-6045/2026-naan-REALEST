@@ -79,7 +79,7 @@ public class Bindings {
         // );
 
 //feeder shot
-        m_driverController.leftTrigger().whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake, MotorConstants.kFeederShotFlywheelRPM, MotorConstants.kFeederShotTopRollerRPM));
+        m_driverController.leftTrigger().whileTrue(new FeedShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake, MotorConstants.kFeederShotFlywheelRPM, MotorConstants.kFeederShotTopRollerRPM));
 
         m_driverController.x().whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake,
             () -> SmartDashboard.getNumber("TuneShot/Flywheel RPM", MotorConstants.kTowerShotFlywheelRPM),
