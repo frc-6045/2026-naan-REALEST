@@ -15,6 +15,7 @@ import frc.robot.Constants.FeedingConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.MotorConstants;
+import frc.robot.Constants.ShooterGeometryConstants;
 import frc.robot.Constants.ShootingConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.IntakeSystem.Intake;
@@ -151,6 +152,7 @@ public class AutoAimAndFeed extends Command {
             m_flywheel.setTargetRPM(targetRPM);
 
             double desiredHeadingDeg = bearingDeg
+                    - ShooterGeometryConstants.kShooterYawDegrees
                     - LimelightConstants.kFrontCamera.yawOffsetDegrees
                     - compensation.aimLeadDegrees;
             double aimOutput = m_aimPID.calculate(headingDeg, desiredHeadingDeg);

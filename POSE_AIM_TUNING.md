@@ -4,9 +4,12 @@ Values and settings that may need tuning after the switch from Limelight-tx aim 
 
 ## 1. Mechanical / config (one-time, set first)
 
+- **`ShooterGeometryConstants.kShooterYawDegrees`** (currently `90.0`)
+  Big-picture shooter mounting: angle of the shooter's firing axis relative to robot forward (+X), CCW positive. Our robot fires out the left side, so this is `90.0`. If the intake/forward ever gets reassigned or the shooter gets re-mounted, update this. Pose-based aim aligns `heading + kShooterYawDegrees` with the target bearing.
+
 - **`LimelightConstants.kFrontCamera.yawOffsetDegrees`** (`Constants.java:170`, currently `0.0`)
-  The single most important knob. Corrects for "shooter tube isn't exactly along robot +X axis." Pose-based aim computes a bearing-to-target in field frame and expects robot heading to equal that bearing when the shooter is on-target. If the shooter physically points 2° right of robot forward, put `2.0` here.
-  **Calibration:** line the robot square at a tag at close range, enable aim, observe where the ball actually goes, enter that delta.
+  Fine calibration knob on top of `kShooterYawDegrees`. If the shooter doesn't quite point exactly along the expected axis (small mechanical misalignment, say 2° off), put `2.0` here.
+  **Calibration:** with `kShooterYawDegrees` set correctly, line the robot square at a tag at close range, enable aim, observe where the ball actually goes, enter the small delta.
 
 - **`LimelightConstants.kRearCamera.mountHeightMeters / mountAngleDegrees / yawOffsetDegrees`** (`Constants.java:174-177`, all `0.0`)
   The rear camera still contributes to pose via MegaTag2 fusion. Zeros mean YAGSL is treating its pose contributions as coming from a camera mounted identically to the front one, which is wrong. Either measure and fill them in, or drop `kRearCamera` from `kAllCameras` until you do.

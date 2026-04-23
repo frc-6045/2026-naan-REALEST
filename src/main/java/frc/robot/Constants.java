@@ -268,6 +268,17 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     }
   }
 
+  public static class ShooterGeometryConstants {
+    /**
+     * Angle of the shooter's firing axis relative to robot forward (+X), CCW positive.
+     * Intake is the "front" (+X) of the robot; the shooter fires out the left side,
+     * so the shooter axis is +90° (CCW) from robot forward.
+     *
+     * Pose-based aim rotates the robot so that heading + kShooterYawDegrees points at the target.
+     */
+    public static final double kShooterYawDegrees = 90.0;
+  }
+
   public static class FieldConstants {
     public static final AprilTagFieldLayout kFieldLayout =
         AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
