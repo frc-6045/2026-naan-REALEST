@@ -28,6 +28,7 @@ import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
+import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.shooterSystem.TopRoller;
 
@@ -35,7 +36,7 @@ public class Bindings {
     public static void configureBindings(
         CommandXboxController m_driverController,
         CommandXboxController m_operatorController,
-        Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve
+        Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve, LEDs leds
     ) {
 
         // Initialize SmartDashboard tuning values

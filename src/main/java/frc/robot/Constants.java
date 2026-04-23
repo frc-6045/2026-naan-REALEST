@@ -7,6 +7,7 @@ package frc.robot;
 import java.util.Map;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -340,6 +341,19 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     IN,
     OUT,
     TOGGLE
+  }
+
+  public static class LEDConstants {
+    // Hardware - adjust these for your setup
+    public static final int kLEDPort = 8;      // PWM port
+    public static final int kLEDCount = 250;    // Number of LEDs in strip
+
+    // Animation timing
+    public static final double kGradientPeriodSec = 2.0;  // Time for full green->orange->green cycle
+
+    // Colors
+    public static final Color kGreen = Color.kGreen;
+    public static final Color kOrange = Color.kOrange;
   }
 
 }
