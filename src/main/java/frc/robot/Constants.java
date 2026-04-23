@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
@@ -281,6 +282,19 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
      * Pose-based aim rotates the robot so that heading + kShooterYawDegrees points at the target.
      */
     public static final double kShooterYawDegrees = 90.0;
+
+    // Shooter exit position in robot frame, meters.
+    // +X = forward of robot center (toward intake), +Y = left of robot center (toward shooter).
+    // Robot center = swerve kinematics origin (midpoint of modules).
+    // Shooter sits 15.375" behind robot center, laterally centered.
+    public static final double kShooterOffsetXMeters = -0.390525; // -15.375 in
+    public static final double kShooterOffsetYMeters = 0.0;
+
+    /** Shooter exit position in field frame, given the current robot pose. */
+    public static Translation2d shooterFieldPosition(Pose2d robotPose) {
+      Translation2d offsetInRobot = new Translation2d(kShooterOffsetXMeters, kShooterOffsetYMeters);
+      return robotPose.getTranslation().plus(offsetInRobot.rotateBy(robotPose.getRotation()));
+    }
   }
 
   public static class FieldConstants {

@@ -122,7 +122,10 @@ public class AutoAimAndFeed extends Command {
             Pose2d robotPose = m_swerve.getPose();
             double headingDeg = robotPose.getRotation().getDegrees();
 
-            Translation2d toTarget = targetTranslation.minus(robotPose.getTranslation());
+            // Compute bearing/distance from the shooter exit, not robot center, to avoid parallax
+            // misses when the shooter is mechanically offset from the chassis center.
+            Translation2d shooterField = ShooterGeometryConstants.shooterFieldPosition(robotPose);
+            Translation2d toTarget = targetTranslation.minus(shooterField);
             double bearingDeg = toTarget.getAngle().getDegrees();
             double poseDistance = toTarget.getNorm();
 

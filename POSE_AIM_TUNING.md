@@ -7,6 +7,10 @@ Values and settings that may need tuning after the switch from Limelight-tx aim 
 - **`ShooterGeometryConstants.kShooterYawDegrees`** (currently `90.0`)
   Big-picture shooter mounting: angle of the shooter's firing axis relative to robot forward (+X), CCW positive. Our robot fires out the left side, so this is `90.0`. If the intake/forward ever gets reassigned or the shooter gets re-mounted, update this. Pose-based aim aligns `heading + kShooterYawDegrees` with the target bearing.
 
+- **`ShooterGeometryConstants.kShooterOffsetXMeters` / `kShooterOffsetYMeters`** (currently `0.0 / 0.0`)
+  Where the shooter exit sits in the robot frame: +X = forward (toward intake), +Y = left. Required so bearing/distance are computed from the **shooter exit**, not the chassis center — otherwise you get parallax misses that get worse the closer you are to the target. Measure from the swerve kinematics origin (midpoint of the modules) to the ball exit point.
+  **Symptom of this being wrong:** misses get larger at close range, smaller at long range. (Constant miss across ranges → yaw offset instead.)
+
 - **`LimelightConstants.kFrontCamera.yawOffsetDegrees`** (`Constants.java:170`, currently `0.0`)
   Fine calibration knob on top of `kShooterYawDegrees`. If the shooter doesn't quite point exactly along the expected axis (small mechanical misalignment, say 2° off), put `2.0` here.
   **Calibration:** with `kShooterYawDegrees` set correctly, line the robot square at a tag at close range, enable aim, observe where the ball actually goes, enter the small delta.
@@ -75,14 +79,6 @@ These were tuned against Limelight ty-trig distance and now get pose distance in
 - **Aim lead wrong direction (shoot-while-moving):** flip the sign on `compensation.aimLeadDegrees` in the `desiredHeadingDeg` expression in both commands.
 
 - **Distance compensation wrong sign** (robot moving toward target → RPM goes up instead of down): flip the sign in `ShotCompensation.java:112` where `distanceAdjustment = -radialVelocity * flightTime * scalar`.
-
-## 6. Subtle: shooter position offset from robot center
-
-Current math treats the shooter exit as at the robot-pose origin. If the shooter exit is, for example, 25 cm forward of the chassis center, the bearing from *shooter* to tag differs slightly from bearing from *robot-center* to tag — and the error grows at close range.
-
-**Signal that you need this:** a systematic miss that gets worse as the robot gets closer to the tag.
-
-**Fix:** add `ShooterGeometryConstants.kShooterOffsetX/Y` and apply them to translate robot pose into a shooter pose before the `atan2`. Not worth doing until the symptom shows up.
 
 ## Suggested tune order
 
