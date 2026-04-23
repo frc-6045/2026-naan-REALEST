@@ -119,4 +119,15 @@ public final class ShotCompensation {
         return new CompensationResult(aimLeadDeg, adjustedDistance, flightTime,
                 lateralVelocity, radialVelocity, true, robotSpeed);
     }
+
+    /**
+     * Pose-based variant: accepts a field-frame target bearing directly instead of Limelight tx.
+     * Converts bearing to the synthetic tx that {@link #calculate} expects (tx = heading - bearing).
+     */
+    public static CompensationResult calculateFromBearing(ChassisSpeeds fieldVelocity,
+            double headingDegrees, double targetBearingDegrees, double distanceMeters) {
+        double syntheticTx = MathUtil.inputModulus(
+                headingDegrees - targetBearingDegrees, -180.0, 180.0);
+        return calculate(fieldVelocity, headingDegrees, syntheticTx, distanceMeters);
+    }
 }

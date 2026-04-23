@@ -1,15 +1,18 @@
 package frc.robot.commands.ShootFeedCommands.AutoScoringCommands;
 
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AimConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.TagOverrideConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.MotorConstants;
@@ -24,6 +27,7 @@ import frc.robot.subsystems.shooterSystem.TopRoller;
 import frc.robot.util.IntakePivotOscillator;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightTargeting;
+import frc.robot.util.PoseAim;
 import frc.robot.util.ShootingLookupTable;
 import frc.robot.util.ShotCompensation;
 import frc.robot.subsystems.shooterSystem.Spindexer;
@@ -74,7 +78,7 @@ public class AutoAimAndShoot extends Command {
 
         m_aimPID = new PIDController(AimConstants.kAimP, AimConstants.kAimI, AimConstants.kAimD);
         m_aimPID.setTolerance(AimConstants.kAimToleranceDegrees);
-        m_aimPID.setSetpoint(0); // Target: zero tx offset
+        m_aimPID.enableContinuousInput(-180.0, 180.0);
 
         addRequirements(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake);
     }
@@ -94,27 +98,35 @@ public class AutoAimAndShoot extends Command {
 
     @Override
     public void execute() {
-        LimelightTargeting.TargetingResult target = LimelightTargeting.acquireTarget(m_tagLock);
+        // Still drive Limelight to establish which tag we want to hit; once lockedTagID is set
+        // we aim via pose even if the Limelight momentarily loses sight of the tag.
+        LimelightTargeting.acquireTarget(m_tagLock);
+        int lockedTag = m_tagLock.lockedTagID;
+        Optional<Translation2d> targetOpt = (lockedTag != -1)
+                ? FieldConstants.getTagTranslation(lockedTag)
+                : Optional.empty();
 
-        // Get driver translation input, scale to m/s
         double translationX = m_translationXSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
         double translationY = m_translationYSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
         Translation2d translation = new Translation2d(translationX, translationY);
 
-        if (target.hasValidTarget) {
-            // Velocity compensation for shoot-while-moving
-            ChassisSpeeds fieldVelocity = m_swerve.getFieldVelocity();
-            double headingDeg = m_swerve.getHeading().getDegrees();
-            ShotCompensation.CompensationResult compensation =
-                    ShotCompensation.calculate(fieldVelocity, headingDeg, target.txDegrees, target.distanceMeters);
+        if (targetOpt.isPresent()) {
+            Translation2d targetTranslation = targetOpt.get();
+            Pose2d robotPose = m_swerve.getPose();
+            double headingDeg = robotPose.getRotation().getDegrees();
 
-            // Use compensated distance for RPM lookups, clamped to valid range
+            double bearingDeg = PoseAim.targetBearingDegrees(robotPose, targetTranslation);
+            double distance = PoseAim.distanceMeters(robotPose, targetTranslation);
+
+            ChassisSpeeds fieldVelocity = m_swerve.getFieldVelocity();
+            ShotCompensation.CompensationResult compensation =
+                    ShotCompensation.calculateFromBearing(fieldVelocity, headingDeg, bearingDeg, distance);
+
             double compensatedDistance = MathUtil.clamp(compensation.adjustedDistanceMeters,
                     ShootingConstants.kMinShootingDistanceMeters,
                     ShootingConstants.kMaxShootingDistanceMeters);
 
-            // Look up roller and flywheel RPM from compensated distance, with per-tag offset
-            double tagRpmOffset = TagOverrideConstants.getRpmOffset(target.lockedTagID);
+            double tagRpmOffset = TagOverrideConstants.getRpmOffset(lockedTag);
             double targetRollerRPM = ShootingLookupTable.getRollerRPM(compensatedDistance) + tagRpmOffset;
             double targetRPM = ShootingLookupTable.getFlywheelRPM(compensatedDistance) + tagRpmOffset;
             m_lastTargetRPM = targetRPM;
@@ -123,20 +135,20 @@ public class AutoAimAndShoot extends Command {
             m_topRoller.setRPM(targetRollerRPM);
             m_flywheel.setTargetRPM(targetRPM);
 
-            // Calculate auto-rotation from aim PID (tx -> rad/s)
-            // Setpoint is the aim lead angle (0 when stationary, offset when moving)
-            double tagYawOffset = TagOverrideConstants.getYawOffset(target.lockedTagID);
-            double aimSetpoint = compensation.aimLeadDegrees
-                    + LimelightConstants.kFrontCamera.yawOffsetDegrees
-                    + tagYawOffset;
-            double aimOutput = m_aimPID.calculate(target.txDegrees, aimSetpoint);
+            // Desired heading: face the target, corrected for camera yaw offset and velocity lead.
+            // Per-tag yaw offsets dropped — pose-based aim uses the true tag location.
+            double desiredHeadingDeg = bearingDeg
+                    - LimelightConstants.kFrontCamera.yawOffsetDegrees
+                    - compensation.aimLeadDegrees;
+
+            double aimOutput = m_aimPID.calculate(headingDeg, desiredHeadingDeg);
             double rotationSpeed = MathUtil.clamp(aimOutput,
                     -AimConstants.kMaxAutoRotationRadPerSec,
                     AimConstants.kMaxAutoRotationRadPerSec);
 
-            // Check if all conditions are met (aimed = reached lead angle, not necessarily centered)
+            double headingErr = MathUtil.inputModulus(desiredHeadingDeg - headingDeg, -180.0, 180.0);
             double aimTolerance = compensation.getAimToleranceDegrees();
-            boolean aimed = Math.abs(target.txDegrees - aimSetpoint) < aimTolerance;
+            boolean aimed = Math.abs(headingErr) < aimTolerance;
             boolean topRollerReady = m_topRoller.isAtTargetSpeed(targetRollerRPM);
             boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
             boolean readyToFire = aimed && topRollerReady && flywheelReady;
@@ -144,14 +156,12 @@ public class AutoAimAndShoot extends Command {
             updateFeedState(readyToFire);
             IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, m_feeding, "AutoAim/");
 
-            // Lock swerve in X pattern while feeding to resist defense; otherwise drive normally
             if (m_feeding) {
                 m_swerve.setLockAngles();
             } else {
                 m_swerve.drive(translation, rotationSpeed, true);
             }
 
-            // Telemetry
             SmartDashboard.putBoolean("AutoAim/Aimed", aimed);
             SmartDashboard.putBoolean("AutoAim/TopRollerReady", topRollerReady);
             SmartDashboard.putBoolean("AutoAim/FlywheelReady", flywheelReady);
@@ -159,14 +169,16 @@ public class AutoAimAndShoot extends Command {
             SmartDashboard.putNumber("AutoAim/RobotSpeed", compensation.robotSpeedMps);
             SmartDashboard.putNumber("AutoAim/AimLead", compensation.aimLeadDegrees);
             SmartDashboard.putNumber("AutoAim/CompDistance", compensatedDistance);
-            SmartDashboard.putNumber("AutoAim/RawDistance", target.distanceMeters);
+            SmartDashboard.putNumber("AutoAim/PoseDistance", distance);
+            SmartDashboard.putNumber("AutoAim/HeadingErr", headingErr);
+            SmartDashboard.putNumber("AutoAim/DesiredHeading", desiredHeadingDeg);
+            SmartDashboard.putNumber("AutoAim/TargetBearing", bearingDeg);
             SmartDashboard.putBoolean("AutoAim/CompActive", compensation.compensationActive);
             SmartDashboard.putNumber("AutoAim/AimTolerance", aimTolerance);
-            SmartDashboard.putNumber("AutoAim/LockedTagID", target.lockedTagID);
-            SmartDashboard.putNumber("AutoAim/TagYawOffset", tagYawOffset);
+            SmartDashboard.putNumber("AutoAim/LockedTagID", lockedTag);
             SmartDashboard.putNumber("AutoAim/TagRpmOffset", tagRpmOffset);
         } else {
-            // No valid target: drive with zero rotation, keep motors spinning at last RPM
+            // No tag ever locked (or field layout doesn't know this tag): idle motors, no rotation.
             m_swerve.drive(translation, 0.0, true);
             m_flywheel.setTargetRPM(m_lastTargetRPM);
             m_topRoller.setRPM(m_lastTargetRollerRPM);

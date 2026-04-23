@@ -1,9 +1,11 @@
 package frc.robot.commands.ShootFeedCommands.AutoFeedingCommands;
 
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
@@ -11,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AimConstants;
 import frc.robot.Constants.FeedingConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShootingConstants;
@@ -26,6 +29,7 @@ import frc.robot.util.FeedingLookupTable;
 import frc.robot.util.IntakePivotOscillator;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightTargeting;
+import frc.robot.util.PoseAim;
 import frc.robot.util.ShotCompensation;
 
 /**
@@ -75,7 +79,7 @@ public class AutoAimAndFeed extends Command {
 
         m_aimPID = new PIDController(AimConstants.kAimP, AimConstants.kAimI, AimConstants.kAimD);
         m_aimPID.setTolerance(FeedingConstants.kFeedAimToleranceDegrees);
-        m_aimPID.setSetpoint(0);
+        m_aimPID.enableContinuousInput(-180.0, 180.0);
 
         addRequirements(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake);
     }
@@ -94,20 +98,30 @@ public class AutoAimAndFeed extends Command {
 
     @Override
     public void execute() {
-        LimelightTargeting.TargetingResult target =
-                LimelightTargeting.acquireTarget(m_tagLock, LimelightConstants::isValidFeedTagID);
+        LimelightTargeting.acquireTarget(m_tagLock, LimelightConstants::isValidFeedTagID);
+        int lockedTag = m_tagLock.lockedTagID;
+        Optional<Translation2d> targetOpt = (lockedTag != -1)
+                ? FieldConstants.getTagTranslation(lockedTag)
+                : Optional.empty();
 
         double translationX = m_translationXSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
         double translationY = m_translationYSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
         Translation2d translation = new Translation2d(translationX, translationY);
 
-        if (target.hasValidTarget) {
-            ChassisSpeeds fieldVelocity = m_swerve.getFieldVelocity();
-            double headingDeg = m_swerve.getHeading().getDegrees();
-            ShotCompensation.CompensationResult compensation =
-                    ShotCompensation.calculate(fieldVelocity, headingDeg, target.txDegrees, target.distanceMeters);
+        if (targetOpt.isPresent()) {
+            Translation2d targetTranslation = targetOpt.get();
+            Pose2d robotPose = m_swerve.getPose();
+            double headingDeg = robotPose.getRotation().getDegrees();
 
-            boolean isOppZone = LimelightConstants.isOpponentZoneFeedTag(target.lockedTagID);
+            double bearingDeg = PoseAim.targetBearingDegrees(robotPose, targetTranslation);
+            double poseDistance = PoseAim.distanceMeters(robotPose, targetTranslation);
+
+            ChassisSpeeds fieldVelocity = m_swerve.getFieldVelocity();
+            ShotCompensation.CompensationResult compensation =
+                    ShotCompensation.calculateFromBearing(fieldVelocity, headingDeg, bearingDeg, poseDistance);
+
+            // Opponent-zone feeds are a full-field lob with fixed distance; midfield uses pose + bump.
+            boolean isOppZone = LimelightConstants.isOpponentZoneFeedTag(lockedTag);
             double feedDistance;
             if (isOppZone) {
                 feedDistance = FeedingConstants.kOpponentZoneFeedDistanceMeters;
@@ -126,15 +140,18 @@ public class AutoAimAndFeed extends Command {
             m_topRoller.setRPM(targetRollerRPM);
             m_flywheel.setTargetRPM(targetRPM);
 
-            double aimSetpoint = compensation.aimLeadDegrees + LimelightConstants.kFrontCamera.yawOffsetDegrees;
-            double aimOutput = m_aimPID.calculate(target.txDegrees, aimSetpoint);
+            double desiredHeadingDeg = bearingDeg
+                    - LimelightConstants.kFrontCamera.yawOffsetDegrees
+                    - compensation.aimLeadDegrees;
+            double aimOutput = m_aimPID.calculate(headingDeg, desiredHeadingDeg);
             double rotationSpeed = MathUtil.clamp(aimOutput,
                     -AimConstants.kMaxAutoRotationRadPerSec,
                     AimConstants.kMaxAutoRotationRadPerSec);
 
+            double headingErr = MathUtil.inputModulus(desiredHeadingDeg - headingDeg, -180.0, 180.0);
             double aimTolerance = Math.max(compensation.getAimToleranceDegrees(),
                     FeedingConstants.kFeedAimToleranceDegrees);
-            boolean aimed = Math.abs(target.txDegrees - aimSetpoint) < aimTolerance;
+            boolean aimed = Math.abs(headingErr) < aimTolerance;
             boolean topRollerReady = m_topRoller.isAtTargetSpeed(targetRollerRPM);
             boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
             boolean readyToFire = aimed && topRollerReady && flywheelReady;
@@ -153,9 +170,12 @@ public class AutoAimAndFeed extends Command {
             SmartDashboard.putBoolean("AutoFeed/FlywheelReady", flywheelReady);
             SmartDashboard.putBoolean("AutoFeed/ReadyToFire", readyToFire);
             SmartDashboard.putNumber("AutoFeed/FeedDistance", feedDistance);
-            SmartDashboard.putNumber("AutoFeed/RawDistance", target.distanceMeters);
+            SmartDashboard.putNumber("AutoFeed/PoseDistance", poseDistance);
+            SmartDashboard.putNumber("AutoFeed/HeadingErr", headingErr);
+            SmartDashboard.putNumber("AutoFeed/DesiredHeading", desiredHeadingDeg);
+            SmartDashboard.putNumber("AutoFeed/TargetBearing", bearingDeg);
             SmartDashboard.putBoolean("AutoFeed/OpponentZone", isOppZone);
-            SmartDashboard.putNumber("AutoFeed/LockedTagID", target.lockedTagID);
+            SmartDashboard.putNumber("AutoFeed/LockedTagID", lockedTag);
         } else {
             m_swerve.drive(translation, 0.0, true);
             m_flywheel.setTargetRPM(m_lastTargetRPM);

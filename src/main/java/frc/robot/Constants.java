@@ -5,7 +5,11 @@
 package frc.robot;
 
 import java.util.Map;
+import java.util.Optional;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 
@@ -261,6 +265,16 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
       return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
           ? kRedRightSideTag
           : kBlueRightSideTag;
+    }
+  }
+
+  public static class FieldConstants {
+    public static final AprilTagFieldLayout kFieldLayout =
+        AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+
+    /** Blue-origin translation of an AprilTag on the current field. Empty if unknown. */
+    public static Optional<Translation2d> getTagTranslation(int tagID) {
+      return kFieldLayout.getTagPose(tagID).map(p -> p.toPose2d().getTranslation());
     }
   }
 
