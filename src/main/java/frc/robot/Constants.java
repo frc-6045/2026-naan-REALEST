@@ -351,25 +351,6 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
   }
 
   public static class TagOverrideConstants {
-    // Per-AprilTag yaw offset in degrees (added to aim setpoint)
-    // Positive = aim further right, Negative = aim further left
-    public static final Map<Integer, Double> kYawOffsetByTag = Map.ofEntries(
-        // Red hub tags
-        Map.entry(9,  -6.0),
-        Map.entry(10, -9.0),
-        Map.entry(2,  -3.0),
-        Map.entry(11, 0.0),
-        Map.entry(5,  -14.0),
-        Map.entry(8,  -3.0),
-        // Blue hub tags
-        Map.entry(25, -6.0),
-      Map.entry(26, -9.0),
-        Map.entry(21, -3.0),
-        Map.entry(24, 0.0),
-        Map.entry(18, -9.0),
-        Map.entry(27, -3.0)
-    );
-
     // Per-AprilTag RPM offset (added to BOTH roller and flywheel RPM after lookup)
     // Positive = more power, Negative = less power
     public static final Map<Integer, Double> kRpmOffsetByTag = Map.ofEntries(
@@ -388,11 +369,6 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
         Map.entry(18, 0.0),
         Map.entry(27, 0.0)
     );
-
-    /** Get yaw offset for a tag ID. Returns 0.0 for unknown tags. */
-    public static double getYawOffset(int tagID) {
-      return kYawOffsetByTag.getOrDefault(tagID, 0.0);
-    }
 
     /** Get RPM offset for a tag ID. Returns 0.0 for unknown tags. */
     public static double getRpmOffset(int tagID) {

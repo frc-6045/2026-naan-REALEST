@@ -52,8 +52,10 @@ public class AutoAimAndShoot extends Command {
 
     private final PIDController m_aimPID;
 
-    private double m_lastTargetRPM = MotorConstants.kShooterTargetRPM;
-    private double m_lastTargetRollerRPM = MotorConstants.kRollerTargetRPM;
+    // Only valid once m_hasLockedTag is true; otherwise motors stay stopped.
+    private double m_lastTargetRPM = 0.0;
+    private double m_lastTargetRollerRPM = 0.0;
+    private boolean m_hasLockedTag = false;
     private boolean m_feeding = false;
     private final Timer m_graceTimer = new Timer();
     private final IntakePivotOscillator.OscillationState m_pivotState = new IntakePivotOscillator.OscillationState();
@@ -89,8 +91,12 @@ public class AutoAimAndShoot extends Command {
     public void initialize() {
         LimelightHelpers.setPipelineIndex(LimelightConstants.kFrontCamera.name, LimelightConstants.kAprilTagPipeline);
 
+        // Resync gyro-drifted heading against fresh MegaTag1 vision before aim PID starts.
+        m_swerve.seedHeadingFromVision();
+
         m_aimPID.reset();
         m_feeding = false;
+        m_hasLockedTag = false;
         m_graceTimer.stop();
         m_graceTimer.reset();
         m_tagLock.reset();
@@ -131,6 +137,7 @@ public class AutoAimAndShoot extends Command {
             double targetRPM = ShootingLookupTable.getFlywheelRPM(compensatedDistance) + tagRpmOffset;
             m_lastTargetRPM = targetRPM;
             m_lastTargetRollerRPM = targetRollerRPM;
+            m_hasLockedTag = true;
 
             m_topRoller.setRPM(targetRollerRPM);
             m_flywheel.setTargetRPM(targetRPM);
@@ -149,7 +156,8 @@ public class AutoAimAndShoot extends Command {
             boolean aimed = Math.abs(headingErr) < aimTolerance;
             boolean topRollerReady = m_topRoller.isAtTargetSpeed(targetRollerRPM);
             boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
-            boolean readyToFire = aimed && topRollerReady && flywheelReady;
+            boolean visionTrusted = m_swerve.hasEverAcceptedVision();
+            boolean readyToFire = aimed && topRollerReady && flywheelReady && visionTrusted;
 
             updateFeedState(readyToFire);
             IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, m_feeding, "AutoAim/");
@@ -175,10 +183,18 @@ public class AutoAimAndShoot extends Command {
             SmartDashboard.putNumber("AutoAim/AimTolerance", aimTolerance);
             SmartDashboard.putNumber("AutoAim/LockedTagID", lockedTag);
             SmartDashboard.putNumber("AutoAim/TagRpmOffset", tagRpmOffset);
+            SmartDashboard.putBoolean("AutoAim/VisionTrusted", visionTrusted);
         } else {
             m_swerve.drive(translation, 0.0, true);
-            m_flywheel.setTargetRPM(m_lastTargetRPM);
-            m_topRoller.setRPM(m_lastTargetRollerRPM);
+            // Keep motors coasting at last setpoint *only* if we've locked a tag at least once;
+            // otherwise we'd spin to zero-RPM (or worse, a stale default) before ever aiming.
+            if (m_hasLockedTag) {
+                m_flywheel.setTargetRPM(m_lastTargetRPM);
+                m_topRoller.setRPM(m_lastTargetRollerRPM);
+            } else {
+                m_flywheel.stopFlywheelMotor();
+                m_topRoller.stopRollerMotor();
+            }
             m_feeder.stopFeederMotor();
             m_spindexer.stopSpindexerMotor();
             m_feeding = false;

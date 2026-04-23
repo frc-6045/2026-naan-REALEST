@@ -62,10 +62,10 @@ public class Feeder extends SubsystemBase {
   }
 
   /**
-   * skibidi xooks
-   * @param speed
-   * @param runFeeder set true to run feeder
-   * @param runBlackRoller set true to run black roller
+   * Selectively run the feeder motor and/or the intake black roller at the given speed.
+   * @param speed target duty-cycle (clamped to kFeederMotorMaximumSpeed)
+   * @param runFeeder set true to run the feeder motor
+   * @param runBlackRoller set true to run the intake black roller
    */
   public void setSpeed(double speed, boolean runFeeder, boolean runBlackRoller) {
     double requestedSpeed = speed;

@@ -260,12 +260,6 @@ public class Autos {
             .until(() -> intakePivot.atSetpoint()));
     }, Set.of(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake)).asProxy());
 
-    // Aim while driving -- overrides PathPlanner rotation to aim at target, spins up + feeds
-    // NamedCommands.registerCommand("autoAimWhileDriving", Commands.defer(
-    //   () -> new AutoAimWhileDriving(swerve, flywheel, topRoller, feeder, spindexer)
-    //       .withTimeout(ShootingConstants.kAutoShootTimeoutSec),
-    //   Set.of(flywheel, topRoller, feeder, spindexer)).asProxy());
-
     // Cancel prep -- stops flywheel and top roller
     NamedCommands.registerCommand("stopAim", new ParallelCommandGroup(
       new InstantCommand(() -> flywheel.stopFlywheelMotor(), flywheel),

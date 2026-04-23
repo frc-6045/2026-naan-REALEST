@@ -39,12 +39,12 @@ public class AutoAimAndShootSide extends AutoAimAndShoot {
 
     @Override
     public void initialize() {
-        // Set priority tag based on approach side BEFORE calling parent initialize
+        // Parent resets the tag lock (including priorityTagID), so set priority AFTER.
+        super.initialize();
+
         int priorityTag = (m_side == ApproachSide.LEFT)
             ? SideTagConstants.getLeftSidePriorityTag()
             : SideTagConstants.getRightSidePriorityTag();
         m_tagLock.setPriorityTag(priorityTag);
-
-        super.initialize();
     }
 }
