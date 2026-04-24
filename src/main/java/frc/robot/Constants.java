@@ -287,8 +287,8 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     // +X = forward of robot center (toward intake), +Y = left of robot center (toward shooter).
     // Robot center = swerve kinematics origin (midpoint of modules).
     // Shooter sits 15.375" behind robot center, laterally centered.
-    public static final double kShooterOffsetXMeters = -0.390525; // -15.375 in
-    public static final double kShooterOffsetYMeters = 0.0;
+    public static final double kShooterOffsetXMeters = -0.2286; // -15.375 in
+    public static final double kShooterOffsetYMeters = -0.0254;
 
     /** Shooter exit position in field frame, given the current robot pose. */
     public static Translation2d shooterFieldPosition(Pose2d robotPose) {
@@ -325,7 +325,7 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final double kAimP = 0.2; // Proportional gain
     public static final double kAimI = 0.0; // Integral gain
     public static final double kAimD = 0.01; // Derivative gain
-    public static final double kAimToleranceDegrees = 2; // Acceptable aim error (degrees)
+    public static final double kAimToleranceDegrees = 1; // Acceptable aim error (degrees)
     public static final double kAimMovingToleranceDegrees = 10.0; // Wider tolerance while moving
     public static final double kMovingSpeedThresholdMps = 0.3; // Speed above which wider tolerance applies
     public static final double kMaxAutoRotationRadPerSec = 3.0; // Max rotation speed during auto-aim (rad/s)
