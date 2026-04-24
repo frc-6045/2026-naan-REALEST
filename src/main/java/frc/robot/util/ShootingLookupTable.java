@@ -54,6 +54,8 @@ public class ShootingLookupTable {
         m_rollerRPMMap.put(0.0254*135, 2050+offset);
         
         m_rollerRPMMap.put(0.0254*150, 2200+offset);
+        
+        m_rollerRPMMap.put(0.0254*175, 2450+offset);
 
         // Distance (meters) -> Flywheel RPM
         m_flywheelRPMMap.put(0.0254*45, 2600.00+offset);  // 83 inches
@@ -63,6 +65,7 @@ public class ShootingLookupTable {
         m_flywheelRPMMap.put(0.0254*120, 2500.0+offset);  // 117 inches
         m_flywheelRPMMap.put(0.0254*135, 2650.0+offset);  // 117 inches
         m_flywheelRPMMap.put(0.0254*150, 2700.0+offset);  // 117 inches
+        m_flywheelRPMMap.put(0.0254*175, 2850.0+offset);  // 117 inches
         
     }
 
