@@ -122,8 +122,8 @@ public final class Constants {
     public static final double kShooterTargetRPM = 2200.0; // Target shooter wheel speed in RPM
     public static final double kRollerTargetRPM = 2400; // Target shooter wheel speed in RPM
     // Tight tolerance used by Flywheel/TopRoller.isAtTargetSpeed() (subsystem-level "spun up" check).
-    public static final double kShooterRPMTolerance = 300.0;
-    public static final double kRollerRPMTolerance = 300.0;
+    public static final double kShooterRPMTolerance = 100.0;
+    public static final double kRollerRPMTolerance = 100.0;
     // Looser tolerance used by feed gates where overshoot/undershoot during feed is acceptable.
     public static final double kShooterRPMToleranceForFeeder = 600.0;
     public static final double kRollerRPMToleranceForFeeder = 600.0;
