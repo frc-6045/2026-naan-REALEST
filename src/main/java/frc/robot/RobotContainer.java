@@ -19,8 +19,10 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.util.RPMLookupTable;
 
 public class RobotContainer {
   private Autos m_Autos;
@@ -53,6 +55,8 @@ public class RobotContainer {
     Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve, m_LEDs);
 
     DriverStation.silenceJoystickConnectionWarning(true);
+
+    SmartDashboard.putData("Shooter position", RPMLookupTable.getShooterPositionChooser());
 
     // Field-relative drive runs in blue-origin coords. Red drivers stand at the opposite end,
     // so their "forward" stick input maps to -X in field. Flip translation (not rotation) on red.

@@ -8,7 +8,7 @@ import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.TopRoller;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightTargeting;
-import frc.robot.util.ShootingLookupTable;
+import frc.robot.util.RPMLookupTable;
 
 /**
  * Lightweight auto-aim prep command for autonomous use.
@@ -43,8 +43,8 @@ public class AutoAimPrepare extends Command {
 
         if (target.hasValidTarget) {
             double tagRpmOffset = TagOverrideConstants.getRpmOffset(target.lockedTagID);
-            double targetRollerRPM = ShootingLookupTable.getRollerRPM(target.distanceMeters) + tagRpmOffset;
-            double targetRPM = ShootingLookupTable.getFlywheelRPM(target.distanceMeters) + tagRpmOffset;
+            double targetRollerRPM = RPMLookupTable.getShootingRollerRPM(target.distanceMeters) + tagRpmOffset;
+            double targetRPM = RPMLookupTable.getShootingFlywheelRPM(target.distanceMeters) + tagRpmOffset;
             m_lastTargetRPM = targetRPM;
             m_lastTargetRollerRPM = targetRollerRPM;
 

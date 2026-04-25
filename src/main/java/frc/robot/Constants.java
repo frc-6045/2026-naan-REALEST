@@ -298,6 +298,11 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
       Translation2d offsetInRobot = new Translation2d(kShooterOffsetXMeters, kShooterOffsetYMeters);
       return robotPose.getTranslation().plus(offsetInRobot.rotateBy(robotPose.getRotation()));
     }
+
+    // Aliases for pose-based command code that uses unit-less names.
+    public static final double kShooterOffsetX = kShooterOffsetXMeters;
+    public static final double kShooterOffsetY = kShooterOffsetYMeters;
+    public static final double kShooterAngleOffsetDegrees = kShooterYawDegrees;
   }
 
   public static class FieldConstants {
@@ -338,6 +343,10 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     // Valid shooting distance range (meters)
     public static final double kMinShootingDistanceMeters = 1.0;
     public static final double kMaxShootingDistanceMeters = 7.0;
+
+    // Valid feeding distance range (meters) - longer range than shooting
+    public static final double kMinFeedingDistanceMeters = 7.0;
+    public static final double kMaxFeedingDistanceMeters = 15.0;
 
     // Autonomous auto-aim timing (seconds)
     public static final double kAutoShootFeedDurationSec = 20; // How long to run feeder after auto-fire triggers
