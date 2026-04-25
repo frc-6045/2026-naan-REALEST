@@ -31,7 +31,7 @@ public class RobotContainer {
   private final TopRoller m_TopRoller = new TopRoller();
   private final Feeder m_Feeder = new Feeder();
   private final Swerve m_Swerve = new Swerve();
-  private final LEDs m_LEDs = new LEDs();
+  private final LEDs m_LEDs = new LEDs(m_Flywheel, m_TopRoller, m_Feeder);
   private final PowerDistribution m_pdh = new PowerDistribution(1, ModuleType.kRev);
 
   private final CommandXboxController m_driverController =

@@ -414,7 +414,7 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
   public static class LEDConstants {
     // Hardware - adjust these for your setup
     public static final int kLEDPort = 8;      // PWM port
-    public static final int kLEDCount = 250;    // Number of LEDs in strip
+    public static final int kLEDCount = 300;    // Number of LEDs in strip
 
     // Animation timing
     public static final double kGradientPeriodSec = 2.0;  // Time for full green->orange->green cycle
@@ -422,6 +422,25 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     // Colors
     public static final Color kGreen = Color.kGreen;
     public static final Color kOrange = Color.kOrange;
+    public static final Color kYellow = Color.kYellow;
+    public static final Color kRed = Color.kRed;
+    public static final Color kBlue = Color.kBlue;
+    public static final Color kPurple = Color.kPurple;
+
+    // Animation settings
+    public static final double kAnimationSpeedMs = 50.0;  // Milliseconds per LED position (15 seconds total)
+
+    // Morse code settings
+    public static final String kMorseMessage = "60 BALL AUTO";
+    public static final long kMorseDotMs = 200;
+    public static final long kMorseDashMs = 600;
+    public static final long kMorseGapMs = 200;
+    public static final long kMorseLetterGapMs = 600;
+    public static final long kMorseWordGapMs = 1400;
+
+    // Match time warnings (seconds)
+    public static final double kEndgameWarningTime = 8.0;
+    public static final double kShootWarningTime = 3.0;
   }
 
 }

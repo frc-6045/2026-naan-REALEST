@@ -105,6 +105,9 @@ public class Bindings {
             () -> SmartDashboard.getNumber("TuneShot/Flywheel RPM", MotorConstants.kTowerShotFlywheelRPM),
             () -> SmartDashboard.getNumber("TuneShot/TopRoller RPM", MotorConstants.kTowerShotTopRollerRPM)));
 
+        // A button: Start LED chase animation
+        m_driverController.a().onTrue(Commands.runOnce(() -> leds.startAnimation()));
+
         /*============================*/
         /*     Operator Bindings      */
         /*============================*/
