@@ -295,8 +295,6 @@ public class Autos {
     // Center
     m_autoChooser.addOption("CENTER depot", AutoBuilder.buildAuto("CENTER depot"));
 
-    m_autoChooser.addOption("CENTER depot", AutoBuilder.buildAuto("CENTER depot"));
-
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
   }
 
