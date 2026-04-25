@@ -129,12 +129,12 @@ public final class Constants {
     public static final double kRollerRPMToleranceForFeeder = 600.0;
 
     // Tower Shot Constants
-    public static final double kTowerShotFlywheelRPM = 2700.0; // Target flywheel RPM for tower shot
-    public static final double kTowerShotTopRollerRPM = 2950.0; // Target top roller RPM for tower shot
+    public static final double kTowerShotFlywheelRPM = 2550.0; // Target flywheel RPM for tower shot
+    public static final double kTowerShotTopRollerRPM = 2800.0; // Target top roller RPM for tower shot
     public static final double kTowerShotSpinUpDelaySec = 1.0; // Delay before feeding (seconds)
 
-    public static final double kTowerShotFrontFlywheelRPM = 2400.0; // Target flywheel RPM for tower shot front
-    public static final double kTowerShotFrontTopRollerRPM = 1800.0; // Target top roller RPM for tower shot front
+    public static final double kTowerShotFrontFlywheelRPM = 2250.0; // Target flywheel RPM for tower shot front
+    public static final double kTowerShotFrontTopRollerRPM = 1650.0; // Target top roller RPM for tower shot front
 
     public static final double kFeederShotFlywheelRPM = 5250; //for feeding
     public static final double kFeederShotTopRollerRPM = 3250; //also for feeding
