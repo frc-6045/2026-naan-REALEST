@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -19,6 +20,7 @@ import frc.robot.commands.IntakeCommands.StowIntake;
 import frc.robot.commands.ShootFeedCommands.RevShooter;
 import frc.robot.commands.ShootFeedCommands.RunFeeder;
 import frc.robot.commands.ShootFeedCommands.TowerShot;
+import frc.robot.commands.ShootFeedCommands.AutoFeedingCommands.AutoAimAndFeed;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShoot;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.ScanForTarget;
 import frc.robot.commands.SpindexerCommands.RunSpindexer;
@@ -27,15 +29,21 @@ import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
+import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.shooterSystem.TopRoller;
+import frc.robot.commands.ShootFeedCommands.FeedShot;
 
 public class Bindings {
     public static void configureBindings(
         CommandXboxController m_driverController,
         CommandXboxController m_operatorController,
-        Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve
+        Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve, LEDs leds
     ) {
+
+        // Initialize SmartDashboard tuning values
+        SmartDashboard.putNumber("TuneShot/Flywheel RPM", MotorConstants.kTowerShotFlywheelRPM);
+        SmartDashboard.putNumber("TuneShot/TopRoller RPM", MotorConstants.kTowerShotTopRollerRPM);
 
         /*============================*/
         /*      Driver Bindings       */
@@ -68,14 +76,28 @@ public class Bindings {
             )
         ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
             .until(() -> intakePivot.atSetpoint())));
-        //m_driverController.rightTrigger().whileTrue(Commands.run(() -> swerve.lock(), swerve));
-        // m_driverController.rightTrigger(0.5).whileTrue(
-        //     new AutoAimAndShoot(
-        //         swerve, flywheel, topRoller, feeder, spindexer,
-        //         () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
-        //         () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
-        //     )
-        // );
+
+        // Auto-aim and auto-feed: lob game pieces back toward our alliance zone off feeding AprilTags
+        m_driverController.leftBumper().whileTrue(new SequentialCommandGroup(
+            new ScanForTarget(swerve,
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)),
+            new AutoAimAndFeed(
+                swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
+                () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
+            )
+        ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+            .until(() -> intakePivot.atSetpoint())));
+
+        m_driverController.leftTrigger().whileTrue(new FeedShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake, MotorConstants.kFeederShotFlywheelRPM, MotorConstants.kFeederShotTopRollerRPM));
+
+        m_driverController.x().whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+            () -> SmartDashboard.getNumber("TuneShot/Flywheel RPM", MotorConstants.kTowerShotFlywheelRPM),
+            () -> SmartDashboard.getNumber("TuneShot/TopRoller RPM", MotorConstants.kTowerShotTopRollerRPM)));
+
+        // A button: Start LED chase animation
+        m_driverController.a().onTrue(Commands.runOnce(() -> leds.startAnimation()));
 
         /*============================*/
         /*     Operator Bindings      */
@@ -117,9 +139,6 @@ public class Bindings {
 
         m_operatorController.rightBumper().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotMiddleSetpoint));
 
-        //shoot while parked against the trench
-        m_operatorController.pov(180).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake));
-        // in front of trength
         m_operatorController.pov(0).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake, MotorConstants.kTowerShotFrontFlywheelRPM, MotorConstants.kTowerShotFrontTopRollerRPM));
 
         // Spindexer CW (normal direction)

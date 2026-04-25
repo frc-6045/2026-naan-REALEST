@@ -5,8 +5,14 @@
 package frc.robot;
 
 import java.util.Map;
+import java.util.Optional;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -82,10 +88,10 @@ public final class Constants {
 
     // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
     // TODO: Determine empirically on the robot
-    public static final double kIntakePivotDeploySetpoint = 0.8418624401092529;   // Fully down (deployed)
-    public static final double kIntakePivotOuttakeSetpoint = 0.7764841914176941;  // a bit up for eject balls
-    public static final double kIntakePivotMiddleSetpoint = 0.6458311676979065;   // Halfway — oscillation bottom
-    public static final double kIntakePivotStowSetpoint = 0.4517042338848114;     // Fully up (stowed/raised)
+    public static final double kIntakePivotDeploySetpoint = 0.725833535194397;   // Fully down (deployed)
+    public static final double kIntakePivotOuttakeSetpoint = 0.6731676459312439;  // a bit up for eject balls
+    public static final double kIntakePivotMiddleSetpoint = 0.4819125533103943;   // Halfway — oscillation bottom
+    public static final double kIntakePivotStowSetpoint = 0.3160654306411743;     // Fully up (stowed/raised)
 
     // Seconds per oscillation direction (up->middle or middle->up)
     public static final double kIntakePivotOscillationPeriodSec = 0.8;
@@ -100,13 +106,13 @@ public final class Constants {
     public static final double kIntakePivotEncoderOffsetRad = 1.0;
 
     // Shooter PID Constants (for velocity control in RPM)
-    public static final double kShooterP = 0.000; // Proportional gain
+    public static final double kShooterP = 0.0002; // Proportional gain
     public static final double kShooterI = 0.0; // Integral gain
     public static final double kShooterD = 0.0; // Derivative gain
     public static final double kShooterFF = 0.00184; // Feed-forward gain (velocity feed-forward)
     public static final double kShooterIZone = 400.0; // I term only active within this RPM error range
 
-    public static final double kRollerP = 0.0001; // Proportional gain
+    public static final double kRollerP = 0.0002; // Proportional gain
     public static final double kRollerI = 0.0; // Integral gain
     public static final double kRollerD = 0.0; // Derivative gain
     public static final double kRollerFF = 0.00182; // Feed-forward gain (velocity feed-forward)
@@ -115,16 +121,26 @@ public final class Constants {
     // Shooter Target Speed (RPM)
     public static final double kShooterTargetRPM = 2200.0; // Target shooter wheel speed in RPM
     public static final double kRollerTargetRPM = 2400; // Target shooter wheel speed in RPM
-    public static final double kShooterRPMTolerance = 670.0; // Acceptable RPM tolerance before feeding
-    public static final double kRollerRPMTolerance = 670.0; // Acceptable roller RPM tolerance before feeding
+    // Tight tolerance used by Flywheel/TopRoller.isAtTargetSpeed() (subsystem-level "spun up" check).
+    public static final double kShooterRPMTolerance = 300.0;
+    public static final double kRollerRPMTolerance = 300.0;
+    // Looser tolerance used by feed gates where overshoot/undershoot during feed is acceptable.
+    public static final double kShooterRPMToleranceForFeeder = 600.0;
+    public static final double kRollerRPMToleranceForFeeder = 600.0;
+    // FeedShot-specific tolerance (lobbing across the field — wider RPM band acceptable).
+    public static final double kFeedShotFlywheelRPMTolerance = 1000.0;
+    public static final double kFeedShotRollerRPMTolerance = 1000.0;
 
     // Tower Shot Constants
-    public static final double kTowerShotFlywheelRPM = 2700.0; // Target flywheel RPM for tower shot
-    public static final double kTowerShotTopRollerRPM = 2950.0; // Target top roller RPM for tower shot
+    public static final double kTowerShotFlywheelRPM = 2550.0; // Target flywheel RPM for tower shot
+    public static final double kTowerShotTopRollerRPM = 2800.0; // Target top roller RPM for tower shot
     public static final double kTowerShotSpinUpDelaySec = 1.0; // Delay before feeding (seconds)
 
-    public static final double kTowerShotFrontFlywheelRPM = 2450.0; // Target flywheel RPM for tower shot front
-    public static final double kTowerShotFrontTopRollerRPM = 2700.0; // Target top roller RPM for tower shot front
+    public static final double kTowerShotFrontFlywheelRPM = 2250.0; // Target flywheel RPM for tower shot front
+    public static final double kTowerShotFrontTopRollerRPM = 1650.0; // Target top roller RPM for tower shot front
+
+    public static final double kFeederShotFlywheelRPM = 5250; //for feeding
+    public static final double kFeederShotTopRollerRPM = 3250; //also for feeding
 
   }
 
@@ -161,14 +177,14 @@ public final class Constants {
     // Front camera (used for both pose estimation and targeting/aiming)
     public static final CameraConfig kFrontCamera = new CameraConfig(
         "limelight-sabre", // NetworkTables name
-        0.71755,           // Mount height from floor (meters)
+        0.64135,           // Mount height from floor (meters)
         0.0,               // Mount angle above horizontal (degrees)
-        0.0);              // Yaw offset (positive = aim right)
+        4.0);              // Yaw offset (positive = aim right) — calibration nudge to center shots
 
     // Rear camera (used for pose estimation only -- shooter fires forward)
     public static final CameraConfig kRearCamera = new CameraConfig(
         "limelight-rear",  // done: set actual NetworkTables name
-        0.64770,              // done: measure actual mount height (meters)
+        0.64135,              // done: measure actual mount height (meters)
         0.0,              // done: measure actual mount angle (degrees above horizontal)
         0.0);              // done: measure actual yaw offset
 
@@ -190,12 +206,112 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
 
     /** Check if a detected AprilTag ID is in our valid scoring target list. */
     public static boolean isValidTagID(int id) {
-      for (int validID : getTargetAprilTagIDs()) {
-        if (id == validID) {
+      return contains(getTargetAprilTagIDs(), id);
+    }
+
+    // Feeding AprilTag IDs -- used by AutoAimAndFeed to lob game pieces back into our zone.
+    // Midfield tags: aim just OVER them (measured distance + small bump).
+    // Opponent-zone tags: lob all the way back using a fixed ~45 ft feed distance.
+    private static final int[] kRedMidfieldFeedTagIDs = {1, 6};
+    private static final int[] kBlueMidfieldFeedTagIDs = {17, 22};
+    private static final int[] kRedOpponentZoneFeedTagIDs = {23, 28};
+    private static final int[] kBlueOpponentZoneFeedTagIDs = {7, 12};
+
+    public static int[] getMidfieldFeedTagIDs() {
+      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
+          ? kRedMidfieldFeedTagIDs
+          : kBlueMidfieldFeedTagIDs;
+    }
+
+    public static int[] getOpponentZoneFeedTagIDs() {
+      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
+          ? kRedOpponentZoneFeedTagIDs
+          : kBlueOpponentZoneFeedTagIDs;
+    }
+
+    public static boolean isMidfieldFeedTag(int id) {
+      return contains(getMidfieldFeedTagIDs(), id);
+    }
+
+    public static boolean isOpponentZoneFeedTag(int id) {
+      return contains(getOpponentZoneFeedTagIDs(), id);
+    }
+
+    public static boolean isValidFeedTagID(int id) {
+      return isMidfieldFeedTag(id) || isOpponentZoneFeedTag(id);
+    }
+
+    private static boolean contains(int[] array, int value) {
+      for (int v : array) {
+        if (v == value) {
           return true;
         }
       }
       return false;
+    }
+  }
+
+  /** AprilTag IDs for side-approach autonomous routines. */
+  public static class SideTagConstants {
+    // LEFT-side approach (robot comes from left side of field)
+    public static final int kRedLeftSideTag = 8;
+    public static final int kBlueLeftSideTag = 24;
+
+    // RIGHT-side approach (robot comes from right side of field)
+    public static final int kRedRightSideTag = 11;
+    public static final int kBlueRightSideTag = 27;
+
+    /** Get the priority tag ID for LEFT-side approach based on current alliance. */
+    public static int getLeftSidePriorityTag() {
+      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
+          ? kRedLeftSideTag
+          : kBlueLeftSideTag;
+    }
+
+    /** Get the priority tag ID for RIGHT-side approach based on current alliance. */
+    public static int getRightSidePriorityTag() {
+      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
+          ? kRedRightSideTag
+          : kBlueRightSideTag;
+    }
+  }
+
+  public static class ShooterGeometryConstants {
+    /**
+     * Angle of the shooter's firing axis relative to robot forward (+X), CCW positive.
+     * Intake is the "front" (+X) of the robot; the shooter fires out the left side,
+     * so the shooter axis is +90° (CCW) from robot forward.
+     *
+     * Pose-based aim rotates the robot so that heading + kShooterYawDegrees points at the target.
+     */
+    public static final double kShooterYawDegrees = 90.0;
+
+    // Shooter exit position in robot frame, meters.
+    // +X = forward of robot center (toward intake), +Y = left of robot center (toward shooter).
+    // Robot center = swerve kinematics origin (midpoint of modules).
+    // Shooter sits 15.375" behind robot center, laterally centered.
+    public static final double kShooterOffsetXMeters = -0.2286; // -15.375 in
+    public static final double kShooterOffsetYMeters = -0.0254;
+
+    /** Shooter exit position in field frame, given the current robot pose. */
+    public static Translation2d shooterFieldPosition(Pose2d robotPose) {
+      Translation2d offsetInRobot = new Translation2d(kShooterOffsetXMeters, kShooterOffsetYMeters);
+      return robotPose.getTranslation().plus(offsetInRobot.rotateBy(robotPose.getRotation()));
+    }
+
+    // Aliases for pose-based command code that uses unit-less names.
+    public static final double kShooterOffsetX = kShooterOffsetXMeters;
+    public static final double kShooterOffsetY = kShooterOffsetYMeters;
+    public static final double kShooterAngleOffsetDegrees = kShooterYawDegrees;
+  }
+
+  public static class FieldConstants {
+    public static final AprilTagFieldLayout kFieldLayout =
+        AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+
+    /** Blue-origin translation of an AprilTag on the current field. Empty if unknown. */
+    public static Optional<Translation2d> getTagTranslation(int tagID) {
+      return kFieldLayout.getTagPose(tagID).map(p -> p.toPose2d().getTranslation());
     }
   }
 
@@ -217,22 +333,10 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final double kAimP = 0.2; // Proportional gain
     public static final double kAimI = 0.0; // Integral gain
     public static final double kAimD = 0.01; // Derivative gain
-    public static final double kAimToleranceDegrees = 2; // Acceptable aim error (degrees)
+    public static final double kAimToleranceDegrees = 1; // Acceptable aim error (degrees)
     public static final double kAimMovingToleranceDegrees = 10.0; // Wider tolerance while moving
     public static final double kMovingSpeedThresholdMps = 0.3; // Speed above which wider tolerance applies
     public static final double kMaxAutoRotationRadPerSec = 3.0; // Max rotation speed during auto-aim (rad/s)
-  }
-
-  public static class ShooterGeometryConstants {
-    // Offset from robot center to shooter in robot-relative coords
-    // X = forward (negative = behind center), Y = left (positive = left of center)
-    // TODO: Measure on robot
-    public static final double kShooterOffsetX = -0.15; // meters behind robot center
-    public static final double kShooterOffsetY = 0.10;  // meters left of robot center
-
-    // Shooter firing direction relative to robot heading
-    // 90 degrees = shooter points to the robot's left
-    public static final double kShooterAngleOffsetDegrees = 90.0;
   }
 
   public static class ShootingConstants {
@@ -248,6 +352,19 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final double kAutoShootFeedDurationSec = 20; // How long to run feeder after auto-fire triggers
     public static final double kAutoShootTimeoutSec = 20.0; // Safety timeout to prevent stalling auto
     public static final double kFeedingGracePeriodSec = 0.50; // Keeps feeder running through brief aim jitter while moving (~3 cycles at 50Hz)
+  }
+
+  public static class FeedingConstants {
+    // Added to the Limelight-measured distance for midfield feed tags so the ball
+    // clears just over the tag instead of smacking into it.
+    public static final double kMidfieldDistanceBumpMeters = 0.61; // ~2 ft
+
+    // Used regardless of measured distance when feeding from the opponent zone --
+    // we always want a full-field lob, which matches the 45 ft entry in FeedingLookupTable.
+    public static final double kOpponentZoneFeedDistanceMeters = 0.0254 * 12 * 45; // ~13.72 m
+
+    // Feeding can tolerate slightly sloppier aim than scoring.
+    public static final double kFeedAimToleranceDegrees = 3.0;
   }
 
   public static class VelocityCompensationConstants {
@@ -275,25 +392,6 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
   }
 
   public static class TagOverrideConstants {
-    // Per-AprilTag yaw offset in degrees (added to aim setpoint)
-    // Positive = aim further right, Negative = aim further left
-    public static final Map<Integer, Double> kYawOffsetByTag = Map.ofEntries(
-        // Red hub tags
-        Map.entry(9,  -6.0),
-        Map.entry(10, -9.0),
-        Map.entry(2,  -3.0),
-        Map.entry(11, 0.0),
-        Map.entry(5,  -14.0),
-        Map.entry(8,  -3.0),
-        // Blue hub tags
-        Map.entry(25, -6.0),
-      Map.entry(26, -9.0),
-        Map.entry(21, -3.0),
-        Map.entry(24, 0.0),
-        Map.entry(18, -9.0),
-        Map.entry(27, -3.0)
-    );
-
     // Per-AprilTag RPM offset (added to BOTH roller and flywheel RPM after lookup)
     // Positive = more power, Negative = less power
     public static final Map<Integer, Double> kRpmOffsetByTag = Map.ofEntries(
@@ -313,11 +411,6 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
         Map.entry(27, 0.0)
     );
 
-    /** Get yaw offset for a tag ID. Returns 0.0 for unknown tags. */
-    public static double getYawOffset(int tagID) {
-      return kYawOffsetByTag.getOrDefault(tagID, 0.0);
-    }
-
     /** Get RPM offset for a tag ID. Returns 0.0 for unknown tags. */
     public static double getRpmOffset(int tagID) {
       return kRpmOffsetByTag.getOrDefault(tagID, 0.0);
@@ -328,6 +421,38 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     IN,
     OUT,
     TOGGLE
+  }
+
+  public static class LEDConstants {
+    // Hardware - adjust these for your setup
+    public static final int kLEDPort = 8;      // PWM port
+    public static final int kLEDCount = 300;    // Number of LEDs in strip
+
+    // Animation timing
+    public static final double kGradientPeriodSec = 2.0;  // Time for full green->orange->green cycle
+
+    // Colors
+    public static final Color kGreen = Color.kGreen;
+    public static final Color kOrange = Color.kOrange;
+    public static final Color kYellow = Color.kYellow;
+    public static final Color kRed = Color.kRed;
+    public static final Color kBlue = Color.kBlue;
+    public static final Color kPurple = Color.kPurple;
+
+    // Animation settings
+    public static final double kAnimationSpeedMs = 0.005;  // Milliseconds per LED position (super fast!)
+
+    // Morse code settings
+    public static final String kMorseMessage = "60 BALL AUTO";
+    public static final long kMorseDotMs = 200;
+    public static final long kMorseDashMs = 600;
+    public static final long kMorseGapMs = 200;
+    public static final long kMorseLetterGapMs = 600;
+    public static final long kMorseWordGapMs = 1400;
+
+    // Match time warnings (seconds)
+    public static final double kEndgameWarningTime = 8.0;
+    public static final double kShootWarningTime = 3.0;
   }
 
 }

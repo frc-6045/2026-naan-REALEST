@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "depot12"
+            "pathName": "CENTER depot a"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "depot23"
+            "pathName": "CENTER depot b"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "depot34"
+            "pathName": "CENTER depot c"
           }
         },
         {

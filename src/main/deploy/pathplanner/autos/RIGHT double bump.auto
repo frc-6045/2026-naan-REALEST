@@ -7,43 +7,43 @@
         {
           "type": "path",
           "data": {
-            "pathName": "rightdouble12"
+            "pathName": "RIGHT double bump a"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "rightdouble23"
+            "pathName": "RIGHT double bump b"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "rightdouble34"
+            "pathName": "RIGHT double bump c"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "autoAimAndShoot7Second"
+            "name": "autoAimAndShoot7SecondRightSide"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "r double - depot"
+            "pathName": "RIGHT double bump d"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "depot23"
+            "pathName": "CENTER depot b"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "depot34"
+            "pathName": "CENTER depot c"
           }
         }
       ]

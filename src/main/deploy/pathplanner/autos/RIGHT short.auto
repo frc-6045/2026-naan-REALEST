@@ -7,25 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Copy of 45deg12"
+            "pathName": "RIGHT a"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Copy of Copy of SHORT of 45deg23"
+            "pathName": "RIGHT short b"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Copy of Copy of SHORT of 45deg34"
+            "pathName": "RIGHT short c"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "autoAimAndShoot"
+            "name": "autoAimAndShootRightSide"
           }
         }
       ]

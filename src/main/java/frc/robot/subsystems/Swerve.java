@@ -48,6 +48,10 @@ public class Swerve extends SubsystemBase {
     private boolean[] m_lastVisionAccepted = new boolean[LimelightConstants.kAllCameras.length];
     private String[] m_lastVisionRejectReason = new String[LimelightConstants.kAllCameras.length];
 
+    // Latches true on the first accepted MegaTag2 update and stays true.
+    // Commands gate shot-firing on this so pose-based aim can't fire off stale odometry.
+    private boolean m_hasEverAcceptedVision = false;
+
     public Swerve() {
         // Set telemetry verbosity before creating swerve drive
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
@@ -304,9 +308,11 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Resets heading using MegaTag1 vision (independent heading, unlike MegaTag2).
-     * Picks the best estimate across all cameras. Falls back to alliance-based reset
-     * if no valid vision data is available.
+     * Resets robot heading using MegaTag1 vision (independent heading, unlike MegaTag2).
+     * Heading-only: preserves the current X/Y from the pose estimator (which has been
+     * accumulating MegaTag2-fused position) so a momentary bad MegaTag1 frame can't
+     * teleport us across the field. Falls back to alliance-based heading if no valid
+     * vision data is available.
      */
     public void resetHeadingFromVision() {
         LimelightHelpers.PoseEstimate best = null;
@@ -340,12 +346,47 @@ public class Swerve extends SubsystemBase {
         }
 
         if (best != null) {
-            resetOdometry(best.pose);
+            Pose2d current = m_swerveDrive.getPose();
+            m_swerveDrive.resetOdometry(
+                new Pose2d(current.getTranslation(), best.pose.getRotation()));
             SmartDashboard.putString("Vision/HeadingReset",
-                "Used " + bestCamName + " heading=" + String.format("%.1f", best.pose.getRotation().getDegrees()) + "°");
+                "Heading-only from " + bestCamName + " = "
+                    + String.format("%.1f", best.pose.getRotation().getDegrees()) + "°");
         } else {
             zeroGyroWithAlliance();
             SmartDashboard.putString("Vision/HeadingReset", "Fell back to alliance reset (no tags visible)");
+        }
+    }
+
+    /**
+     * Full pose reset (X, Y, and heading) from MegaTag1 vision.
+     * Use only when you intentionally want to overwrite position too — e.g. seeding
+     * autonomous start pose. Day-to-day heading correction should use
+     * {@link #resetHeadingFromVision()} instead.
+     */
+    public void setPoseFromVision() {
+        LimelightHelpers.PoseEstimate best = null;
+
+        for (LimelightConstants.CameraConfig cam : LimelightConstants.kAllCameras) {
+            LimelightHelpers.PoseEstimate mt1 =
+                LimelightHelpers.getBotPoseEstimate_wpiBlue(cam.name);
+
+            if (mt1 == null || mt1.tagCount == 0) continue;
+            if (mt1.avgTagDist > VisionPoseConstants.kMaxTagDistanceMeters) continue;
+
+            double x = mt1.pose.getX();
+            double y = mt1.pose.getY();
+            if (x < -1.0 || x > 17.5 || y < -1.0 || y > 9.2) continue;
+
+            if (best == null
+                    || mt1.tagCount > best.tagCount
+                    || (mt1.tagCount == best.tagCount && mt1.avgTagDist < best.avgTagDist)) {
+                best = mt1;
+            }
+        }
+
+        if (best != null) {
+            resetOdometry(best.pose);
         }
     }
 
@@ -477,8 +518,54 @@ public class Swerve extends SubsystemBase {
         m_swerveDrive.addVisionMeasurement(mt2.pose, mt2.timestampSeconds, stdDevs);
 
         m_lastVisionAccepted[index] = true;
+        m_hasEverAcceptedVision = true;
         m_lastVisionRejectReason[index] = "Accepted (" + mt2.tagCount + " tags, "
             + String.format("%.1f", mt2.avgTagDist) + " m, stdDev=" + String.format("%.2f", xyStdDev) + ")";
+    }
+
+    /**
+     * True once at least one MegaTag2 update has been accepted since boot.
+     * Pose-based aim commands gate firing on this so they don't aim at hallucinated odometry.
+     */
+    public boolean hasEverAcceptedVision() {
+        return m_hasEverAcceptedVision;
+    }
+
+    /**
+     * Heading-only reseed from MegaTag1 (gyro-independent). Preserves current X/Y from the
+     * estimator and only corrects the rotation. Safe to call mid-match: picks the best-quality
+     * estimate across all cameras, no-ops if no usable vision is available.
+     *
+     * Mitigates gyro drift that accumulates over a match since MegaTag2 fusion trusts gyro
+     * for heading ({@link VisionPoseConstants#kBaseStdDevTheta}).
+     */
+    public void seedHeadingFromVision() {
+        LimelightHelpers.PoseEstimate best = null;
+
+        for (LimelightConstants.CameraConfig cam : LimelightConstants.kAllCameras) {
+            LimelightHelpers.PoseEstimate mt1 =
+                LimelightHelpers.getBotPoseEstimate_wpiBlue(cam.name);
+
+            if (mt1 == null || mt1.tagCount == 0) continue;
+            if (mt1.avgTagDist > VisionPoseConstants.kMaxTagDistanceMeters) continue;
+
+            double x = mt1.pose.getX();
+            double y = mt1.pose.getY();
+            if (x < -1.0 || x > 17.5 || y < -1.0 || y > 9.2) continue;
+
+            if (best == null
+                    || mt1.tagCount > best.tagCount
+                    || (mt1.tagCount == best.tagCount && mt1.avgTagDist < best.avgTagDist)) {
+                best = mt1;
+            }
+        }
+
+        if (best == null) {
+            return;
+        }
+
+        Pose2d current = m_swerveDrive.getPose();
+        m_swerveDrive.resetOdometry(new Pose2d(current.getTranslation(), best.pose.getRotation()));
     }
 
     @Override

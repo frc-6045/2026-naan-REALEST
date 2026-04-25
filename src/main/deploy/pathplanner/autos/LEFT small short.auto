@@ -5,27 +5,45 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "small short LEFT Copy of 45deg12"
+            "name": "autoDelay1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "short of small left of LEFT Copy of 45deg23"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "short of small left 34"
+            "pathName": "LEFT small short a"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "autoAimAndShoot"
+            "name": "autoDelay2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LEFT short small b"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "autoDelay3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LEFT small short c"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "autoAimAndShootLeftSide"
           }
         }
       ]
