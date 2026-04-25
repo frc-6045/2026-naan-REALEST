@@ -96,8 +96,8 @@ public class FeedShot extends Command {
     @Override
     public void execute() {
         // Shooter logic - feed when ready (using FeedShot-specific tolerances)
-        boolean flyReady = Math.abs(m_flywheel.getRPM() - m_flywheelRPM) < MotorConstants.kShooterRPMToleranceForFeeder;
-        boolean rolReady = Math.abs(m_topRoller.getRPM() - m_rollerRPM) < MotorConstants.kRollerRPMToleranceForFeeder;
+        boolean flyReady = Math.abs(m_flywheel.getRPM() - m_flywheelRPM) < MotorConstants.kFeedShotFlywheelRPMTolerance;
+        boolean rolReady = Math.abs(m_topRoller.getRPM() - m_rollerRPM) < MotorConstants.kFeedShotRollerRPMTolerance;
         SmartDashboard.putBoolean("FeedShot/flywheel ready", flyReady);
         SmartDashboard.putBoolean("FeedShot/roller ready", rolReady);
         if (flyReady && rolReady) {

@@ -127,6 +127,9 @@ public final class Constants {
     // Looser tolerance used by feed gates where overshoot/undershoot during feed is acceptable.
     public static final double kShooterRPMToleranceForFeeder = 600.0;
     public static final double kRollerRPMToleranceForFeeder = 600.0;
+    // FeedShot-specific tolerance (lobbing across the field — wider RPM band acceptable).
+    public static final double kFeedShotFlywheelRPMTolerance = 1000.0;
+    public static final double kFeedShotRollerRPMTolerance = 1000.0;
 
     // Tower Shot Constants
     public static final double kTowerShotFlywheelRPM = 2550.0; // Target flywheel RPM for tower shot
