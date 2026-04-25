@@ -256,38 +256,51 @@ public class LEDs extends SubsystemBase {
     }
 
     /**
-     * Updates the snake chase animation.
-     * Single LED moves from 0-299, leaving trail. Alternates blue/red. Then flashes orange/green.
+     * Updates the stacking animation.
+     * LED travels from 0 to end, stacking one LED at a time. Alternates blue/red. Then flashes orange/green.
      */
     private void updateAnimation() {
         if (!m_animationActive) {
             return;
         }
 
-        // Phase 1: Fill strip - LED leaves trail as it travels
+        // Phase 1: Stack LEDs at the end, one at a time
         if (!m_animationBuildComplete) {
             long currentTimeMs = System.currentTimeMillis();
             if (currentTimeMs - m_lastAnimationUpdateMs >= LEDConstants.kAnimationSpeedMs) {
                 m_lastAnimationUpdateMs = currentTimeMs;
 
+                // Calculate the target position (where this LED will stop)
+                // First pass goes to position 299, second to 298, etc.
+                int targetPosition = m_ledBuffer.getLength() - 1 - m_animationPass;
+
                 // Determine color for this pass (alternates each pass)
                 Color chaseColor = (m_animationPass % 2 == 0) ? LEDConstants.kBlue : LEDConstants.kRed;
 
-                // Light up current position (leave trail - don't delete previous LEDs)
+                // Clear previous position (snake effect - only 1 LED visible while traveling)
+                if (m_animationChasePosition > 0 && m_animationChasePosition - 1 < targetPosition) {
+                    m_ledBuffer.setLED(m_animationChasePosition - 1, Color.kBlack);
+                }
+
+                // Light up current position
                 m_ledBuffer.setLED(m_animationChasePosition, chaseColor);
                 m_led.setData(m_ledBuffer);
 
                 // Move to next position
                 m_animationChasePosition++;
 
-                // Check if we completed this pass
-                if (m_animationChasePosition >= m_ledBuffer.getLength()) {
+                // Check if we reached the target position (where it should stop)
+                if (m_animationChasePosition > targetPosition) {
+                    // Leave the LED on at target position
+                    m_ledBuffer.setLED(targetPosition, chaseColor);
+                    m_led.setData(m_ledBuffer);
+
                     // Reset for next pass
                     m_animationChasePosition = 0;
                     m_animationPass++;
 
-                    // After 2 passes (blue fill, then red fill), move to flash phase
-                    if (m_animationPass >= 2) {
+                    // Check if we've filled all 300 LEDs
+                    if (m_animationPass >= m_ledBuffer.getLength()) {
                         m_animationBuildComplete = true;
                         m_lastFlashUpdateMs = System.currentTimeMillis();
                     }
