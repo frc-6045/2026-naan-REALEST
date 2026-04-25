@@ -14,8 +14,7 @@ import frc.robot.subsystems.shooterSystem.TopRoller;
 import frc.robot.util.IntakePivotOscillator;
 
 /**
- * Command for shooting while pushed up against the tower. not true.
- * Revs the flywheel and top roller, then feeds when ready.
+ * Revs the flywheel and top roller, then feeds when both are at target speed.
  * Oscillates intake between deploy and mid position, using current sensing
  * to detect game piece contact and raise to mid.
  */

@@ -4,8 +4,6 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -14,12 +12,16 @@ import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.TopRoller;
 
+import java.util.Map;
+
 public class LEDs extends SubsystemBase {
     /** LED states */
     public enum LEDState {
         DISABLED,
         ENABLED
     }
+
+    private static final String kStateKey = "Subsystem: LEDs/State";
 
     private final AddressableLED m_led;
     private final AddressableLEDBuffer m_ledBuffer;
@@ -28,10 +30,13 @@ public class LEDs extends SubsystemBase {
     private final TopRoller m_topRoller;
     private final Feeder m_feeder;
 
+    // Last solid color pushed to the strip. Used to skip redundant setData() writes.
+    private Color m_lastSolidColor = null;
+
     // Animation state
     private boolean m_animationActive = false;
-    private int m_animationChasePosition = 0;  // Current position of the moving LED
-    private int m_animationPass = 0;  // How many chases have completed
+    private int m_animationChasePosition = 0;
+    private int m_animationPass = 0;
     private long m_lastAnimationUpdateMs = 0;
     private boolean m_animationBuildComplete = false;
     private long m_lastFlashUpdateMs = 0;
@@ -43,10 +48,6 @@ public class LEDs extends SubsystemBase {
     private int m_morsePosition = 0;
     private long m_morseLastUpdateMs = 0;
     private boolean m_morseLightOn = false;
-
-    // Match time warning state
-    private boolean m_endgameWarningShown = false;
-    private boolean m_shootWarningActive = false;
 
     public LEDs(Flywheel flywheel, TopRoller topRoller, Feeder feeder) {
         m_flywheel = flywheel;
@@ -76,29 +77,18 @@ public class LEDs extends SubsystemBase {
     }
 
     /**
-     * Sets a solid color on all LEDs.
+     * Sets a solid color on all LEDs. No-op if the strip already shows this color.
      * @param color The color to display
      */
     public void setSolidColor(Color color) {
+        if (color.equals(m_lastSolidColor)) {
+            return;
+        }
         for (int i = 0; i < m_ledBuffer.getLength(); i++) {
             m_ledBuffer.setLED(i, color);
         }
         m_led.setData(m_ledBuffer);
-    }
-
-    /**
-     * Interpolates between two colors.
-     * @param color1 First color
-     * @param color2 Second color
-     * @param t Interpolation factor (0.0 = color1, 1.0 = color2)
-     * @return Interpolated color
-     */
-    private Color interpolateColor(Color color1, Color color2, double t) {
-        t = Math.max(0.0, Math.min(1.0, t));
-        double r = color1.red + (color2.red - color1.red) * t;
-        double g = color1.green + (color2.green - color1.green) * t;
-        double b = color1.blue + (color2.blue - color1.blue) * t;
-        return new Color(r, g, b);
+        m_lastSolidColor = color;
     }
 
     /**
@@ -140,33 +130,36 @@ public class LEDs extends SubsystemBase {
         return DriverStation.isFMSAttached() && DriverStation.isDisabled();
     }
 
+    private static final Map<Character, String> kMorseMap = Map.ofEntries(
+        Map.entry('A', ".-"),    Map.entry('B', "-..."), Map.entry('C', "-.-."),
+        Map.entry('D', "-.."),   Map.entry('E', "."),    Map.entry('F', "..-."),
+        Map.entry('G', "--."),   Map.entry('H', "...."), Map.entry('I', ".."),
+        Map.entry('J', ".---"),  Map.entry('K', "-.-"),  Map.entry('L', ".-.."),
+        Map.entry('M', "--"),    Map.entry('N', "-."),   Map.entry('O', "---"),
+        Map.entry('P', ".--."),  Map.entry('Q', "--.-"), Map.entry('R', ".-."),
+        Map.entry('S', "..."),   Map.entry('T', "-"),    Map.entry('U', "..-"),
+        Map.entry('V', "...-"),  Map.entry('W', ".--"),  Map.entry('X', "-..-"),
+        Map.entry('Y', "-.--"),  Map.entry('Z', "--.."),
+        Map.entry('0', "-----"), Map.entry('1', ".----"), Map.entry('2', "..---"),
+        Map.entry('3', "...--"), Map.entry('4', "....-"), Map.entry('5', "....."),
+        Map.entry('6', "-...."), Map.entry('7', "--..."), Map.entry('8', "---.."),
+        Map.entry('9', "----."), Map.entry(' ', "//")
+    );
+
     /**
-     * Converts text to morse code.
-     * @param text The text to convert
-     * @return Morse code string using . for dot, - for dash, / for letter gap, // for word gap
+     * Converts text to morse code using "." dot, "-" dash, "/" letter gap, "//" word gap.
      */
     private String textToMorse(String text) {
-        String[][] morseMap = {
-            {"A", ".-"}, {"B", "-..."}, {"C", "-.-."}, {"D", "-.."}, {"E", "."}, {"F", "..-."},
-            {"G", "--."}, {"H", "...."}, {"I", ".."}, {"J", ".---"}, {"K", "-.-"}, {"L", ".-.."},
-            {"M", "--"}, {"N", "-."}, {"O", "---"}, {"P", ".--."}, {"Q", "--.-"}, {"R", ".-."},
-            {"S", "..."}, {"T", "-"}, {"U", "..-"}, {"V", "...-"}, {"W", ".--"}, {"X", "-..-"},
-            {"Y", "-.--"}, {"Z", "--.."}, {"0", "-----"}, {"1", ".----"}, {"2", "..---"},
-            {"3", "...--"}, {"4", "....-"}, {"5", "....."}, {"6", "-...."}, {"7", "--..."},
-            {"8", "---.."}, {"9", "----."}, {" ", "//"}
-        };
-
         StringBuilder morse = new StringBuilder();
         for (char c : text.toUpperCase().toCharArray()) {
-            for (String[] pair : morseMap) {
-                if (pair[0].equals(String.valueOf(c))) {
-                    if (morse.length() > 0 && !morse.toString().endsWith("//")) {
-                        morse.append("/"); // Letter gap
-                    }
-                    morse.append(pair[1]);
-                    break;
-                }
+            String code = kMorseMap.get(c);
+            if (code == null) {
+                continue;
             }
+            if (morse.length() > 0 && !morse.toString().endsWith("//")) {
+                morse.append('/');
+            }
+            morse.append(code);
         }
         return morse.toString();
     }
@@ -189,42 +182,29 @@ public class LEDs extends SubsystemBase {
         long elapsedMs = currentTimeMs - m_morseLastUpdateMs;
 
         if (m_morsePosition >= m_morseCode.length()) {
-            // Restart from beginning
             m_morsePosition = 0;
         }
 
         char currentChar = m_morseCode.charAt(m_morsePosition);
 
-        if (currentChar == '.') {
-            // Dot
+        if (currentChar == '.' || currentChar == '-') {
+            long onDuration = (currentChar == '.') ? LEDConstants.kMorseDotMs : LEDConstants.kMorseDashMs;
             if (!m_morseLightOn && elapsedMs >= LEDConstants.kMorseGapMs) {
                 setSolidColor(LEDConstants.kGreen);
                 m_morseLightOn = true;
                 m_morseLastUpdateMs = currentTimeMs;
-            } else if (m_morseLightOn && elapsedMs >= LEDConstants.kMorseDotMs) {
-                setSolidColor(LEDConstants.kOrange);
-                m_morseLightOn = false;
-                m_morseLastUpdateMs = currentTimeMs;
-                m_morsePosition++;
-            }
-        } else if (currentChar == '-') {
-            // Dash
-            if (!m_morseLightOn && elapsedMs >= LEDConstants.kMorseGapMs) {
-                setSolidColor(LEDConstants.kGreen);
-                m_morseLightOn = true;
-                m_morseLastUpdateMs = currentTimeMs;
-            } else if (m_morseLightOn && elapsedMs >= LEDConstants.kMorseDashMs) {
+            } else if (m_morseLightOn && elapsedMs >= onDuration) {
                 setSolidColor(LEDConstants.kOrange);
                 m_morseLightOn = false;
                 m_morseLastUpdateMs = currentTimeMs;
                 m_morsePosition++;
             }
         } else if (currentChar == '/') {
-            // Letter or word gap
-            if (elapsedMs >= (m_morseCode.charAt(m_morsePosition) == '/' &&
-                             m_morsePosition + 1 < m_morseCode.length() &&
-                             m_morseCode.charAt(m_morsePosition + 1) == '/' ?
-                             LEDConstants.kMorseWordGapMs : LEDConstants.kMorseLetterGapMs)) {
+            // "//" is a word gap; a single "/" is a letter gap.
+            boolean isWordGap = m_morsePosition + 1 < m_morseCode.length()
+                && m_morseCode.charAt(m_morsePosition + 1) == '/';
+            long gapMs = isWordGap ? LEDConstants.kMorseWordGapMs : LEDConstants.kMorseLetterGapMs;
+            if (elapsedMs >= gapMs) {
                 setSolidColor(LEDConstants.kOrange);
                 m_morseLastUpdateMs = currentTimeMs;
                 m_morsePosition++;
@@ -249,11 +229,11 @@ public class LEDs extends SubsystemBase {
         m_lastFlashUpdateMs = System.currentTimeMillis();
         m_flashStartTimeMs = 0;
 
-        // Clear all LEDs to black
         for (int i = 0; i < m_ledBuffer.getLength(); i++) {
             m_ledBuffer.setLED(i, Color.kBlack);
         }
         m_led.setData(m_ledBuffer);
+        m_lastSolidColor = null;
     }
 
     /**
@@ -295,6 +275,7 @@ public class LEDs extends SubsystemBase {
 
                 m_ledBuffer.setLED(m_animationChasePosition, chaseColor);
                 m_led.setData(m_ledBuffer);
+                m_lastSolidColor = null;
 
                 m_animationChasePosition++;
 
@@ -310,146 +291,116 @@ public class LEDs extends SubsystemBase {
                 }
             }
         }
-        // Phase 2: Flash orange/green for 5 seconds
+        // Phase 2: orange/green flash for 5s, then stop.
         else {
             long currentTimeMs = System.currentTimeMillis();
-
-            // Initialize flash start time on first entry to flash phase
             if (m_flashStartTimeMs == 0) {
                 m_flashStartTimeMs = currentTimeMs;
             }
-
-            // Check if 5 seconds have elapsed
             if (currentTimeMs - m_flashStartTimeMs >= 5000) {
-                // Stop animation and return to normal state
                 m_animationActive = false;
                 return;
             }
-
-            // Flash every 500ms - orange/green
             if (currentTimeMs - m_lastFlashUpdateMs >= 500) {
                 m_lastFlashUpdateMs = currentTimeMs;
-
-                // Flash between orange and green
                 setSolidColor(m_flashSwapped ? LEDConstants.kGreen : LEDConstants.kOrange);
                 m_flashSwapped = !m_flashSwapped;
             }
         }
     }
 
+    private String m_lastStateLabel = null;
+
+    private void publishState(String label) {
+        if (!label.equals(m_lastStateLabel)) {
+            SmartDashboard.putString(kStateKey, label);
+            m_lastStateLabel = label;
+        }
+    }
+
+    /**
+     * LED priority cascade (highest to lowest):
+     *  1. Morse code "60 BALL AUTO" during autonomous
+     *  2. Yellow while feeder is actively running (shooting)
+     *  3. Match warnings: 3s green flash, then 8s alliance flash
+     *  4. Green when shooter is at target RPM
+     *  5. Theater-chase stacking animation (A button)
+     *  6. Alliance color when FMS-attached and disabled (pre-match)
+     *  7. Default: orange disabled, alliance enabled
+     */
     @Override
     public void periodic() {
-        /*
-         * LED Priority System (highest to lowest):
-         * 1. Morse Code - "60 BALL AUTO" during autonomous
-         * 2. Shooting - Yellow when feeder is actively running
-         * 3. Match Warnings - 8s (alliance color flash) and 3s (green flash) during teleop
-         * 4. Shooter Ready - Green when flywheel and top roller at target RPM (±300 RPM)
-         * 5. Animation - Theater chase stacking (A button)
-         * 6. FMS Queued - Alliance color when connected to FMS and disabled
-         * 7. Default - Orange when disabled, alliance color when enabled
-         */
+        boolean isAuto = DriverStation.isAutonomous();
+        boolean isTeleop = DriverStation.isTeleop();
 
-        // Initialize morse code when autonomous starts
-        if (DriverStation.isAutonomous() && m_morseCode.isEmpty()) {
+        if (isAuto && m_morseCode.isEmpty()) {
             initializeMorseCode();
-        }
-
-        // Reset morse code when leaving autonomous
-        if (!DriverStation.isAutonomous() && !m_morseCode.isEmpty()) {
+        } else if (!isAuto && !m_morseCode.isEmpty()) {
             m_morseCode = "";
         }
 
-        // Cancel animation if interrupted by shooting or shooter ready
-        if (m_animationActive && (isFeeding() || isShooterReady())) {
+        boolean feeding = isFeeding();
+        boolean shooterReady = isShooterReady();
+
+        if (m_animationActive && (feeding || shooterReady)) {
             m_animationActive = false;
         }
 
-        // Priority 1: Morse code during autonomous - HIGHEST
-        if (DriverStation.isAutonomous() && !m_morseCode.isEmpty()) {
+        if (isAuto && !m_morseCode.isEmpty()) {
             updateMorseCode();
-            SmartDashboard.putString("Subsystem: LEDs/State", "AUTO_MORSE");
+            publishState("AUTO_MORSE");
             return;
         }
 
-        // Priority 2: Yellow when actively shooting (feeder running)
-        if (isFeeding()) {
+        if (feeding) {
             setSolidColor(LEDConstants.kYellow);
-            SmartDashboard.putString("Subsystem: LEDs/State", "SHOOTING");
+            publishState("SHOOTING");
             return;
         }
 
-        // Priority 3: Match time warnings during teleop
-        if (DriverStation.isTeleop()) {
+        if (isTeleop) {
             double timeRemaining = DriverStation.getMatchTime();
+            long now = System.currentTimeMillis();
 
-            // 3 second warning - flash green rapidly
             if (timeRemaining > 0 && timeRemaining <= LEDConstants.kShootWarningTime) {
-                long currentTimeMs = System.currentTimeMillis();
-                if (currentTimeMs % 200 < 100) {
-                    setSolidColor(LEDConstants.kGreen);
-                } else {
-                    setSolidColor(Color.kBlack);
-                }
-                SmartDashboard.putString("Subsystem: LEDs/State", "SHOOT_WARNING");
-                m_shootWarningActive = true;
+                setSolidColor((now % 200 < 100) ? LEDConstants.kGreen : Color.kBlack);
+                publishState("SHOOT_WARNING");
                 return;
-            } else {
-                m_shootWarningActive = false;
             }
 
-            // 8 second warning - flash alliance color
-            if (timeRemaining > 0 && timeRemaining <= LEDConstants.kEndgameWarningTime && !m_shootWarningActive) {
-                long currentTimeMs = System.currentTimeMillis();
-                if (currentTimeMs % 500 < 250) {
-                    setSolidColor(getAllianceColor());
-                } else {
-                    setSolidColor(Color.kBlack);
-                }
-                SmartDashboard.putString("Subsystem: LEDs/State", "ENDGAME_WARNING");
-                m_endgameWarningShown = true;
+            if (timeRemaining > 0 && timeRemaining <= LEDConstants.kEndgameWarningTime) {
+                setSolidColor((now % 500 < 250) ? getAllianceColor() : Color.kBlack);
+                publishState("ENDGAME_WARNING");
                 return;
             }
         }
 
-        // Priority 4: Green when shooter is ready (revved up and at target speed)
-        if (isShooterReady()) {
+        if (shooterReady) {
             setSolidColor(LEDConstants.kGreen);
-            SmartDashboard.putString("Subsystem: LEDs/State", "SHOOTER_READY");
+            publishState("SHOOTER_READY");
             return;
         }
 
-        // Priority 5: Animation (can be overridden by states above)
         if (m_animationActive) {
             updateAnimation();
-            SmartDashboard.putString("Subsystem: LEDs/State", "ANIMATION");
-            SmartDashboard.putNumber("LED Animation/Pass", m_animationPass);
-            SmartDashboard.putNumber("LED Animation/Position", m_animationChasePosition);
-            SmartDashboard.putBoolean("LED Animation/Build Complete", m_animationBuildComplete);
+            publishState("ANIMATION");
             return;
         }
 
-        // Priority 6: Alliance color when connected to FMS and it's our shift (pre-match)
         if (isOurShift()) {
             setSolidColor(getAllianceColor());
-            SmartDashboard.putString("Subsystem: LEDs/State", "FMS_QUEUED");
+            publishState("FMS_QUEUED");
             return;
         }
 
-        // Priority 7: State-based behavior
         switch (m_currentState) {
             case DISABLED:
-                // Solid orange when disabled (only reached if no animation is active)
                 setSolidColor(LEDConstants.kOrange);
                 break;
-
             case ENABLED:
-                // Alliance color (red/blue) when enabled but not shooting
                 setSolidColor(getAllianceColor());
                 break;
         }
-
-        // Telemetry
-        SmartDashboard.putString("Subsystem: LEDs/State", m_currentState.toString());
+        publishState(m_currentState.toString());
     }
 }

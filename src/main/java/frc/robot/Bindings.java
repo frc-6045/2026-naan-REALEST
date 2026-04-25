@@ -89,16 +89,7 @@ public class Bindings {
             )
         ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
             .until(() -> intakePivot.atSetpoint())));
-        //m_driverController.rightTrigger().whileTrue(Commands.run(() -> swerve.lock(), swerve));
-        // m_driverController.rightTrigger(0.5).whileTrue(
-        //     new AutoAimAndShoot(
-        //         swerve, flywheel, topRoller, feeder, spindexer,
-        //         () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
-        //         () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
-        //     )
-        // );
 
-//feeder shot
         m_driverController.leftTrigger().whileTrue(new FeedShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake, MotorConstants.kFeederShotFlywheelRPM, MotorConstants.kFeederShotTopRollerRPM));
 
         m_driverController.x().whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake,
@@ -148,9 +139,6 @@ public class Bindings {
 
         m_operatorController.rightBumper().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotMiddleSetpoint));
 
-        //shoot while parked against the trench
-        //not exist anymore
-        // in front of trength
         m_operatorController.pov(0).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake, MotorConstants.kTowerShotFrontFlywheelRPM, MotorConstants.kTowerShotFrontTopRollerRPM));
 
         // Spindexer CW (normal direction)
