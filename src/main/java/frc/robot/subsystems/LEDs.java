@@ -235,8 +235,9 @@ public class LEDs extends SubsystemBase {
     }
 
     /**
-     * Starts the snake chase animation sequence.
-     * Single LED chases from 0 to 299, alternating blue/red passes, fills strip, then flashes.
+     * Starts the theater chase stacking animation.
+     * LEDs travel one at a time and stack from position 0, alternating blue/red.
+     * After all LEDs are stacked, flashes orange/green for 5 seconds then stops.
      */
     public void startAnimation() {
         m_animationActive = true;
@@ -256,6 +257,16 @@ public class LEDs extends SubsystemBase {
     }
 
     /**
+     * Stops the animation and returns LEDs to normal state.
+     */
+    public void stopAnimation() {
+        m_animationActive = false;
+        m_animationChasePosition = 0;
+        m_animationPass = 0;
+        m_animationBuildComplete = false;
+    }
+
+    /**
      * Updates the stacking animation.
      * LED travels from 0 to end, stacking one LED at a time. Alternates blue/red. Then flashes orange/green.
      */
@@ -264,22 +275,26 @@ public class LEDs extends SubsystemBase {
             return;
         }
 
-        // Phase 1: Stack LEDs at the end, one at a time
+        // Phase 1: Theater chase stacking - LEDs travel and stack one at a time
         if (!m_animationBuildComplete) {
             long currentTimeMs = System.currentTimeMillis();
             if (currentTimeMs - m_lastAnimationUpdateMs >= LEDConstants.kAnimationSpeedMs) {
                 m_lastAnimationUpdateMs = currentTimeMs;
 
-                // Calculate the target position (where this LED will stop)
-                // First pass goes to position 0, second to position 1, etc.
+                // Target position is where this LED will stop and stay
                 int targetPosition = m_animationPass;
 
-                // Determine color for this pass (alternates each pass)
+                // Alternating colors for each pass
                 Color chaseColor = (m_animationPass % 2 == 0) ? LEDConstants.kBlue : LEDConstants.kRed;
 
-                // Clear previous position (snake effect - only 1 LED visible while traveling)
-                if (m_animationChasePosition > 0 && m_animationChasePosition - 1 < targetPosition) {
-                    m_ledBuffer.setLED(m_animationChasePosition - 1, Color.kBlack);
+                // Clear the previous chase position ONLY if it's beyond already-stacked LEDs
+                // Don't clear positions 0 through (m_animationPass - 1) as they're already stacked
+                if (m_animationChasePosition > 0) {
+                    int prevPos = m_animationChasePosition - 1;
+                    // Only clear if the previous position is beyond our already-stacked LEDs
+                    if (prevPos >= m_animationPass) {
+                        m_ledBuffer.setLED(prevPos, Color.kBlack);
+                    }
                 }
 
                 // Light up current position
@@ -289,19 +304,16 @@ public class LEDs extends SubsystemBase {
                 // Move to next position
                 m_animationChasePosition++;
 
-                // Check if we reached the target position (where it should stop)
+                // Check if we reached the target (one position past where we want to stop)
                 if (m_animationChasePosition > targetPosition) {
-                    // Leave the LED on at target position
-                    m_ledBuffer.setLED(targetPosition, chaseColor);
-                    m_led.setData(m_ledBuffer);
-
-                    // Reset for next pass
+                    // LED is now stacked at targetPosition, start next pass
                     m_animationChasePosition = 0;
                     m_animationPass++;
 
-                    // Check if we've filled all 300 LEDs
+                    // Check if all LEDs are stacked
                     if (m_animationPass >= m_ledBuffer.getLength()) {
                         m_animationBuildComplete = true;
+                        m_flashStartTimeMs = 0;
                         m_lastFlashUpdateMs = System.currentTimeMillis();
                     }
                 }
@@ -336,6 +348,17 @@ public class LEDs extends SubsystemBase {
 
     @Override
     public void periodic() {
+        /*
+         * LED Priority System (highest to lowest):
+         * 1. Morse Code - "60 BALL AUTO" during autonomous
+         * 2. Shooting - Yellow when feeder is actively running
+         * 3. Match Warnings - 8s (alliance color flash) and 3s (green flash) during teleop
+         * 4. Shooter Ready - Green when flywheel and top roller at target RPM (±300 RPM)
+         * 5. Animation - Theater chase stacking (A button)
+         * 6. FMS Queued - Alliance color when connected to FMS and disabled
+         * 7. Default - Orange when disabled, alliance color when enabled
+         */
+
         // Initialize morse code when autonomous starts
         if (DriverStation.isAutonomous() && m_morseCode.isEmpty()) {
             initializeMorseCode();
@@ -409,6 +432,9 @@ public class LEDs extends SubsystemBase {
         if (m_animationActive) {
             updateAnimation();
             SmartDashboard.putString("Subsystem: LEDs/State", "ANIMATION");
+            SmartDashboard.putNumber("LED Animation/Pass", m_animationPass);
+            SmartDashboard.putNumber("LED Animation/Position", m_animationChasePosition);
+            SmartDashboard.putBoolean("LED Animation/Build Complete", m_animationBuildComplete);
             return;
         }
 
