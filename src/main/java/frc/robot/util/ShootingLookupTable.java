@@ -35,24 +35,24 @@ public class ShootingLookupTable {
     static {
         double offset = 00;
         // Distance (meters) -> Roller RPM
-        m_rollerRPMMap.put(0.0254*45, 500.0+offset);   // 83 inches
-        m_rollerRPMMap.put(0.0254*60, 1500.0+offset);   // 117 inches
-        m_rollerRPMMap.put(0.0254*75, 1700+offset);   // 117 inches
-        m_rollerRPMMap.put(0.0254*90, 1800.0+offset);   // 117 inches
-        m_rollerRPMMap.put(0.0254*120, 1900.0+offset);   // 117 inches                                
-        m_rollerRPMMap.put(0.0254*135, 2050+offset);
-        m_rollerRPMMap.put(0.0254*150, 2200+offset);
-        m_rollerRPMMap.put(0.0254*175, 2450+offset);
+        m_rollerRPMMap.put(0.0254*45,  450.0+offset);
+        m_rollerRPMMap.put(0.0254*60,  1450.0+offset);
+        m_rollerRPMMap.put(0.0254*75,  1650.0+offset);
+        m_rollerRPMMap.put(0.0254*90,  1750.0+offset);
+        m_rollerRPMMap.put(0.0254*120, 1850.0+offset);
+        m_rollerRPMMap.put(0.0254*135, 2000.0+offset);
+        m_rollerRPMMap.put(0.0254*150, 2150.0+offset);
+        m_rollerRPMMap.put(0.0254*175, 2400.0+offset);
 
         // Distance (meters) -> Flywheel RPM
-        m_flywheelRPMMap.put(0.0254*45, 2600.00+offset);  // 83 inches
-        m_flywheelRPMMap.put(0.0254*60, 2300+offset);  // 117 inches
-        m_flywheelRPMMap.put(0.0254*75, 2300.0+offset);  // 117 inches
-        m_flywheelRPMMap.put(0.0254*90, 2400.0+offset);  // 117 inches
-        m_flywheelRPMMap.put(0.0254*120, 2500.0+offset);  // 117 inches
-        m_flywheelRPMMap.put(0.0254*135, 2650.0+offset);  // 117 inches
-        m_flywheelRPMMap.put(0.0254*150, 2700.0+offset);  // 117 inches
-        m_flywheelRPMMap.put(0.0254*175, 2850.0+offset);  // 117 inches
+        m_flywheelRPMMap.put(0.0254*45,  2550.0+offset);
+        m_flywheelRPMMap.put(0.0254*60,  2250.0+offset);
+        m_flywheelRPMMap.put(0.0254*75,  2250.0+offset);
+        m_flywheelRPMMap.put(0.0254*90,  2350.0+offset);
+        m_flywheelRPMMap.put(0.0254*120, 2450.0+offset);
+        m_flywheelRPMMap.put(0.0254*135, 2600.0+offset);
+        m_flywheelRPMMap.put(0.0254*150, 2650.0+offset);
+        m_flywheelRPMMap.put(0.0254*175, 2800.0+offset);
     }
 
     /**
