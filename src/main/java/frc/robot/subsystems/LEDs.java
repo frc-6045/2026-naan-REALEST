@@ -281,36 +281,27 @@ public class LEDs extends SubsystemBase {
             if (currentTimeMs - m_lastAnimationUpdateMs >= LEDConstants.kAnimationSpeedMs) {
                 m_lastAnimationUpdateMs = currentTimeMs;
 
-                // Target position is where this LED will stop and stay
                 int targetPosition = m_animationPass;
-
-                // Alternating colors for each pass
                 Color chaseColor = (m_animationPass % 2 == 0) ? LEDConstants.kBlue : LEDConstants.kRed;
 
-                // Clear the previous chase position ONLY if it's beyond already-stacked LEDs
-                // Don't clear positions 0 through (m_animationPass - 1) as they're already stacked
+                // Erase the trailing pixel only when it's past the stacked region;
+                // positions [0, m_animationPass) are already stacked and must persist.
                 if (m_animationChasePosition > 0) {
                     int prevPos = m_animationChasePosition - 1;
-                    // Only clear if the previous position is beyond our already-stacked LEDs
                     if (prevPos >= m_animationPass) {
                         m_ledBuffer.setLED(prevPos, Color.kBlack);
                     }
                 }
 
-                // Light up current position
                 m_ledBuffer.setLED(m_animationChasePosition, chaseColor);
                 m_led.setData(m_ledBuffer);
 
-                // Move to next position
                 m_animationChasePosition++;
 
-                // Check if we reached the target (one position past where we want to stop)
                 if (m_animationChasePosition > targetPosition) {
-                    // LED is now stacked at targetPosition, start next pass
                     m_animationChasePosition = 0;
                     m_animationPass++;
 
-                    // Check if all LEDs are stacked
                     if (m_animationPass >= m_ledBuffer.getLength()) {
                         m_animationBuildComplete = true;
                         m_flashStartTimeMs = 0;
