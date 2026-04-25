@@ -264,7 +264,7 @@ public class LEDs extends SubsystemBase {
             return;
         }
 
-        // Phase 1: Snake chase - fill the strip
+        // Phase 1: Fill strip - LED leaves trail as it travels
         if (!m_animationBuildComplete) {
             long currentTimeMs = System.currentTimeMillis();
             if (currentTimeMs - m_lastAnimationUpdateMs >= LEDConstants.kAnimationSpeedMs) {
@@ -273,12 +273,7 @@ public class LEDs extends SubsystemBase {
                 // Determine color for this pass (alternates each pass)
                 Color chaseColor = (m_animationPass % 2 == 0) ? LEDConstants.kBlue : LEDConstants.kRed;
 
-                // Turn off previous position if there is one
-                if (m_animationChasePosition > 0) {
-                    m_ledBuffer.setLED(m_animationChasePosition - 1, Color.kBlack);
-                }
-
-                // Light up current position
+                // Light up current position (leave trail - don't delete previous LEDs)
                 m_ledBuffer.setLED(m_animationChasePosition, chaseColor);
                 m_led.setData(m_ledBuffer);
 
@@ -287,17 +282,12 @@ public class LEDs extends SubsystemBase {
 
                 // Check if we completed this pass
                 if (m_animationChasePosition >= m_ledBuffer.getLength()) {
-                    // Leave the last LED on
-                    m_ledBuffer.setLED(m_ledBuffer.getLength() - 1, chaseColor);
-                    m_led.setData(m_ledBuffer);
-
                     // Reset for next pass
                     m_animationChasePosition = 0;
                     m_animationPass++;
 
-                    // Check if we've filled the entire strip
-                    // Need 300 passes to fill all LEDs
-                    if (m_animationPass >= m_ledBuffer.getLength()) {
+                    // After 2 passes (blue fill, then red fill), move to flash phase
+                    if (m_animationPass >= 2) {
                         m_animationBuildComplete = true;
                         m_lastFlashUpdateMs = System.currentTimeMillis();
                     }

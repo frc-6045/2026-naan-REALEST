@@ -428,7 +428,7 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final Color kPurple = Color.kPurple;
 
     // Animation settings
-    public static final double kAnimationSpeedMs = 50.0;  // Milliseconds per LED position (15 seconds total)
+    public static final double kAnimationSpeedMs = 50.0;  // Milliseconds per LED position
 
     // Morse code settings
     public static final String kMorseMessage = "60 BALL AUTO";
