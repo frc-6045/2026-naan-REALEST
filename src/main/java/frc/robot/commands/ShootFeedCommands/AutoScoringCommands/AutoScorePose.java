@@ -217,7 +217,6 @@ public class AutoScorePose extends Command {
         SmartDashboard.putBoolean("AutoScorePose/ReadyToFire", readyToFire);
         SmartDashboard.putBoolean("AutoScorePose/Feeding", m_feeding);
         SmartDashboard.putNumber("AutoScorePose/AimTolerance", aimTolerance);
-        SmartDashboard.putBoolean("AutoScorePose/ShooterUp", RPMLookupTable.isShooterUp());
     }
 
     @Override
