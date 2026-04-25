@@ -271,8 +271,8 @@ public class LEDs extends SubsystemBase {
                 m_lastAnimationUpdateMs = currentTimeMs;
 
                 // Calculate the target position (where this LED will stop)
-                // First pass goes to position 299, second to 298, etc.
-                int targetPosition = m_ledBuffer.getLength() - 1 - m_animationPass;
+                // First pass goes to position 0, second to position 1, etc.
+                int targetPosition = m_animationPass;
 
                 // Determine color for this pass (alternates each pass)
                 Color chaseColor = (m_animationPass % 2 == 0) ? LEDConstants.kBlue : LEDConstants.kRed;

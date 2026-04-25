@@ -106,13 +106,13 @@ public final class Constants {
     public static final double kIntakePivotEncoderOffsetRad = 1.0;
 
     // Shooter PID Constants (for velocity control in RPM)
-    public static final double kShooterP = 0.000; // Proportional gain
+    public static final double kShooterP = 0.0002; // Proportional gain
     public static final double kShooterI = 0.0; // Integral gain
     public static final double kShooterD = 0.0; // Derivative gain
     public static final double kShooterFF = 0.00184; // Feed-forward gain (velocity feed-forward)
     public static final double kShooterIZone = 400.0; // I term only active within this RPM error range
 
-    public static final double kRollerP = 0.0001; // Proportional gain
+    public static final double kRollerP = 0.0002; // Proportional gain
     public static final double kRollerI = 0.0; // Integral gain
     public static final double kRollerD = 0.0; // Derivative gain
     public static final double kRollerFF = 0.00182; // Feed-forward gain (velocity feed-forward)
@@ -122,8 +122,8 @@ public final class Constants {
     public static final double kShooterTargetRPM = 2200.0; // Target shooter wheel speed in RPM
     public static final double kRollerTargetRPM = 2400; // Target shooter wheel speed in RPM
     // Tight tolerance used by Flywheel/TopRoller.isAtTargetSpeed() (subsystem-level "spun up" check).
-    public static final double kShooterRPMTolerance = 100.0;
-    public static final double kRollerRPMTolerance = 100.0;
+    public static final double kShooterRPMTolerance = 300.0;
+    public static final double kRollerRPMTolerance = 300.0;
     // Looser tolerance used by feed gates where overshoot/undershoot during feed is acceptable.
     public static final double kShooterRPMToleranceForFeeder = 600.0;
     public static final double kRollerRPMToleranceForFeeder = 600.0;
@@ -428,7 +428,7 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final Color kPurple = Color.kPurple;
 
     // Animation settings
-    public static final double kAnimationSpeedMs = 50.0;  // Milliseconds per LED position
+    public static final double kAnimationSpeedMs = 0.005;  // Milliseconds per LED position (super fast!)
 
     // Morse code settings
     public static final String kMorseMessage = "60 BALL AUTO";

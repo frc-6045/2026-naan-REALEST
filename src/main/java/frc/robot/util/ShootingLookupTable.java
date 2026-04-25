@@ -28,16 +28,6 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 /// 
 //////////END OF NEW VALUES!!!!
 
-
-
-
-
-
-
-
-
-
-
 public class ShootingLookupTable {
     private static final InterpolatingDoubleTreeMap m_rollerRPMMap = new InterpolatingDoubleTreeMap();
     private static final InterpolatingDoubleTreeMap m_flywheelRPMMap = new InterpolatingDoubleTreeMap();
@@ -47,14 +37,11 @@ public class ShootingLookupTable {
         // Distance (meters) -> Roller RPM
         m_rollerRPMMap.put(0.0254*45, 500.0+offset);   // 83 inches
         m_rollerRPMMap.put(0.0254*60, 1500.0+offset);   // 117 inches
-                m_rollerRPMMap.put(0.0254*75, 1700+offset);   // 117 inches
-                        m_rollerRPMMap.put(0.0254*90, 1800.0+offset);   // 117 inches
-                                        m_rollerRPMMap.put(0.0254*120, 1900.0+offset);   // 117 inches
-                                        
+        m_rollerRPMMap.put(0.0254*75, 1700+offset);   // 117 inches
+        m_rollerRPMMap.put(0.0254*90, 1800.0+offset);   // 117 inches
+        m_rollerRPMMap.put(0.0254*120, 1900.0+offset);   // 117 inches                                
         m_rollerRPMMap.put(0.0254*135, 2050+offset);
-        
         m_rollerRPMMap.put(0.0254*150, 2200+offset);
-        
         m_rollerRPMMap.put(0.0254*175, 2450+offset);
 
         // Distance (meters) -> Flywheel RPM
@@ -66,7 +53,6 @@ public class ShootingLookupTable {
         m_flywheelRPMMap.put(0.0254*135, 2650.0+offset);  // 117 inches
         m_flywheelRPMMap.put(0.0254*150, 2700.0+offset);  // 117 inches
         m_flywheelRPMMap.put(0.0254*175, 2850.0+offset);  // 117 inches
-        
     }
 
     /**
