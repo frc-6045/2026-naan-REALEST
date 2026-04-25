@@ -54,12 +54,23 @@ public class RobotContainer {
 
     DriverStation.silenceJoystickConnectionWarning(true);
 
-    // Set default swerve drive command
+    // Field-relative drive runs in blue-origin coords. Red drivers stand at the opposite end,
+    // so their "forward" stick input maps to -X in field. Flip translation (not rotation) on red.
+    java.util.function.DoubleSupplier allianceSign = () ->
+        DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
+            == DriverStation.Alliance.Red ? -1.0 : 1.0;
+
     m_Swerve.setDefaultCommand(
         m_Swerve.driveCommand(
-            () -> -MathUtil.applyDeadband(m_driverController.getLeftY() + m_operatorController.getLeftY(), ControllerConstants.kDeadband),
-            () -> -MathUtil.applyDeadband(m_driverController.getLeftX() + m_operatorController.getLeftX(), ControllerConstants.kDeadband),
-            () -> -MathUtil.applyDeadband(m_driverController.getRightX() + m_operatorController.getRightX(), ControllerConstants.kDeadband)
+            () -> allianceSign.getAsDouble() * -MathUtil.applyDeadband(
+                m_driverController.getLeftY() + m_operatorController.getLeftY(),
+                ControllerConstants.kDeadband),
+            () -> allianceSign.getAsDouble() * -MathUtil.applyDeadband(
+                m_driverController.getLeftX() + m_operatorController.getLeftX(),
+                ControllerConstants.kDeadband),
+            () -> -MathUtil.applyDeadband(
+                m_driverController.getRightX() + m_operatorController.getRightX(),
+                ControllerConstants.kDeadband)
         )
     );
   }

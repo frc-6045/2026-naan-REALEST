@@ -308,9 +308,11 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Resets heading using MegaTag1 vision (independent heading, unlike MegaTag2).
-     * Picks the best estimate across all cameras. Falls back to alliance-based reset
-     * if no valid vision data is available.
+     * Resets robot heading using MegaTag1 vision (independent heading, unlike MegaTag2).
+     * Heading-only: preserves the current X/Y from the pose estimator (which has been
+     * accumulating MegaTag2-fused position) so a momentary bad MegaTag1 frame can't
+     * teleport us across the field. Falls back to alliance-based heading if no valid
+     * vision data is available.
      */
     public void resetHeadingFromVision() {
         LimelightHelpers.PoseEstimate best = null;
@@ -344,12 +346,47 @@ public class Swerve extends SubsystemBase {
         }
 
         if (best != null) {
-            resetOdometry(best.pose);
+            Pose2d current = m_swerveDrive.getPose();
+            m_swerveDrive.resetOdometry(
+                new Pose2d(current.getTranslation(), best.pose.getRotation()));
             SmartDashboard.putString("Vision/HeadingReset",
-                "Used " + bestCamName + " heading=" + String.format("%.1f", best.pose.getRotation().getDegrees()) + "°");
+                "Heading-only from " + bestCamName + " = "
+                    + String.format("%.1f", best.pose.getRotation().getDegrees()) + "°");
         } else {
             zeroGyroWithAlliance();
             SmartDashboard.putString("Vision/HeadingReset", "Fell back to alliance reset (no tags visible)");
+        }
+    }
+
+    /**
+     * Full pose reset (X, Y, and heading) from MegaTag1 vision.
+     * Use only when you intentionally want to overwrite position too — e.g. seeding
+     * autonomous start pose. Day-to-day heading correction should use
+     * {@link #resetHeadingFromVision()} instead.
+     */
+    public void setPoseFromVision() {
+        LimelightHelpers.PoseEstimate best = null;
+
+        for (LimelightConstants.CameraConfig cam : LimelightConstants.kAllCameras) {
+            LimelightHelpers.PoseEstimate mt1 =
+                LimelightHelpers.getBotPoseEstimate_wpiBlue(cam.name);
+
+            if (mt1 == null || mt1.tagCount == 0) continue;
+            if (mt1.avgTagDist > VisionPoseConstants.kMaxTagDistanceMeters) continue;
+
+            double x = mt1.pose.getX();
+            double y = mt1.pose.getY();
+            if (x < -1.0 || x > 17.5 || y < -1.0 || y > 9.2) continue;
+
+            if (best == null
+                    || mt1.tagCount > best.tagCount
+                    || (mt1.tagCount == best.tagCount && mt1.avgTagDist < best.avgTagDist)) {
+                best = mt1;
+            }
+        }
+
+        if (best != null) {
+            resetOdometry(best.pose);
         }
     }
 
