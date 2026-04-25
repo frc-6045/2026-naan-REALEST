@@ -53,10 +53,10 @@ public class AutoAimAndShoot extends Command {
 
     private final PIDController m_aimPID;
 
-    // Only valid once m_hasLockedTag is true; otherwise motors stay stopped.
-    private double m_lastTargetRPM = 0.0;
-    private double m_lastTargetRollerRPM = 0.0;
-    private boolean m_hasLockedTag = false;
+    // Spin to the safe default until a tag-based lookup overrides them. Keeps the flywheel
+    // at speed from the moment the command starts so the first ball isn't fed mid-spin-up.
+    private double m_lastTargetRPM = MotorConstants.kShooterTargetRPM;
+    private double m_lastTargetRollerRPM = MotorConstants.kRollerTargetRPM;
     private boolean m_feeding = false;
     private final Timer m_graceTimer = new Timer();
     private final IntakePivotOscillator.OscillationState m_pivotState = new IntakePivotOscillator.OscillationState();
@@ -94,7 +94,6 @@ public class AutoAimAndShoot extends Command {
 
         m_aimPID.reset();
         m_feeding = false;
-        m_hasLockedTag = false;
         m_graceTimer.stop();
         m_graceTimer.reset();
         m_tagLock.reset();
@@ -138,7 +137,6 @@ public class AutoAimAndShoot extends Command {
             double targetRPM = ShootingLookupTable.getFlywheelRPM(compensatedDistance) + tagRpmOffset;
             m_lastTargetRPM = targetRPM;
             m_lastTargetRollerRPM = targetRollerRPM;
-            m_hasLockedTag = true;
 
             m_topRoller.setRPM(targetRollerRPM);
             m_flywheel.setTargetRPM(targetRPM);
@@ -188,15 +186,9 @@ public class AutoAimAndShoot extends Command {
             SmartDashboard.putBoolean("AutoAim/VisionTrusted", visionTrusted);
         } else {
             m_swerve.drive(translation, 0.0, true);
-            // Keep motors coasting at last setpoint *only* if we've locked a tag at least once;
-            // otherwise we'd spin to zero-RPM (or worse, a stale default) before ever aiming.
-            if (m_hasLockedTag) {
-                m_flywheel.setTargetRPM(m_lastTargetRPM);
-                m_topRoller.setRPM(m_lastTargetRollerRPM);
-            } else {
-                m_flywheel.stopFlywheelMotor();
-                m_topRoller.stopRollerMotor();
-            }
+            // Keep motors at last setpoint so the flywheel stays spun up while we re-acquire a tag.
+            m_flywheel.setTargetRPM(m_lastTargetRPM);
+            m_topRoller.setRPM(m_lastTargetRollerRPM);
             m_feeder.stopFeederMotor();
             m_spindexer.stopSpindexerMotor();
             m_feeding = false;
