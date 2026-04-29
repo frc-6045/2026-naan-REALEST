@@ -100,8 +100,6 @@ public class Robot extends TimedRobot {
     // Set LED state to enabled (RSL-synced flashing)
     m_robotContainer.getLEDs().setState(LEDState.ENABLED);
 
-    m_robotContainer.resetHeadingFromVision();
-
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
