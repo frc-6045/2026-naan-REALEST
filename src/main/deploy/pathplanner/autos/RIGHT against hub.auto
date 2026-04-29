@@ -5,45 +5,51 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "LEFT double bump a"
+            "name": "autoDelay1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LEFT double bump b"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LEFT double bump c"
+            "pathName": "RIGHT small short a"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "autoAimAndShoot7SecondLeftSide"
+            "name": "autoDelay2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LEFT double bump d"
+            "pathName": "RIGHT small long b"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "autoDelay3"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CENTER depot b"
+            "pathName": "RIGHT against hub c"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CENTER depot c"
+            "pathName": "RIGHT 1987 d"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "autoAimAndShoot"
           }
         }
       ]

@@ -139,8 +139,8 @@ public final class Constants {
     public static final double kTowerShotFrontFlywheelRPM = 2250.0; // Target flywheel RPM for tower shot front
     public static final double kTowerShotFrontTopRollerRPM = 1650.0; // Target top roller RPM for tower shot front
 
-    public static final double kFeederShotFlywheelRPM = 5250; //for feeding
-    public static final double kFeederShotTopRollerRPM = 3250; //also for feeding
+    public static final double kFeederShotFlywheelRPM = 4850; //for feeding
+    public static final double kFeederShotTopRollerRPM = 3500; //also for feeding
 
   }
 
