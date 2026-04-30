@@ -1,0 +1,61 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "autoDelay1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LEFT small short a"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "autoDelay2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LEFT small short b"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "autoDelay3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LEFT small short c"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LEFT 1987 d"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "autoAimAndShoot"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
