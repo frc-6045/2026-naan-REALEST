@@ -428,9 +428,6 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final int kLEDPort = 8;      // PWM port
     public static final int kLEDCount = 300;    // Number of LEDs in strip
 
-    // Animation timing
-    public static final double kGradientPeriodSec = 2.0;  // Time for full green->orange->green cycle
-
     // Colors
     public static final Color kGreen = Color.kGreen;
     public static final Color kOrange = Color.kOrange;
@@ -438,6 +435,8 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final Color kRed = Color.kRed;
     public static final Color kBlue = Color.kBlue;
     public static final Color kPurple = Color.kPurple;
+    public static final Color kIndigo = new Color(75, 0, 130);  // RGB for indigo
+    public static final Color kViolet = new Color(238, 130, 238);  // RGB for violet
 
     // Animation settings
     public static final double kAnimationSpeedMs = 0.005;  // Milliseconds per LED position (super fast!)
