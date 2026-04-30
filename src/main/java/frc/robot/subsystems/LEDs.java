@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,15 +21,7 @@ public class LEDs extends SubsystemBase {
         ENABLED
     }
 
-    /** Disabled LED display modes */
-    public enum DisabledLEDMode {
-        ORANGE,
-        GREEN,
-        RAINBOW
-    }
-
     private static final String kStateKey = "Subsystem: LEDs/State";
-    private final SendableChooser<DisabledLEDMode> m_disabledModeChooser;
 
     private final AddressableLED m_led;
     private final AddressableLEDBuffer m_ledBuffer;
@@ -67,13 +58,6 @@ public class LEDs extends SubsystemBase {
         m_led.setLength(m_ledBuffer.getLength());
         m_led.setData(m_ledBuffer);
         m_led.start();
-
-        // Initialize disabled mode chooser
-        m_disabledModeChooser = new SendableChooser<>();
-        m_disabledModeChooser.setDefaultOption("Orange", DisabledLEDMode.ORANGE);
-        m_disabledModeChooser.addOption("Green", DisabledLEDMode.GREEN);
-        m_disabledModeChooser.addOption("Rainbow", DisabledLEDMode.RAINBOW);
-        SmartDashboard.putData("LED Disabled Mode", m_disabledModeChooser);
     }
 
     /**
@@ -105,27 +89,6 @@ public class LEDs extends SubsystemBase {
         }
         m_led.setData(m_ledBuffer);
         m_lastSolidColor = color;
-    }
-
-    /**
-     * Sets a rainbow pattern (ROYGBIV) across all LEDs.
-     */
-    public void setRainbowPattern() {
-        Color[] rainbowColors = {
-            LEDConstants.kRed,
-            LEDConstants.kOrange,
-            LEDConstants.kYellow,
-            LEDConstants.kGreen,
-            LEDConstants.kBlue,
-            LEDConstants.kIndigo,
-            LEDConstants.kViolet
-        };
-
-        for (int i = 0; i < m_ledBuffer.getLength(); i++) {
-            m_ledBuffer.setLED(i, rainbowColors[i % rainbowColors.length]);
-        }
-        m_led.setData(m_ledBuffer);
-        m_lastSolidColor = null;  // Rainbow is not a solid color
     }
 
     /**
@@ -432,21 +395,7 @@ public class LEDs extends SubsystemBase {
 
         switch (m_currentState) {
             case DISABLED:
-                DisabledLEDMode selectedMode = m_disabledModeChooser.getSelected();
-                if (selectedMode == null) {
-                    selectedMode = DisabledLEDMode.ORANGE;  // Fallback to orange if null
-                }
-                switch (selectedMode) {
-                    case ORANGE:
-                        setSolidColor(LEDConstants.kOrange);
-                        break;
-                    case GREEN:
-                        setSolidColor(LEDConstants.kGreen);
-                        break;
-                    case RAINBOW:
-                        setRainbowPattern();
-                        break;
-                }
+                setSolidColor(LEDConstants.kOrange);
                 break;
             case ENABLED:
                 setSolidColor(getAllianceColor());
