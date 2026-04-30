@@ -170,11 +170,7 @@ public class AutoAimAndFeed extends Command {
             updateFeedState(readyToFire);
             IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, m_feeding, "AutoFeed/");
 
-            if (m_feeding) {
-                m_swerve.setLockAngles();
-            } else {
-                m_swerve.drive(translation, rotationSpeed, true);
-            }
+            m_swerve.drive(translation, rotationSpeed, true);
 
             SmartDashboard.putBoolean("AutoFeed/Aimed", aimed);
             SmartDashboard.putBoolean("AutoFeed/TopRollerReady", topRollerReady);
