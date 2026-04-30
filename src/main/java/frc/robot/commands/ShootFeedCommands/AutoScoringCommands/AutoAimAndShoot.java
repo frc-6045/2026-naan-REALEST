@@ -156,8 +156,7 @@ public class AutoAimAndShoot extends Command {
             boolean aimed = Math.abs(headingErr) < aimTolerance;
             boolean topRollerReady = m_topRoller.isAtTargetSpeed(targetRollerRPM);
             boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
-            boolean visionTrusted = m_swerve.hasEverAcceptedVision();
-            boolean readyToFire = aimed && topRollerReady && flywheelReady && visionTrusted;
+            boolean readyToFire = aimed && topRollerReady && flywheelReady;
 
             updateFeedState(readyToFire);
             IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, m_feeding, "AutoAim/");
@@ -183,7 +182,6 @@ public class AutoAimAndShoot extends Command {
             SmartDashboard.putNumber("AutoAim/AimTolerance", aimTolerance);
             SmartDashboard.putNumber("AutoAim/LockedTagID", lockedTag);
             SmartDashboard.putNumber("AutoAim/TagRpmOffset", tagRpmOffset);
-            SmartDashboard.putBoolean("AutoAim/VisionTrusted", visionTrusted);
         } else {
             m_swerve.drive(translation, 0.0, true);
             // Keep motors at last setpoint so the flywheel stays spun up while we re-acquire a tag.
