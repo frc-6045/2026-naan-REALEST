@@ -24,10 +24,10 @@ public class Spindexer extends SubsystemBase {
   @SuppressWarnings("deprecation")
   public Spindexer() {
     m_SpindexerMotor = new SparkFlex(MotorConstants.kSpindexerMotorCanID, MotorType.kBrushless);
-    m_Encoder = m_SpindexerMotor.getEncoder();
 
     updateMotorSettings();
     m_SpindexerMotor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    m_Encoder = m_SpindexerMotor.getEncoder();
 
     // Initialize SmartDashboard values
     SmartDashboard.putNumber("Subsystem: Spindexer/Speed", 0);

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.DrivebaseConstants;
+import frc.robot.Constants.Mode;
 import frc.robot.subsystems.LEDs.LEDState;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -38,21 +39,32 @@ public class Robot extends LoggedRobot {
     // to NetworkTables — otherwise those publishes are missed by the log capture.
     Logger.recordMetadata("ProjectName", "2026-naan-REALEST");
     Logger.recordMetadata("TeamNumber", "6045");
+    Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+    Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+    Logger.recordMetadata("GitDirty", BuildConstants.GIT_DIRTY);
 
-    if (isReal()) {
-      // No-arg WPILOGWriter auto-detects: writes to /U/logs if a USB stick is mounted,
-      // otherwise falls back to /home/lvuser/logs on the RoboRIO.
-      Logger.addDataReceiver(new WPILOGWriter());
-      Logger.addDataReceiver(new NT4Publisher());
-    } else if (isSimulation()) {
-      Logger.addDataReceiver(new WPILOGWriter("logs/"));
-      Logger.addDataReceiver(new NT4Publisher());
-    } else {
-      // Replay mode: read from a log file and re-emit with a "_sim" suffix for diffing.
-      setUseTiming(false);
-      String logPath = LogFileUtil.findReplayLog();
-      Logger.setReplaySource(new WPILOGReader(logPath));
-      Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+    Mode mode = isReal() ? Mode.REAL : Constants.kSimMode;
+    switch (mode) {
+      case REAL:
+        // No-arg WPILOGWriter auto-detects: writes to /U/logs if a USB stick is mounted,
+        // otherwise falls back to /home/lvuser/logs on the RoboRIO.
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+      case SIM:
+        Logger.addDataReceiver(new WPILOGWriter("logs/"));
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+      case REPLAY:
+        // Read a recorded log and re-emit with a "_sim" suffix for diffing modified code
+        // against the original run. Activate by setting Constants.kSimMode = Mode.REPLAY.
+        setUseTiming(false);
+        String logPath = LogFileUtil.findReplayLog();
+        Logger.setReplaySource(new WPILOGReader(logPath));
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        break;
     }
 
     Logger.start();

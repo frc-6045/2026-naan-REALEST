@@ -23,6 +23,17 @@ import edu.wpi.first.wpilibj.util.Color;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  /**
+   * AdvantageKit run mode. {@code REAL} is auto-selected on the roboRIO; {@code SIM} and
+   * {@code REPLAY} are only reachable when not running on real hardware. Switch
+   * {@link #kSimMode} to {@code REPLAY} when running {@code ./gradlew replayWatch} against a
+   * recorded log.
+   */
+  public enum Mode { REAL, SIM, REPLAY }
+
+  /** Mode used when running off-robot. Set to {@code REPLAY} to feed a recorded WPILOG back through the code. */
+  public static final Mode kSimMode = Mode.SIM;
+
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
