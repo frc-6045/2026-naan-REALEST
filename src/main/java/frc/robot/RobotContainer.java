@@ -103,4 +103,8 @@ public class RobotContainer {
   public LEDs getLEDs() {
     return m_LEDs;
   }
+
+  public Swerve getSwerve() {
+    return m_Swerve;
+  }
 }
