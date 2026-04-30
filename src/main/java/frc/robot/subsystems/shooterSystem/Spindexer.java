@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooterSystem;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.FeedbackSensor;
@@ -13,14 +14,17 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
+import frc.robot.util.LoggingUtils;
 
 public class Spindexer extends SubsystemBase {
   private final SparkFlex m_SpindexerMotor;
+  private final RelativeEncoder m_Encoder;
   private final SparkFlexConfig m_config = new SparkFlexConfig();
 
   @SuppressWarnings("deprecation")
   public Spindexer() {
     m_SpindexerMotor = new SparkFlex(MotorConstants.kSpindexerMotorCanID, MotorType.kBrushless);
+    m_Encoder = m_SpindexerMotor.getEncoder();
 
     updateMotorSettings();
     m_SpindexerMotor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
@@ -60,7 +64,7 @@ public class Spindexer extends SubsystemBase {
   }
 
   public double getRPM() {
-    return m_SpindexerMotor.getEncoder().getVelocity();
+    return m_Encoder.getVelocity();
   }
 
   public double getCurrent() {
@@ -71,5 +75,7 @@ public class Spindexer extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Spindexer/Velocity (RPM)", getRPM());
     SmartDashboard.putNumber("Subsystem: Spindexer/Current", getCurrent());
+
+    LoggingUtils.logSpark("Spindexer", m_SpindexerMotor, m_Encoder);
   }
 }

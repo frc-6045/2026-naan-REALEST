@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
+import frc.robot.util.LoggingUtils;
 
 @SuppressWarnings({"deprecation","removal"})
 public class TopRoller extends SubsystemBase {
@@ -117,5 +118,7 @@ public class TopRoller extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", getRPM());
     SmartDashboard.putNumber("Subsystem: Roller/Current", m_Motor.getOutputCurrent());
+
+    LoggingUtils.logSpark("TopRoller", m_Motor, m_Encoder);
   }
 }

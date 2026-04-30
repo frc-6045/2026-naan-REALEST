@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooterSystem;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.FeedbackSensor;
@@ -13,16 +14,21 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
+import frc.robot.util.LoggingUtils;
 
 public class Feeder extends SubsystemBase {
   private final SparkFlex m_FeederMotor;
   private final SparkFlex m_IntakeBlackRollerMotor;
+  private final RelativeEncoder m_FeederEncoder;
+  private final RelativeEncoder m_BlackRollerEncoder;
   private final SparkFlexConfig m_config = new SparkFlexConfig();
 
   @SuppressWarnings("deprecation")
   public Feeder() {
     m_FeederMotor = new SparkFlex(MotorConstants.kFeederMotorCanID, MotorType.kBrushless);
     m_IntakeBlackRollerMotor = new SparkFlex(MotorConstants.kIntakeBlackRollerMotorCanID, MotorType.kBrushless);
+    m_FeederEncoder = m_FeederMotor.getEncoder();
+    m_BlackRollerEncoder = m_IntakeBlackRollerMotor.getEncoder();
 
     updateMotorSettings(m_FeederMotor, true);
     updateMotorSettings(m_IntakeBlackRollerMotor, false);
@@ -95,5 +101,8 @@ public class Feeder extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Feeder/Current", m_FeederMotor.getOutputCurrent());
+
+    LoggingUtils.logSpark("Feeder/FeederMotor", m_FeederMotor, m_FeederEncoder);
+    LoggingUtils.logSpark("Feeder/BlackRoller", m_IntakeBlackRollerMotor, m_BlackRollerEncoder);
   }
 }
