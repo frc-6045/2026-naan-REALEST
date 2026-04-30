@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -48,6 +49,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     //SmartDashboard.putData(CommandScheduler.getInstance());
     SmartDashboard.putNumber("ROBOT current draw", m_robotContainer.getRobotCurrentDraw());
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
