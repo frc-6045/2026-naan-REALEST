@@ -12,7 +12,7 @@
         "y": 6.469585292443502
       },
       "isLocked": false,
-      "linkedName": "cool"
+      "linkedName": "amazingleft"
     },
     {
       "anchor": {
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "leftnewnewnew"
+      "linkedName": "newnewnewleft"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
+    "maxVelocity": 1.5,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
