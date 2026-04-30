@@ -309,9 +309,47 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final AprilTagFieldLayout kFieldLayout =
         AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
+    /** A picked AprilTag together with its blue-origin field translation. */
+    public record TagPick(int id, Translation2d translation) {}
+
     /** Blue-origin translation of an AprilTag on the current field. Empty if unknown. */
     public static Optional<Translation2d> getTagTranslation(int tagID) {
       return kFieldLayout.getTagPose(tagID).map(p -> p.toPose2d().getTranslation());
+    }
+
+    /** Closest scoring (hub) tag of the current alliance to the given shooter position. */
+    public static Optional<TagPick> pickClosestScoringTag(Translation2d shooterFieldPos) {
+      return pickClosestFromSet(shooterFieldPos, LimelightConstants.getTargetAprilTagIDs());
+    }
+
+    /** Closest feed tag (midfield ∪ opponent-zone) of the current alliance to the given shooter position. */
+    public static Optional<TagPick> pickClosestFeedTag(Translation2d shooterFieldPos) {
+      Optional<TagPick> midfield = pickClosestFromSet(shooterFieldPos, LimelightConstants.getMidfieldFeedTagIDs());
+      Optional<TagPick> oppZone = pickClosestFromSet(shooterFieldPos, LimelightConstants.getOpponentZoneFeedTagIDs());
+      if (midfield.isEmpty()) return oppZone;
+      if (oppZone.isEmpty()) return midfield;
+      double dMid = midfield.get().translation().getDistance(shooterFieldPos);
+      double dOpp = oppZone.get().translation().getDistance(shooterFieldPos);
+      return dMid <= dOpp ? midfield : oppZone;
+    }
+
+    private static Optional<TagPick> pickClosestFromSet(Translation2d from, int[] candidateIDs) {
+      TagPick best = null;
+      double bestDistSq = Double.POSITIVE_INFINITY;
+      for (int id : candidateIDs) {
+        Optional<Translation2d> tagPos = getTagTranslation(id);
+        if (tagPos.isEmpty()) {
+          continue;
+        }
+        double dx = tagPos.get().getX() - from.getX();
+        double dy = tagPos.get().getY() - from.getY();
+        double distSq = dx * dx + dy * dy;
+        if (distSq < bestDistSq) {
+          bestDistSq = distSq;
+          best = new TagPick(id, tagPos.get());
+        }
+      }
+      return Optional.ofNullable(best);
     }
   }
 

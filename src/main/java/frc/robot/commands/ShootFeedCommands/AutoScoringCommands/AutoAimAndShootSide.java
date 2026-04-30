@@ -1,7 +1,10 @@
 package frc.robot.commands.ShootFeedCommands.AutoScoringCommands;
 
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.SideTagConstants;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
@@ -12,13 +15,12 @@ import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.shooterSystem.TopRoller;
 
 /**
- * Auto-aim and shoot command with side-specific AprilTag prioritization.
- * Used for autonomous routines that approach the hub from the left or right side
- * to ensure the robot locks onto the optimal tag for that approach angle.
+ * Auto-aim and shoot variant that targets a fixed side-specific hub tag rather than
+ * picking the geometrically closest one. Used when an autonomous routine approaches the
+ * hub from a known angle and we want deterministic tag selection.
  */
 public class AutoAimAndShootSide extends AutoAimAndShoot {
 
-    /** Approach side for tag prioritization. */
     public enum ApproachSide {
         LEFT,
         RIGHT
@@ -38,13 +40,10 @@ public class AutoAimAndShootSide extends AutoAimAndShoot {
     }
 
     @Override
-    public void initialize() {
-        // Parent resets the tag lock (including priorityTagID), so set priority AFTER.
-        super.initialize();
-
-        int priorityTag = (m_side == ApproachSide.LEFT)
-            ? SideTagConstants.getLeftSidePriorityTag()
-            : SideTagConstants.getRightSidePriorityTag();
-        m_tagLock.setPriorityTag(priorityTag);
+    protected Optional<FieldConstants.TagPick> pickTargetTag(Translation2d shooterFieldPos) {
+        int id = m_side == ApproachSide.LEFT
+                ? SideTagConstants.getLeftSidePriorityTag()
+                : SideTagConstants.getRightSidePriorityTag();
+        return FieldConstants.getTagTranslation(id).map(t -> new FieldConstants.TagPick(id, t));
     }
 }

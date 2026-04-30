@@ -31,7 +31,6 @@ import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShoot;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShootSide;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShootSide.ApproachSide;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimPrepare;
-import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.ScanForTarget;
 import frc.robot.commands.SpindexerCommands.StopSpindexer;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
@@ -143,7 +142,7 @@ public class Autos {
     // Auto-aim commands (Limelight-based shooting for autonomous)
 
     // Prep only -- spins flywheel + sets top roller while PathPlanner drives
-    NamedCommands.registerCommand("autoAimPrepShooter", new AutoAimPrepare(flywheel, topRoller).asProxy());
+    NamedCommands.registerCommand("autoAimPrepShooter", new AutoAimPrepare(flywheel, topRoller, swerve).asProxy());
 
     // Stop driving, scan for a tag, rotate to target, fire, deploy intake.
     NamedCommands.registerCommand("autoAimAndShoot",
@@ -218,9 +217,7 @@ public class Autos {
       Timer feedTimer = new Timer();
       AutoAimAndShoot cmd = cmdFactory.get();
 
-      return new SequentialCommandGroup(
-        new ScanForTarget(m_swerve, () -> 0.0, () -> 0.0),
-        cmd.until(() -> {
+      return cmd.until(() -> {
           if (cmd.isFeedingActive()) {
             if (!feedTimer.isRunning()) {
               feedTimer.start();
@@ -230,7 +227,7 @@ public class Autos {
           return false;
         }).finallyDo(() -> { feedTimer.stop(); feedTimer.reset(); })
           .withTimeout(timeoutSec)
-      ).andThen(new IntakePivotSetpoint(m_intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+        .andThen(new IntakePivotSetpoint(m_intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
           .until(() -> m_intakePivot.atSetpoint()));
     }, m_aimRequirements).asProxy();
   }

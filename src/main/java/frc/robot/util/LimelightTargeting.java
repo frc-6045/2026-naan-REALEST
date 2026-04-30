@@ -62,16 +62,6 @@ public final class LimelightTargeting {
 
     private LimelightTargeting() {} // Prevent instantiation
 
-    /** Check if any camera sees a valid target. */
-    public static boolean anyTargetVisible() {
-        for (LimelightConstants.CameraConfig cam : LimelightConstants.kAllCameras) {
-            if (LimelightHelpers.getTV(cam.name)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Run the full per-frame targeting pipeline against the scoring tag set.
      *

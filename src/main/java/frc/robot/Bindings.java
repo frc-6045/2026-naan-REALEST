@@ -22,7 +22,6 @@ import frc.robot.commands.ShootFeedCommands.RunFeeder;
 import frc.robot.commands.ShootFeedCommands.TowerShot;
 import frc.robot.commands.ShootFeedCommands.AutoFeedingCommands.AutoAimAndFeed;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShoot;
-import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.ScanForTarget;
 import frc.robot.commands.SpindexerCommands.RunSpindexer;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
@@ -65,30 +64,20 @@ public class Bindings {
 
         // Auto-aim and auto-shoot (driver retains left stick translational control)
         // After shooting ends, intake pivot returns to deploy position automatically
-        m_driverController.rightTrigger().whileTrue(new SequentialCommandGroup(
-            new ScanForTarget(swerve,
-                () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
-                () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)),
-            new AutoAimAndShoot(
+        m_driverController.rightTrigger().whileTrue(new AutoAimAndShoot(
                 swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
-            )
-        ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
-            .until(() -> intakePivot.atSetpoint())));
+            ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+                .until(() -> intakePivot.atSetpoint())));
 
         // Auto-aim and auto-feed: lob game pieces back toward our alliance zone off feeding AprilTags
-        m_driverController.leftBumper().whileTrue(new SequentialCommandGroup(
-            new ScanForTarget(swerve,
-                () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
-                () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)),
-            new AutoAimAndFeed(
+        m_driverController.leftBumper().whileTrue(new AutoAimAndFeed(
                 swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
-            )
-        ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
-            .until(() -> intakePivot.atSetpoint())));
+            ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+                .until(() -> intakePivot.atSetpoint())));
 
         m_driverController.leftTrigger().whileTrue(new FeedShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake, MotorConstants.kFeederShotFlywheelRPM, MotorConstants.kFeederShotTopRollerRPM));
 
@@ -150,17 +139,12 @@ public class Bindings {
         m_operatorController.pov(270).whileTrue(new DeployIntake(intakePivot));
         m_operatorController.y().whileTrue(new StowIntake(intakePivot));
 
-        m_operatorController.back().whileTrue(new SequentialCommandGroup(
-            new ScanForTarget(swerve,
-                () -> -MathUtil.applyDeadband(m_operatorController.getLeftY(), ControllerConstants.kDeadband),
-                () -> -MathUtil.applyDeadband(m_operatorController.getLeftX(), ControllerConstants.kDeadband)),
-            new AutoAimAndShoot(
+        m_operatorController.back().whileTrue(new AutoAimAndShoot(
                 swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
                 () -> -MathUtil.applyDeadband(m_operatorController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_operatorController.getLeftX(), ControllerConstants.kDeadband)
-            )
-        ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
-            .until(() -> intakePivot.atSetpoint())));
+            ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+                .until(() -> intakePivot.atSetpoint())));
 
         /*============================*/
         /*       Test Bindings        */
