@@ -58,6 +58,7 @@ public class AutoAimAndShoot extends Command {
     private double m_lastTargetRPM = MotorConstants.kShooterTargetRPM;
     private double m_lastTargetRollerRPM = MotorConstants.kRollerTargetRPM;
     private boolean m_feeding = false;
+    private boolean m_tilted = false;
     private final Timer m_graceTimer = new Timer();
     private final IntakePivotOscillator.OscillationState m_pivotState = new IntakePivotOscillator.OscillationState();
 
@@ -94,6 +95,7 @@ public class AutoAimAndShoot extends Command {
 
         m_aimPID.reset();
         m_feeding = false;
+        m_tilted = false;
         m_graceTimer.stop();
         m_graceTimer.reset();
         m_tagLock.reset();
@@ -152,7 +154,16 @@ public class AutoAimAndShoot extends Command {
                     AimConstants.kMaxAutoRotationRadPerSec);
 
             double headingErr = MathUtil.inputModulus(desiredHeadingDeg - headingDeg, -180.0, 180.0);
+            double tiltMagDeg = Math.max(
+                    Math.abs(m_swerve.getPitch().getDegrees()),
+                    Math.abs(m_swerve.getRoll().getDegrees()));
+            m_tilted = m_tilted
+                    ? tiltMagDeg > AimConstants.kTiltThresholdDegrees - AimConstants.kTiltDeadbandDegrees
+                    : tiltMagDeg > AimConstants.kTiltThresholdDegrees;
             double aimTolerance = compensation.getAimToleranceDegrees();
+            if (m_tilted) {
+                aimTolerance = Math.max(aimTolerance, AimConstants.kTiltedAimToleranceDegrees);
+            }
             boolean aimed = Math.abs(headingErr) < aimTolerance;
             boolean topRollerReady = m_topRoller.isAtTargetSpeed(targetRollerRPM);
             boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
@@ -180,6 +191,8 @@ public class AutoAimAndShoot extends Command {
             SmartDashboard.putNumber("AutoAim/TargetBearing", bearingDeg);
             SmartDashboard.putBoolean("AutoAim/CompActive", compensation.compensationActive);
             SmartDashboard.putNumber("AutoAim/AimTolerance", aimTolerance);
+            SmartDashboard.putNumber("AutoAim/TiltMag", tiltMagDeg);
+            SmartDashboard.putBoolean("AutoAim/Tilted", m_tilted);
             SmartDashboard.putNumber("AutoAim/LockedTagID", lockedTag);
             SmartDashboard.putNumber("AutoAim/TagRpmOffset", tagRpmOffset);
         } else {
