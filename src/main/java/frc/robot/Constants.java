@@ -209,38 +209,6 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
       return contains(getTargetAprilTagIDs(), id);
     }
 
-    // Feeding AprilTag IDs -- used by AutoAimAndFeed to lob game pieces back into our zone.
-    // Midfield tags: aim just OVER them (measured distance + small bump).
-    // Opponent-zone tags: lob all the way back using a fixed ~45 ft feed distance.
-    private static final int[] kRedMidfieldFeedTagIDs = {1, 6};
-    private static final int[] kBlueMidfieldFeedTagIDs = {17, 22};
-    private static final int[] kRedOpponentZoneFeedTagIDs = {23, 28};
-    private static final int[] kBlueOpponentZoneFeedTagIDs = {7, 12};
-
-    public static int[] getMidfieldFeedTagIDs() {
-      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
-          ? kRedMidfieldFeedTagIDs
-          : kBlueMidfieldFeedTagIDs;
-    }
-
-    public static int[] getOpponentZoneFeedTagIDs() {
-      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
-          ? kRedOpponentZoneFeedTagIDs
-          : kBlueOpponentZoneFeedTagIDs;
-    }
-
-    public static boolean isMidfieldFeedTag(int id) {
-      return contains(getMidfieldFeedTagIDs(), id);
-    }
-
-    public static boolean isOpponentZoneFeedTag(int id) {
-      return contains(getOpponentZoneFeedTagIDs(), id);
-    }
-
-    public static boolean isValidFeedTagID(int id) {
-      return isMidfieldFeedTag(id) || isOpponentZoneFeedTag(id);
-    }
-
     private static boolean contains(int[] array, int value) {
       for (int v : array) {
         if (v == value) {
@@ -309,11 +277,14 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final AprilTagFieldLayout kFieldLayout =
         AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
-    // 2026 REBUILT field nominal dimensions (Game Manual §5.2)
-    public static final double kFieldLengthMeters = 16.54;
-    public static final double kFieldWidthMeters = 8.07;
+    // 2026 REBUILT field dimensions, sourced from the loaded AprilTag layout so
+    // they stay in sync with WPILib's field constants.
+    public static final double kFieldLengthMeters = kFieldLayout.getFieldLength();
+    public static final double kFieldWidthMeters = kFieldLayout.getFieldWidth();
 
-    // Alliance zone is 4.03m deep against each alliance wall (Game Manual §5.3)
+    // Alliance zone is 4.03m deep against each alliance wall (Game Manual §5.3).
+    // Used to locate our hub, which sits centered on width at the alliance-zone /
+    // neutral-zone boundary.
     public static final double kAllianceZoneDepthMeters = 4.03;
 
     /** Blue-origin translation of an AprilTag on the current field. Empty if unknown. */
@@ -365,28 +336,16 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     // Feeding can tolerate slightly sloppier aim than scoring.
     public static final double kFeedAimToleranceDegrees = 3.0;
 
-    // Diagonal inset (meters) from the wall corner toward the zone interior.
-    // Provides a cushion so shot variance still lands fuel inside the zone.
+    // Diagonal inset (meters) from the wall corner toward the zone interior, used
+    // when the robot is still in our own alliance zone. Provides a cushion so shot
+    // variance still lands fuel inside the zone.
     public static final double kFeedCornerInsetMeters = 0.5;
 
-    /**
-     * Returns the field-frame translation we should aim at when feeding back into
-     * our alliance zone. Picks the corner of our alliance zone that is on the
-     * alliance wall and on the same Y-side as the robot, then insets diagonally
-     * into the zone by kFeedCornerInsetMeters. The hub is centered on width and
-     * sits at the alliance-zone / neutral-zone boundary, so a wall-corner target
-     * is always on the far side of the hub from the robot.
-     */
-    public static Translation2d getFeedTargetTranslation(Pose2d robotPose) {
-      boolean isRed = DriverStation.getAlliance()
-          .orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
-      double wallX = isRed ? FieldConstants.kFieldLengthMeters : 0.0;
-      boolean lowSide = robotPose.getY() < FieldConstants.kFieldWidthMeters / 2.0;
-      double wallY = lowSide ? 0.0 : FieldConstants.kFieldWidthMeters;
-      double targetX = wallX + (isRed ? -kFeedCornerInsetMeters : kFeedCornerInsetMeters);
-      double targetY = wallY + (lowSide ? kFeedCornerInsetMeters : -kFeedCornerInsetMeters);
-      return new Translation2d(targetX, targetY);
-    }
+    // Smaller inset used once the robot is past our hub, so the target sits closer
+    // to the actual wall corner. This pulls the trajectory line farther from hub
+    // center (which is at field-width center), reducing the chance of clipping the
+    // hub on a long over-the-hub lob.
+    public static final double kFeedCornerInsetPastHubMeters = 0.15;
   }
 
   public static class VelocityCompensationConstants {
