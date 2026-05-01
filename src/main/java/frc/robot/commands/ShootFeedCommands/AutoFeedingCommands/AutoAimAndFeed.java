@@ -95,7 +95,9 @@ public class AutoAimAndFeed extends Command {
         Pose2d robotPose = m_swerve.getPose();
         double headingDeg = robotPose.getRotation().getDegrees();
 
-        Translation2d target = computeFeedTarget(robotPose);
+        boolean isRed = DriverStation.getAlliance()
+                .orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
+        Translation2d target = computeFeedTarget(robotPose, isRed);
         // Use shooter exit position rather than robot center to avoid parallax misses.
         Translation2d shooterField = ShooterGeometryConstants.shooterFieldPosition(robotPose);
         Translation2d toTarget = target.minus(shooterField);
@@ -189,9 +191,7 @@ public class AutoAimAndFeed extends Command {
      * half-side plus kFeedHubLateralMarginMeters so the trajectory clears the
      * hub footprint and lands well inside the field width.
      */
-    private static Translation2d computeFeedTarget(Pose2d robotPose) {
-        boolean isRed = DriverStation.getAlliance()
-                .orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
+    static Translation2d computeFeedTarget(Pose2d robotPose, boolean isRed) {
         // sign points from our alliance wall into the field — flips the X math for red.
         double sign = isRed ? -1.0 : 1.0;
         double ourWallX = isRed ? FieldConstants.kFieldLengthMeters : 0.0;
