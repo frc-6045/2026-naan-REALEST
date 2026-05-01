@@ -137,12 +137,13 @@ public class AutoAimAndFeed extends Command {
             m_swerve.drive(new Translation2d(translationX, translationY), rotationSpeed, true);
         }
 
-        boolean lowSide = robotPose.getY() < FieldConstants.kFieldWidthMeters / 2.0;
         SmartDashboard.putBoolean("AutoFeed/Aimed", aimed);
         SmartDashboard.putBoolean("AutoFeed/TopRollerReady", topRollerReady);
         SmartDashboard.putBoolean("AutoFeed/FlywheelReady", flywheelReady);
         SmartDashboard.putBoolean("AutoFeed/ReadyToFire", readyToFire);
         SmartDashboard.putBoolean("AutoFeed/VisionTrusted", visionTrusted);
+        SmartDashboard.putBoolean("AutoFeed/LowSide",
+                robotPose.getY() < FieldConstants.kFieldWidthMeters / 2.0);
         SmartDashboard.putNumber("AutoFeed/FeedDistance", feedDistance);
         SmartDashboard.putNumber("AutoFeed/PoseDistance", poseDistance);
         SmartDashboard.putNumber("AutoFeed/HeadingErr", headingErr);
@@ -150,7 +151,6 @@ public class AutoAimAndFeed extends Command {
         SmartDashboard.putNumber("AutoFeed/TargetBearing", bearingDeg);
         SmartDashboard.putNumber("AutoFeed/TargetX", target.getX());
         SmartDashboard.putNumber("AutoFeed/TargetY", target.getY());
-        SmartDashboard.putString("AutoFeed/SelectedSide", lowSide ? "low-Y" : "high-Y");
     }
 
     @Override
