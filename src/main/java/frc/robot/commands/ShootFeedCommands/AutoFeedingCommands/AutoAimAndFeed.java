@@ -31,15 +31,16 @@ import frc.robot.util.ShotCompensation;
 
 /**
  * Auto-aim and auto-feed command for lobbing fuel back into our alliance zone.
- * Targets the same-side back corner of our alliance zone (against the alliance wall),
- * inset diagonally toward the zone interior. When the robot is still inside our own
- * alliance zone the trajectory does not cross the hub, so we use a comfortable
- * inset for shot-variance cushion. Once the robot is past our hub line, the lob
- * has to pass over the hub, so we shrink the inset to push the target closer to
- * the actual corner -- this pulls the trajectory line farther from hub center
- * (which is at field-width center) and reduces the chance of clipping the hub.
- * The lookup table is still responsible for ensuring the lob has enough apex
- * height to clear the hub vertically.
+ * Targets a point alongside our hub on the same Y-side as the robot: pulled
+ * back from the hub front face into our alliance zone by
+ * {@link FeedingConstants#kFeedHubBackBufferMeters} and offset from field-width
+ * center by the hub half-side plus
+ * {@link FeedingConstants#kFeedHubLateralMarginMeters}. This keeps the target
+ * well clear of the hub footprint in both dimensions and gives shot variance
+ * meters of margin to the back wall and the side wall, instead of the ~0.5 m
+ * the previous wall-corner target gave us. The feeding lookup table is still
+ * responsible for ensuring the lob has enough apex height to clear the hub
+ * vertically when the trajectory passes over it.
  */
 public class AutoAimAndFeed extends Command {
     private final Swerve m_swerve;
@@ -94,10 +95,7 @@ public class AutoAimAndFeed extends Command {
         Pose2d robotPose = m_swerve.getPose();
         double headingDeg = robotPose.getRotation().getDegrees();
 
-        boolean isRed = DriverStation.getAlliance()
-                .orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
-        boolean pastHub = isPastOurHub(robotPose, isRed);
-        Translation2d target = computeFeedTarget(robotPose, isRed, pastHub);
+        Translation2d target = computeFeedTarget(robotPose);
         // Use shooter exit position rather than robot center to avoid parallax misses.
         Translation2d shooterField = ShooterGeometryConstants.shooterFieldPosition(robotPose);
         Translation2d toTarget = target.minus(shooterField);
@@ -109,8 +107,8 @@ public class AutoAimAndFeed extends Command {
                 ShotCompensation.calculateFromBearing(fieldVelocity, headingDeg, bearingDeg, poseDistance);
 
         double feedDistance = MathUtil.clamp(compensation.adjustedDistanceMeters,
-                ShootingConstants.kMinShootingDistanceMeters,
-                ShootingConstants.kMaxShootingDistanceMeters);
+                ShootingConstants.kMinFeedingDistanceMeters,
+                ShootingConstants.kMaxFeedingDistanceMeters);
 
         double targetRollerRPM = RPMLookupTable.getFeedingRollerRPM(feedDistance);
         double targetRPM = RPMLookupTable.getFeedingFlywheelRPM(feedDistance);
@@ -153,7 +151,6 @@ public class AutoAimAndFeed extends Command {
         SmartDashboard.putBoolean("AutoFeed/VisionTrusted", visionTrusted);
         SmartDashboard.putBoolean("AutoFeed/LowSide",
                 robotPose.getY() < FieldConstants.kFieldWidthMeters / 2.0);
-        SmartDashboard.putBoolean("AutoFeed/PastHub", pastHub);
         SmartDashboard.putNumber("AutoFeed/FeedDistance", feedDistance);
         SmartDashboard.putNumber("AutoFeed/PoseDistance", poseDistance);
         SmartDashboard.putNumber("AutoFeed/HeadingErr", headingErr);
@@ -185,31 +182,28 @@ public class AutoAimAndFeed extends Command {
     }
 
     /**
-     * True when the robot has crossed our hub X-line into the neutral or opponent
-     * side of the field. Our hub sits on the alliance-zone / neutral-zone boundary,
-     * so any feed taken from past that line has to clear the hub on the way back.
+     * Picks a target alongside our hub on the same Y-side as the robot. Target X
+     * is pulled back from the hub front face into our alliance zone by
+     * kFeedHubBackBufferMeters so shot variance toward the neutral zone still
+     * lands inside the zone. Target Y is offset from hub center by the hub
+     * half-side plus kFeedHubLateralMarginMeters so the trajectory clears the
+     * hub footprint and lands well inside the field width.
      */
-    private static boolean isPastOurHub(Pose2d robotPose, boolean isRed) {
-        double hubX = isRed
-                ? FieldConstants.kFieldLengthMeters - FieldConstants.kAllianceZoneDepthMeters
-                : FieldConstants.kAllianceZoneDepthMeters;
-        return isRed ? robotPose.getX() < hubX : robotPose.getX() > hubX;
-    }
+    private static Translation2d computeFeedTarget(Pose2d robotPose) {
+        boolean isRed = DriverStation.getAlliance()
+                .orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
+        // sign points from our alliance wall into the field — flips the X math for red.
+        double sign = isRed ? -1.0 : 1.0;
+        double ourWallX = isRed ? FieldConstants.kFieldLengthMeters : 0.0;
+        double hubFrontX = ourWallX + sign * (FieldConstants.kAllianceZoneDepthMeters
+                - FieldConstants.kHubHalfSideMeters);
+        double targetX = hubFrontX - sign * FeedingConstants.kFeedHubBackBufferMeters;
 
-    /**
-     * Picks the back-corner of our alliance zone on the same Y-side as the robot
-     * and insets diagonally toward the zone interior. Uses a smaller inset once the
-     * robot is past our hub so the trajectory line stays farther from hub center.
-     */
-    private static Translation2d computeFeedTarget(Pose2d robotPose, boolean isRed, boolean pastHub) {
-        double inset = pastHub
-                ? FeedingConstants.kFeedCornerInsetPastHubMeters
-                : FeedingConstants.kFeedCornerInsetMeters;
-        double wallX = isRed ? FieldConstants.kFieldLengthMeters : 0.0;
-        boolean lowSide = robotPose.getY() < FieldConstants.kFieldWidthMeters / 2.0;
-        double wallY = lowSide ? 0.0 : FieldConstants.kFieldWidthMeters;
-        double targetX = wallX + (isRed ? -inset : inset);
-        double targetY = wallY + (lowSide ? inset : -inset);
+        double centerY = FieldConstants.kFieldWidthMeters / 2.0;
+        boolean lowSide = robotPose.getY() < centerY;
+        double lateralOffset = FieldConstants.kHubHalfSideMeters
+                + FeedingConstants.kFeedHubLateralMarginMeters;
+        double targetY = lowSide ? centerY - lateralOffset : centerY + lateralOffset;
         return new Translation2d(targetX, targetY);
     }
 

@@ -287,6 +287,11 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     // neutral-zone boundary.
     public static final double kAllianceZoneDepthMeters = 4.03;
 
+    // Hub is a 1.19 m × 1.19 m square prism centered on field width at the
+    // alliance-zone / neutral-zone boundary (Game Manual §5.4).
+    public static final double kHubSideMeters = 1.19;
+    public static final double kHubHalfSideMeters = kHubSideMeters / 2.0;
+
     /** Blue-origin translation of an AprilTag on the current field. Empty if unknown. */
     public static Optional<Translation2d> getTagTranslation(int tagID) {
       return kFieldLayout.getTagPose(tagID).map(p -> p.toPose2d().getTranslation());
@@ -336,16 +341,17 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     // Feeding can tolerate slightly sloppier aim than scoring.
     public static final double kFeedAimToleranceDegrees = 3.0;
 
-    // Diagonal inset (meters) from the wall corner toward the zone interior, used
-    // when the robot is still in our own alliance zone. Provides a cushion so shot
-    // variance still lands fuel inside the zone.
-    public static final double kFeedCornerInsetMeters = 0.5;
+    // Lateral cushion past the hub's side face. The target sits at
+    // fieldWidth/2 ± (hubHalfSide + this value) on the robot's Y-side, giving
+    // shot variance a few meters of room to either Y wall instead of the
+    // ~0.5 m the wall-corner target gave us.
+    public static final double kFeedHubLateralMarginMeters = 0.5;
 
-    // Smaller inset used once the robot is past our hub, so the target sits closer
-    // to the actual wall corner. This pulls the trajectory line farther from hub
-    // center (which is at field-width center), reducing the chance of clipping the
-    // hub on a long over-the-hub lob.
-    public static final double kFeedCornerInsetPastHubMeters = 0.15;
+    // Back-buffer from the hub front face into our alliance zone. Target X is
+    // pulled this far from the hub front face toward our wall so the line of
+    // fire never grazes the hub corner and shot variance toward the neutral
+    // zone still lands inside our alliance zone.
+    public static final double kFeedHubBackBufferMeters = 0.3;
   }
 
   public static class VelocityCompensationConstants {
