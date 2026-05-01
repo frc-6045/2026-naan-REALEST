@@ -339,6 +339,7 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final double kMaxAutoRotationRadPerSec = 3.0; // Max rotation speed during auto-aim (rad/s)
     // When tilted (e.g. ball stuck under robot), the chassis can't rotate the last few degrees, so widen tolerance to still fire.
     public static final double kTiltThresholdDegrees = 4.0;
+    public static final double kTiltDeadbandDegrees = 1.0; // Hysteresis: enter tilted at threshold, exit at threshold - deadband
     public static final double kTiltedAimToleranceDegrees = 15.0;
   }
 
