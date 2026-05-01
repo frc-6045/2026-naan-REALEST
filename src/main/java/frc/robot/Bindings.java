@@ -77,18 +77,13 @@ public class Bindings {
         ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
             .until(() -> intakePivot.atSetpoint())));
 
-        // Auto-aim and auto-feed: lob game pieces back toward our alliance zone off feeding AprilTags
-        m_driverController.leftBumper().whileTrue(new SequentialCommandGroup(
-            new ScanForTarget(swerve,
-                () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
-                () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)),
-            new AutoAimAndFeed(
+        // Auto-aim and auto-feed: pose-based lob into the same-side back corner of our alliance zone
+        m_driverController.leftBumper().whileTrue(new AutoAimAndFeed(
                 swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
-            )
-        ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
-            .until(() -> intakePivot.atSetpoint())));
+            ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
+                .until(() -> intakePivot.atSetpoint())));
 
         m_driverController.leftTrigger().whileTrue(new FeedShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake, MotorConstants.kFeederShotFlywheelRPM, MotorConstants.kFeederShotTopRollerRPM));
 

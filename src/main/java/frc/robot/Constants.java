@@ -309,6 +309,13 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final AprilTagFieldLayout kFieldLayout =
         AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
+    // 2026 REBUILT field nominal dimensions (Game Manual §5.2)
+    public static final double kFieldLengthMeters = 16.54;
+    public static final double kFieldWidthMeters = 8.07;
+
+    // Alliance zone is 4.03m deep against each alliance wall (Game Manual §5.3)
+    public static final double kAllianceZoneDepthMeters = 4.03;
+
     /** Blue-origin translation of an AprilTag on the current field. Empty if unknown. */
     public static Optional<Translation2d> getTagTranslation(int tagID) {
       return kFieldLayout.getTagPose(tagID).map(p -> p.toPose2d().getTranslation());
@@ -355,16 +362,31 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
   }
 
   public static class FeedingConstants {
-    // Added to the Limelight-measured distance for midfield feed tags so the ball
-    // clears just over the tag instead of smacking into it.
-    public static final double kMidfieldDistanceBumpMeters = 0.61; // ~2 ft
-
-    // Used regardless of measured distance when feeding from the opponent zone --
-    // we always want a full-field lob, which matches the 45 ft entry in FeedingLookupTable.
-    public static final double kOpponentZoneFeedDistanceMeters = 0.0254 * 12 * 45; // ~13.72 m
-
     // Feeding can tolerate slightly sloppier aim than scoring.
     public static final double kFeedAimToleranceDegrees = 3.0;
+
+    // Diagonal inset (meters) from the wall corner toward the zone interior.
+    // Provides a cushion so shot variance still lands fuel inside the zone.
+    public static final double kFeedCornerInsetMeters = 0.5;
+
+    /**
+     * Returns the field-frame translation we should aim at when feeding back into
+     * our alliance zone. Picks the corner of our alliance zone that is on the
+     * alliance wall and on the same Y-side as the robot, then insets diagonally
+     * into the zone by kFeedCornerInsetMeters. The hub is centered on width and
+     * sits at the alliance-zone / neutral-zone boundary, so a wall-corner target
+     * is always on the far side of the hub from the robot.
+     */
+    public static Translation2d getFeedTargetTranslation(Pose2d robotPose) {
+      boolean isRed = DriverStation.getAlliance()
+          .orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
+      double wallX = isRed ? FieldConstants.kFieldLengthMeters : 0.0;
+      boolean lowSide = robotPose.getY() < FieldConstants.kFieldWidthMeters / 2.0;
+      double wallY = lowSide ? 0.0 : FieldConstants.kFieldWidthMeters;
+      double targetX = wallX + (isRed ? -kFeedCornerInsetMeters : kFeedCornerInsetMeters);
+      double targetY = wallY + (lowSide ? kFeedCornerInsetMeters : -kFeedCornerInsetMeters);
+      return new Translation2d(targetX, targetY);
+    }
   }
 
   public static class VelocityCompensationConstants {
