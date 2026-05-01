@@ -277,6 +277,10 @@ public class Swerve extends SubsystemBase {
         return m_swerveDrive.getPitch();
     }
 
+    public Rotation2d getRoll() {
+        return m_swerveDrive.getRoll();
+    }
+
     /**
      * Zeroes the gyro heading.
      */
