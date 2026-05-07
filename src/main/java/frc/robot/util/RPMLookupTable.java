@@ -16,20 +16,21 @@ public class RPMLookupTable {
     private static final InterpolatingDoubleTreeMap m_feedingFlywheelMap = new InterpolatingDoubleTreeMap();
 
     static {
+        final int shortOffset = -50;
         // Shooting table (vision-based, short range). Distances in inches converted to meters.
-        m_shootingRollerMap.put(0.0254 * 45,   400.0);
-        m_shootingRollerMap.put(0.0254 * 60,  1400.0);
-        m_shootingRollerMap.put(0.0254 * 75,  1600.0);
-        m_shootingRollerMap.put(0.0254 * 90,  1700.0);
+        m_shootingRollerMap.put(0.0254 * 45,   400.0 + shortOffset);
+        m_shootingRollerMap.put(0.0254 * 60,  1400.0 + shortOffset);
+        m_shootingRollerMap.put(0.0254 * 75,  1600.0 + shortOffset);
+        m_shootingRollerMap.put(0.0254 * 90,  1700.0 + shortOffset);
         m_shootingRollerMap.put(0.0254 * 120, 1800.0);
         m_shootingRollerMap.put(0.0254 * 135, 1950.0);
         m_shootingRollerMap.put(0.0254 * 150, 2100.0);
         m_shootingRollerMap.put(0.0254 * 175, 2350.0);
 
-        m_shootingFlywheelMap.put(0.0254 * 45,  2500.0);
-        m_shootingFlywheelMap.put(0.0254 * 60,  2200.0);
-        m_shootingFlywheelMap.put(0.0254 * 75,  2200.0);
-        m_shootingFlywheelMap.put(0.0254 * 90,  2300.0);
+        m_shootingFlywheelMap.put(0.0254 * 45,  2500.0 + shortOffset);
+        m_shootingFlywheelMap.put(0.0254 * 60,  2200.0 + shortOffset);
+        m_shootingFlywheelMap.put(0.0254 * 75,  2200.0 + shortOffset);
+        m_shootingFlywheelMap.put(0.0254 * 90,  2300.0 + shortOffset);
         m_shootingFlywheelMap.put(0.0254 * 120, 2400.0);
         m_shootingFlywheelMap.put(0.0254 * 135, 2550.0);
         m_shootingFlywheelMap.put(0.0254 * 150, 2600.0);

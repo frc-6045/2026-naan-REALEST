@@ -99,10 +99,10 @@ public final class Constants {
 
     // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
     // TODO: Determine empirically on the robot
-    public static final double kIntakePivotDeploySetpoint = 0.725833535194397;   // Fully down (deployed)
-    public static final double kIntakePivotOuttakeSetpoint = 0.6731676459312439;  // a bit up for eject balls
-    public static final double kIntakePivotMiddleSetpoint = 0.4819125533103943;   // Halfway — oscillation bottom
-    public static final double kIntakePivotStowSetpoint = 0.3160654306411743;     // Fully up (stowed/raised)
+    public static final double kIntakePivotDeploySetpoint = 0.03799157962203026;   // Fully down (deployed)
+    public static final double kIntakePivotOuttakeSetpoint = 0.9843974709510803;  // a bit up for eject balls
+    public static final double kIntakePivotMiddleSetpoint = 0.8136550188064575;   // Halfway — oscillation bottom
+    public static final double kIntakePivotStowSetpoint = 0.6408624053001404;     // Fully up (stowed/raised)
 
     // Seconds per oscillation direction (up->middle or middle->up)
     public static final double kIntakePivotOscillationPeriodSec = 0.8;
@@ -220,38 +220,6 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
       return contains(getTargetAprilTagIDs(), id);
     }
 
-    // Feeding AprilTag IDs -- used by AutoAimAndFeed to lob game pieces back into our zone.
-    // Midfield tags: aim just OVER them (measured distance + small bump).
-    // Opponent-zone tags: lob all the way back using a fixed ~45 ft feed distance.
-    private static final int[] kRedMidfieldFeedTagIDs = {1, 6};
-    private static final int[] kBlueMidfieldFeedTagIDs = {17, 22};
-    private static final int[] kRedOpponentZoneFeedTagIDs = {23, 28};
-    private static final int[] kBlueOpponentZoneFeedTagIDs = {7, 12};
-
-    public static int[] getMidfieldFeedTagIDs() {
-      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
-          ? kRedMidfieldFeedTagIDs
-          : kBlueMidfieldFeedTagIDs;
-    }
-
-    public static int[] getOpponentZoneFeedTagIDs() {
-      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
-          ? kRedOpponentZoneFeedTagIDs
-          : kBlueOpponentZoneFeedTagIDs;
-    }
-
-    public static boolean isMidfieldFeedTag(int id) {
-      return contains(getMidfieldFeedTagIDs(), id);
-    }
-
-    public static boolean isOpponentZoneFeedTag(int id) {
-      return contains(getOpponentZoneFeedTagIDs(), id);
-    }
-
-    public static boolean isValidFeedTagID(int id) {
-      return isMidfieldFeedTag(id) || isOpponentZoneFeedTag(id);
-    }
-
     private static boolean contains(int[] array, int value) {
       for (int v : array) {
         if (v == value) {
@@ -320,6 +288,21 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final AprilTagFieldLayout kFieldLayout =
         AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
+    // 2026 REBUILT field dimensions, sourced from the loaded AprilTag layout so
+    // they stay in sync with WPILib's field constants.
+    public static final double kFieldLengthMeters = kFieldLayout.getFieldLength();
+    public static final double kFieldWidthMeters = kFieldLayout.getFieldWidth();
+
+    // Alliance zone is 4.03m deep against each alliance wall (Game Manual §5.3).
+    // Used to locate our hub, which sits centered on width at the alliance-zone /
+    // neutral-zone boundary.
+    public static final double kAllianceZoneDepthMeters = 4.03;
+
+    // Hub is a 1.19 m × 1.19 m square prism centered on field width at the
+    // alliance-zone / neutral-zone boundary (Game Manual §5.4).
+    public static final double kHubSideMeters = 1.19;
+    public static final double kHubHalfSideMeters = kHubSideMeters / 2.0;
+
     /** Blue-origin translation of an AprilTag on the current field. Empty if unknown. */
     public static Optional<Translation2d> getTagTranslation(int tagID) {
       return kFieldLayout.getTagPose(tagID).map(p -> p.toPose2d().getTranslation());
@@ -344,10 +327,14 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final double kAimP = 0.2; // Proportional gain
     public static final double kAimI = 0.0; // Integral gain
     public static final double kAimD = 0.01; // Derivative gain
-    public static final double kAimToleranceDegrees = 1; // Acceptable aim error (degrees)
+    public static final double kAimToleranceDegrees = 2; // Acceptable aim error (degrees)
     public static final double kAimMovingToleranceDegrees = 10.0; // Wider tolerance while moving
     public static final double kMovingSpeedThresholdMps = 0.3; // Speed above which wider tolerance applies
     public static final double kMaxAutoRotationRadPerSec = 3.0; // Max rotation speed during auto-aim (rad/s)
+    // When tilted (e.g. ball stuck under robot), the chassis can't rotate the last few degrees, so widen tolerance to still fire.
+    public static final double kTiltThresholdDegrees = 4.0;
+    public static final double kTiltDeadbandDegrees = 1.0; // Hysteresis: enter tilted at threshold, exit at threshold - deadband
+    public static final double kTiltedAimToleranceDegrees = 15.0;
   }
 
   public static class ShootingConstants {
@@ -366,16 +353,20 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
   }
 
   public static class FeedingConstants {
-    // Added to the Limelight-measured distance for midfield feed tags so the ball
-    // clears just over the tag instead of smacking into it.
-    public static final double kMidfieldDistanceBumpMeters = 0.61; // ~2 ft
-
-    // Used regardless of measured distance when feeding from the opponent zone --
-    // we always want a full-field lob, which matches the 45 ft entry in FeedingLookupTable.
-    public static final double kOpponentZoneFeedDistanceMeters = 0.0254 * 12 * 45; // ~13.72 m
-
     // Feeding can tolerate slightly sloppier aim than scoring.
     public static final double kFeedAimToleranceDegrees = 3.0;
+
+    // Lateral cushion past the hub's side face. The target sits at
+    // fieldWidth/2 ± (hubHalfSide + this value) on the robot's Y-side, giving
+    // shot variance a few meters of room to either Y wall instead of the
+    // ~0.5 m the wall-corner target gave us.
+    public static final double kFeedHubLateralMarginMeters = 0.5;
+
+    // Back-buffer from the hub front face into our alliance zone. Target X is
+    // pulled this far from the hub front face toward our wall so the line of
+    // fire never grazes the hub corner and shot variance toward the neutral
+    // zone still lands inside our alliance zone.
+    public static final double kFeedHubBackBufferMeters = 0.3;
   }
 
   public static class VelocityCompensationConstants {

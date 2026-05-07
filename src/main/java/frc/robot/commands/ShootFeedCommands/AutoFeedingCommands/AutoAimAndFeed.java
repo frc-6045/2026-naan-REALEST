@@ -7,13 +7,13 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AimConstants;
 import frc.robot.Constants.FeedingConstants;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShooterGeometryConstants;
 import frc.robot.Constants.ShootingConstants;
@@ -27,18 +27,20 @@ import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.shooterSystem.TopRoller;
 import frc.robot.util.RPMLookupTable;
 import frc.robot.util.IntakePivotOscillator;
-import frc.robot.util.LimelightHelpers;
-import frc.robot.util.LimelightTargeting;
 import frc.robot.util.ShotCompensation;
 
 /**
- * Auto-aim and auto-feed command for lobbing game pieces back into our alliance zone.
- * Mirrors AutoAimAndShoot but targets feeding tags instead of scoring tags and
- * sources RPMs from FeedingLookupTable.
- *
- * Distance used for the lookup depends on which tag we lock onto:
- * - Midfield tags (1/6 red, 17/22 blue): measured distance + a small bump so the ball clears the tag
- * - Opponent-zone tags (23/28 red, 7/12 blue): fixed ~45 ft (matches the long-feed lookup entry)
+ * Auto-aim and auto-feed command for lobbing fuel back into our alliance zone.
+ * Targets a point alongside our hub on the same Y-side as the robot: pulled
+ * back from the hub front face into our alliance zone by
+ * {@link FeedingConstants#kFeedHubBackBufferMeters} and offset from field-width
+ * center by the hub half-side plus
+ * {@link FeedingConstants#kFeedHubLateralMarginMeters}. This keeps the target
+ * well clear of the hub footprint in both dimensions and gives shot variance
+ * meters of margin to the back wall and the side wall, instead of the ~0.5 m
+ * the previous wall-corner target gave us. The feeding lookup table is still
+ * responsible for ensuring the lob has enough apex height to clear the hub
+ * vertically when the trajectory passes over it.
  */
 public class AutoAimAndFeed extends Command {
     private final Swerve m_swerve;
@@ -49,24 +51,14 @@ public class AutoAimAndFeed extends Command {
     private final IntakePivot m_intakePivot;
     private final Intake m_intake;
 
-    private final DoubleSupplier m_translationXSupplier; // Forward/back (field-relative Y on joystick)
-    private final DoubleSupplier m_translationYSupplier; // Left/right (field-relative X on joystick)
+    private final DoubleSupplier m_translationXSupplier;
+    private final DoubleSupplier m_translationYSupplier;
 
     private final PIDController m_aimPID;
 
-    // Spin to the safe default until a tag-based lookup overrides them. Keeps the flywheel
-    // at speed from the moment the command starts so the first ball isn't fed mid-spin-up.
-    private double m_lastTargetRPM = MotorConstants.kShooterTargetRPM;
-    private double m_lastTargetRollerRPM = MotorConstants.kRollerTargetRPM;
     private boolean m_feeding = false;
     private final Timer m_graceTimer = new Timer();
     private final IntakePivotOscillator.OscillationState m_pivotState = new IntakePivotOscillator.OscillationState();
-
-    private final LimelightTargeting.TagLockState m_tagLock = new LimelightTargeting.TagLockState();
-
-    // Cached target translation for the currently locked tag; avoids per-cycle Optional/Pose2d chain.
-    private int m_cachedTagID = -1;
-    private Translation2d m_cachedTagTranslation = null;
 
     public AutoAimAndFeed(
             Swerve swerve, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
@@ -91,124 +83,87 @@ public class AutoAimAndFeed extends Command {
 
     @Override
     public void initialize() {
-        LimelightHelpers.setPipelineIndex(LimelightConstants.kFrontCamera.name, LimelightConstants.kAprilTagPipeline);
-
         m_aimPID.reset();
         m_feeding = false;
         m_graceTimer.stop();
         m_graceTimer.reset();
-        m_tagLock.reset();
         m_pivotState.reset();
-        m_cachedTagID = -1;
-        m_cachedTagTranslation = null;
     }
 
     @Override
     public void execute() {
-        int lockedTag = LimelightTargeting
-                .acquireTarget(m_tagLock, LimelightConstants::isValidFeedTagID)
-                .lockedTagID;
-        Translation2d targetTranslation = lockedTagTranslation(lockedTag);
+        Pose2d robotPose = m_swerve.getPose();
+        double headingDeg = robotPose.getRotation().getDegrees();
 
-        double translationX = m_translationXSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
-        double translationY = m_translationYSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
-        Translation2d translation = new Translation2d(translationX, translationY);
+        boolean isRed = DriverStation.getAlliance()
+                .orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
+        Translation2d target = computeFeedTarget(robotPose, isRed);
+        // Use shooter exit position rather than robot center to avoid parallax misses.
+        Translation2d shooterField = ShooterGeometryConstants.shooterFieldPosition(robotPose);
+        Translation2d toTarget = target.minus(shooterField);
+        double bearingDeg = toTarget.getAngle().getDegrees();
+        double poseDistance = toTarget.getNorm();
 
-        if (targetTranslation != null) {
-            Pose2d robotPose = m_swerve.getPose();
-            double headingDeg = robotPose.getRotation().getDegrees();
+        ChassisSpeeds fieldVelocity = m_swerve.getFieldVelocity();
+        ShotCompensation.CompensationResult compensation =
+                ShotCompensation.calculateFromBearing(fieldVelocity, headingDeg, bearingDeg, poseDistance);
 
-            // Compute bearing/distance from the shooter exit, not robot center, to avoid parallax
-            // misses when the shooter is mechanically offset from the chassis center.
-            Translation2d shooterField = ShooterGeometryConstants.shooterFieldPosition(robotPose);
-            Translation2d toTarget = targetTranslation.minus(shooterField);
-            double bearingDeg = toTarget.getAngle().getDegrees();
-            double poseDistance = toTarget.getNorm();
+        double feedDistance = MathUtil.clamp(compensation.adjustedDistanceMeters,
+                ShootingConstants.kMinFeedingDistanceMeters,
+                ShootingConstants.kMaxFeedingDistanceMeters);
 
-            ChassisSpeeds fieldVelocity = m_swerve.getFieldVelocity();
-            ShotCompensation.CompensationResult compensation =
-                    ShotCompensation.calculateFromBearing(fieldVelocity, headingDeg, bearingDeg, poseDistance);
+        double targetRollerRPM = RPMLookupTable.getFeedingRollerRPM(feedDistance);
+        double targetRPM = RPMLookupTable.getFeedingFlywheelRPM(feedDistance);
 
-            // Opponent-zone feeds are a full-field lob with fixed distance; midfield uses pose + bump.
-            boolean isOppZone = LimelightConstants.isOpponentZoneFeedTag(lockedTag);
-            double feedDistance;
-            if (isOppZone) {
-                feedDistance = FeedingConstants.kOpponentZoneFeedDistanceMeters;
-            } else {
-                double bumped = compensation.adjustedDistanceMeters + FeedingConstants.kMidfieldDistanceBumpMeters;
-                feedDistance = MathUtil.clamp(bumped,
-                        ShootingConstants.kMinShootingDistanceMeters,
-                        ShootingConstants.kMaxShootingDistanceMeters);
-            }
+        m_topRoller.setRPM(targetRollerRPM);
+        m_flywheel.setTargetRPM(targetRPM);
 
-            double targetRollerRPM = RPMLookupTable.getFeedingRollerRPM(feedDistance);
-            double targetRPM = RPMLookupTable.getFeedingFlywheelRPM(feedDistance);
-            m_lastTargetRPM = targetRPM;
-            m_lastTargetRollerRPM = targetRollerRPM;
+        double desiredHeadingDeg = bearingDeg
+                - ShooterGeometryConstants.kShooterYawDegrees
+                - compensation.aimLeadDegrees;
+        double aimOutput = m_aimPID.calculate(headingDeg, desiredHeadingDeg);
+        double rotationSpeed = MathUtil.clamp(aimOutput,
+                -AimConstants.kMaxAutoRotationRadPerSec,
+                AimConstants.kMaxAutoRotationRadPerSec);
 
-            m_topRoller.setRPM(targetRollerRPM);
-            m_flywheel.setTargetRPM(targetRPM);
+        double headingErr = MathUtil.inputModulus(desiredHeadingDeg - headingDeg, -180.0, 180.0);
+        double aimTolerance = Math.max(compensation.getAimToleranceDegrees(),
+                FeedingConstants.kFeedAimToleranceDegrees);
+        boolean aimed = Math.abs(headingErr) < aimTolerance;
+        boolean topRollerReady = m_topRoller.isAtTargetSpeed(targetRollerRPM);
+        boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
+        boolean visionTrusted = m_swerve.hasEverAcceptedVision();
+        boolean readyToFire = aimed && topRollerReady && flywheelReady && visionTrusted;
 
-            double desiredHeadingDeg = bearingDeg
-                    - ShooterGeometryConstants.kShooterYawDegrees
-                    - LimelightConstants.kFrontCamera.yawOffsetDegrees
-                    - compensation.aimLeadDegrees;
-            double aimOutput = m_aimPID.calculate(headingDeg, desiredHeadingDeg);
-            double rotationSpeed = MathUtil.clamp(aimOutput,
-                    -AimConstants.kMaxAutoRotationRadPerSec,
-                    AimConstants.kMaxAutoRotationRadPerSec);
+        updateFeedState(readyToFire);
+        IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, m_feeding, "AutoFeed/");
 
-            double headingErr = MathUtil.inputModulus(desiredHeadingDeg - headingDeg, -180.0, 180.0);
-            double aimTolerance = Math.max(compensation.getAimToleranceDegrees(),
-                    FeedingConstants.kFeedAimToleranceDegrees);
-            boolean aimed = Math.abs(headingErr) < aimTolerance;
-            boolean topRollerReady = m_topRoller.isAtTargetSpeed(targetRollerRPM);
-            boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
-            boolean visionTrusted = m_swerve.hasEverAcceptedVision();
-            boolean readyToFire = aimed && topRollerReady && flywheelReady && visionTrusted;
-
-            updateFeedState(readyToFire);
-            IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, m_feeding, "AutoFeed/");
-
-            if (m_feeding) {
-                m_swerve.setLockAngles();
-            } else {
-                m_swerve.drive(translation, rotationSpeed, true);
-            }
-
-            SmartDashboard.putBoolean("AutoFeed/Aimed", aimed);
-            SmartDashboard.putBoolean("AutoFeed/TopRollerReady", topRollerReady);
-            SmartDashboard.putBoolean("AutoFeed/FlywheelReady", flywheelReady);
-            SmartDashboard.putBoolean("AutoFeed/ReadyToFire", readyToFire);
-            SmartDashboard.putNumber("AutoFeed/FeedDistance", feedDistance);
-            SmartDashboard.putNumber("AutoFeed/PoseDistance", poseDistance);
-            SmartDashboard.putNumber("AutoFeed/HeadingErr", headingErr);
-            SmartDashboard.putNumber("AutoFeed/DesiredHeading", desiredHeadingDeg);
-            SmartDashboard.putNumber("AutoFeed/TargetBearing", bearingDeg);
-            SmartDashboard.putBoolean("AutoFeed/OpponentZone", isOppZone);
-            SmartDashboard.putNumber("AutoFeed/LockedTagID", lockedTag);
-            SmartDashboard.putBoolean("AutoFeed/VisionTrusted", visionTrusted);
+        if (m_feeding) {
+            m_swerve.setLockAngles();
         } else {
-            m_swerve.drive(translation, 0.0, true);
-            // Keep motors at last setpoint so the flywheel stays spun up while we re-acquire a tag.
-            m_flywheel.setTargetRPM(m_lastTargetRPM);
-            m_topRoller.setRPM(m_lastTargetRollerRPM);
-            m_feeder.stopFeederMotor();
-            m_spindexer.stopSpindexerMotor();
-            m_feeding = false;
-            m_graceTimer.stop();
-            m_graceTimer.reset();
-            IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, false, "AutoFeed/");
-
-            SmartDashboard.putBoolean("AutoFeed/Aimed", false);
-            SmartDashboard.putBoolean("AutoFeed/ReadyToFire", false);
+            double translationX = m_translationXSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
+            double translationY = m_translationYSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
+            m_swerve.drive(new Translation2d(translationX, translationY), rotationSpeed, true);
         }
+
+        SmartDashboard.putBoolean("AutoFeed/Aimed", aimed);
+        SmartDashboard.putBoolean("AutoFeed/TopRollerReady", topRollerReady);
+        SmartDashboard.putBoolean("AutoFeed/FlywheelReady", flywheelReady);
+        SmartDashboard.putBoolean("AutoFeed/ReadyToFire", readyToFire);
+        SmartDashboard.putBoolean("AutoFeed/VisionTrusted", visionTrusted);
+        SmartDashboard.putBoolean("AutoFeed/LowSide",
+                robotPose.getY() < FieldConstants.kFieldWidthMeters / 2.0);
+        SmartDashboard.putNumber("AutoFeed/FeedDistance", feedDistance);
+        SmartDashboard.putNumber("AutoFeed/PoseDistance", poseDistance);
+        SmartDashboard.putNumber("AutoFeed/HeadingErr", headingErr);
+        SmartDashboard.putNumber("AutoFeed/DesiredHeading", desiredHeadingDeg);
+        SmartDashboard.putNumber("AutoFeed/TargetBearing", bearingDeg);
+        SmartDashboard.putNumber("AutoFeed/TargetX", target.getX());
+        SmartDashboard.putNumber("AutoFeed/TargetY", target.getY());
     }
 
     @Override
     public void end(boolean interrupted) {
-        LimelightHelpers.setPipelineIndex(LimelightConstants.kFrontCamera.name, LimelightConstants.kAprilTagPipeline);
-        m_tagLock.reset();
         m_swerve.drive(new Translation2d(), 0.0, true);
         m_flywheel.stopFlywheelMotor();
         m_topRoller.stopRollerMotor();
@@ -228,16 +183,28 @@ public class AutoAimAndFeed extends Command {
         return m_feeding;
     }
 
-    /** Look up the locked tag's field translation, caching across cycles while the lock is held. */
-    private Translation2d lockedTagTranslation(int lockedTag) {
-        if (lockedTag == -1) {
-            return null;
-        }
-        if (lockedTag != m_cachedTagID) {
-            m_cachedTagID = lockedTag;
-            m_cachedTagTranslation = FieldConstants.getTagTranslation(lockedTag).orElse(null);
-        }
-        return m_cachedTagTranslation;
+    /**
+     * Picks a target alongside our hub on the same Y-side as the robot. Target X
+     * is pulled back from the hub front face into our alliance zone by
+     * kFeedHubBackBufferMeters so shot variance toward the neutral zone still
+     * lands inside the zone. Target Y is offset from hub center by the hub
+     * half-side plus kFeedHubLateralMarginMeters so the trajectory clears the
+     * hub footprint and lands well inside the field width.
+     */
+    static Translation2d computeFeedTarget(Pose2d robotPose, boolean isRed) {
+        // sign points from our alliance wall into the field — flips the X math for red.
+        double sign = isRed ? -1.0 : 1.0;
+        double ourWallX = isRed ? FieldConstants.kFieldLengthMeters : 0.0;
+        double hubFrontX = ourWallX + sign * (FieldConstants.kAllianceZoneDepthMeters
+                - FieldConstants.kHubHalfSideMeters);
+        double targetX = hubFrontX - sign * FeedingConstants.kFeedHubBackBufferMeters;
+
+        double centerY = FieldConstants.kFieldWidthMeters / 2.0;
+        boolean lowSide = robotPose.getY() < centerY;
+        double lateralOffset = FieldConstants.kHubHalfSideMeters
+                + FeedingConstants.kFeedHubLateralMarginMeters;
+        double targetY = lowSide ? centerY - lateralOffset : centerY + lateralOffset;
+        return new Translation2d(targetX, targetY);
     }
 
     private void updateFeedState(boolean readyToFire) {

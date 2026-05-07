@@ -200,6 +200,8 @@ public class Autos {
 
     // Left-side autos (mirrored)
     m_autoChooser.addOption("LEFT small short", AutoBuilder.buildAuto("LEFT small short"));
+    m_autoChooser.addOption("LEFT 1987 auto", AutoBuilder.buildAuto("LEFT 1987 auto"));
+    m_autoChooser.addOption("LEFT against hub", AutoBuilder.buildAuto("LEFT against hub"));
 
     // Center
     m_autoChooser.addOption("CENTER depot", AutoBuilder.buildAuto("CENTER depot"));

@@ -45,7 +45,7 @@
     },
     {
       "name": "deploy :D",
-      "waypointRelativePos": 0,
+      "waypointRelativePos": 0.28113793545082033,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
