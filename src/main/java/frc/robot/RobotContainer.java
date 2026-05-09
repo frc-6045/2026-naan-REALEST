@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
   private Autos m_Autos;
@@ -102,5 +103,43 @@ public class RobotContainer {
    */
   public LEDs getLEDs() {
     return m_LEDs;
+  }
+
+  public Swerve getSwerve() {
+    return m_Swerve;
+  }
+
+  /** Per-tick AdvantageKit outputs that live at the RobotContainer level (PDH + controller inputs). */
+  public void recordPeriodicOutputs() {
+    Logger.recordOutput("PDH/TotalCurrent", m_pdh.getTotalCurrent());
+    Logger.recordOutput("PDH/Voltage", m_pdh.getVoltage());
+    Logger.recordOutput("PDH/Temperature", m_pdh.getTemperature());
+    Logger.recordOutput("PDH/TotalEnergy", m_pdh.getTotalEnergy());
+    Logger.recordOutput("PDH/TotalPower", m_pdh.getTotalPower());
+    Logger.recordOutput("PDH/ChannelCurrents", m_pdh.getAllCurrents());
+
+    recordController("Driver", m_driverController);
+    recordController("Operator", m_operatorController);
+  }
+
+  private static void recordController(String name, CommandXboxController c) {
+    String prefix = "Controllers/" + name + "/";
+    Logger.recordOutput(prefix + "LeftX", c.getLeftX());
+    Logger.recordOutput(prefix + "LeftY", c.getLeftY());
+    Logger.recordOutput(prefix + "RightX", c.getRightX());
+    Logger.recordOutput(prefix + "RightY", c.getRightY());
+    Logger.recordOutput(prefix + "LeftTrigger", c.getLeftTriggerAxis());
+    Logger.recordOutput(prefix + "RightTrigger", c.getRightTriggerAxis());
+    Logger.recordOutput(prefix + "A", c.getHID().getAButton());
+    Logger.recordOutput(prefix + "B", c.getHID().getBButton());
+    Logger.recordOutput(prefix + "X", c.getHID().getXButton());
+    Logger.recordOutput(prefix + "Y", c.getHID().getYButton());
+    Logger.recordOutput(prefix + "LB", c.getHID().getLeftBumperButton());
+    Logger.recordOutput(prefix + "RB", c.getHID().getRightBumperButton());
+    Logger.recordOutput(prefix + "Back", c.getHID().getBackButton());
+    Logger.recordOutput(prefix + "Start", c.getHID().getStartButton());
+    Logger.recordOutput(prefix + "LeftStick", c.getHID().getLeftStickButton());
+    Logger.recordOutput(prefix + "RightStick", c.getHID().getRightStickButton());
+    Logger.recordOutput(prefix + "POV", c.getHID().getPOV());
   }
 }

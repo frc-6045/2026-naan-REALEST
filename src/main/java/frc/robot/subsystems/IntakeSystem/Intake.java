@@ -1,5 +1,6 @@
 package frc.robot.subsystems.IntakeSystem;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
@@ -14,10 +15,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
+import frc.robot.util.LoggingUtils;
+import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
   private final SparkFlex m_IntakeMotorLeft;
   private final SparkFlex m_IntakeMotorRight;
+  private final RelativeEncoder m_LeftEncoder;
+  private final RelativeEncoder m_RightEncoder;
   private final SparkFlexConfig m_config = new SparkFlexConfig();
   private double m_TargetSpeed = 0.0;
 
@@ -25,6 +30,8 @@ public class Intake extends SubsystemBase {
   public Intake() {
     m_IntakeMotorLeft = new SparkFlex(MotorConstants.kIntakeMotorLeftCanID, MotorType.kBrushless);
     m_IntakeMotorRight = new SparkFlex(MotorConstants.kIntakeMotorRightCanID, MotorType.kBrushless);
+    m_LeftEncoder = m_IntakeMotorLeft.getEncoder();
+    m_RightEncoder = m_IntakeMotorRight.getEncoder();
 
     updateMotorSettings();
     m_IntakeMotorLeft.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
@@ -72,8 +79,12 @@ public class Intake extends SubsystemBase {
     m_IntakeMotorLeft.set(m_TargetSpeed);
     m_IntakeMotorRight.set(-m_TargetSpeed);
     SmartDashboard.putNumber("Subsystem: Intake/Speed", m_TargetSpeed);
-    SmartDashboard.putNumber("Subsystem: Intake/Left Actual Speed", m_IntakeMotorLeft.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Subsystem: Intake/Right Actual Speed", m_IntakeMotorRight.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Subsystem: Intake/Left Actual Speed", m_LeftEncoder.getVelocity());
+    SmartDashboard.putNumber("Subsystem: Intake/Right Actual Speed", m_RightEncoder.getVelocity());
     SmartDashboard.putNumber("Subsystem: Intake/Velocity", m_TargetSpeed);
+
+    Logger.recordOutput("Intake/TargetSpeed", m_TargetSpeed);
+    LoggingUtils.logSpark("Intake/Left", m_IntakeMotorLeft, m_LeftEncoder);
+    LoggingUtils.logSpark("Intake/Right", m_IntakeMotorRight, m_RightEncoder);
   }
 }

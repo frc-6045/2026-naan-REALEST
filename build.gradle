@@ -72,7 +72,61 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
+    annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
 }
+
+task(replayWatch, type: JavaExec) {
+    mainClass = "org.littletonrobotics.junction.ReplayWatch"
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+// Generate src/main/java/frc/robot/BuildConstants.java with git + build metadata so
+// AdvantageKit logs can be tied back to the exact code that produced them. Re-runs
+// every build so the SHA/dirty flag stay current.
+def generatedSrcDir = layout.buildDirectory.dir("generated/sources/buildconstants/main/java")
+def buildConstantsFile = generatedSrcDir.map { it.file("frc/robot/BuildConstants.java") }
+sourceSets.main.java.srcDir generatedSrcDir
+
+def runGit = { String... cmd ->
+    try {
+        def proc = (["git"] + (cmd as List)).execute(null, projectDir)
+        proc.waitFor()
+        return proc.exitValue() == 0 ? proc.text.trim() : "unknown"
+    } catch (ignored) {
+        return "unknown"
+    }
+}
+
+task generateBuildConstants {
+    outputs.upToDateWhen { false }
+    doLast {
+        def file = buildConstantsFile.get().asFile
+        file.parentFile.mkdirs()
+        def sha = runGit("rev-parse", "HEAD")
+        def shortSha = runGit("rev-parse", "--short=8", "HEAD")
+        def branch = runGit("rev-parse", "--abbrev-ref", "HEAD")
+        def gitDate = runGit("log", "-1", "--format=%cI", "HEAD")
+        def status = runGit("status", "--porcelain")
+        def dirty = status == "unknown" ? "unknown" : (status.isEmpty() ? "clean" : "dirty")
+        def buildDate = new Date().format("yyyy-MM-dd HH:mm:ss z")
+        file.text = """package frc.robot;
+
+public final class BuildConstants {
+    public static final String GIT_SHA = "${sha}";
+    public static final String GIT_SHORT_SHA = "${shortSha}";
+    public static final String GIT_BRANCH = "${branch}";
+    public static final String GIT_DATE = "${gitDate}";
+    public static final String GIT_DIRTY = "${dirty}";
+    public static final String BUILD_DATE = "${buildDate}";
+    private BuildConstants() {}
+}
+"""
+    }
+}
+
+compileJava.dependsOn generateBuildConstants
 
 test {
     useJUnitPlatform()

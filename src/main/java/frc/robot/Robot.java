@@ -5,20 +5,27 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.DrivebaseConstants;
+import frc.robot.Constants.Mode;
 import frc.robot.subsystems.LEDs.LEDState;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
  * the TimedRobot documentation. If you change the name of this class or the package after creating
  * this project, you must also update the Main.java file in the project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
   private final RobotContainer m_robotContainer;
   private final Timer m_disabledTimer = new Timer();
@@ -28,9 +35,47 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   public Robot() {
+    // AdvantageKit logger setup. Must run before any subsystem instantiates and publishes
+    // to NetworkTables — otherwise those publishes are missed by the log capture.
+    Logger.recordMetadata("ProjectName", "2026-naan-REALEST");
+    Logger.recordMetadata("TeamNumber", "6045");
+    Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+    Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+    Logger.recordMetadata("GitDirty", BuildConstants.GIT_DIRTY);
+
+    Mode mode = isReal() ? Mode.REAL : Constants.kSimMode;
+    switch (mode) {
+      case REAL:
+        // No-arg WPILOGWriter auto-detects: writes to /U/logs if a USB stick is mounted,
+        // otherwise falls back to /home/lvuser/logs on the RoboRIO.
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+      case SIM:
+        Logger.addDataReceiver(new WPILOGWriter("logs/"));
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+      case REPLAY:
+        // Read a recorded log and re-emit with a "_sim" suffix for diffing modified code
+        // against the original run. Activate by setting Constants.kSimMode = Mode.REPLAY.
+        setUseTiming(false);
+        String logPath = LogFileUtil.findReplayLog();
+        Logger.setReplaySource(new WPILOGReader(logPath));
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        break;
+    }
+
+    Logger.start();
+
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+  }
+
+  RobotContainer getRobotContainer() {
+    return m_robotContainer;
   }
 
   /**
@@ -49,7 +94,27 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     //SmartDashboard.putData(CommandScheduler.getInstance());
     SmartDashboard.putNumber("ROBOT current draw", m_robotContainer.getRobotCurrentDraw());
-    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+
+    Logger.recordOutput("DS/MatchTime", DriverStation.getMatchTime());
+    Logger.recordOutput("DS/Alliance",
+        DriverStation.getAlliance().map(Enum::name).orElse("Unknown"));
+    Logger.recordOutput("DS/MatchType", DriverStation.getMatchType().name());
+    Logger.recordOutput("DS/MatchNumber", DriverStation.getMatchNumber());
+    Logger.recordOutput("DS/EventName", DriverStation.getEventName());
+    Logger.recordOutput("DS/IsAutonomous", DriverStation.isAutonomous());
+    Logger.recordOutput("DS/IsTeleop", DriverStation.isTeleop());
+    Logger.recordOutput("DS/IsEnabled", DriverStation.isEnabled());
+    Logger.recordOutput("DS/IsFMSAttached", DriverStation.isFMSAttached());
+
+    Logger.recordOutput("Battery/Voltage", RobotController.getBatteryVoltage());
+    var canStatus = RobotController.getCANStatus();
+    Logger.recordOutput("CAN/BusUtilization", canStatus.percentBusUtilization);
+    Logger.recordOutput("CAN/OffCount", canStatus.busOffCount);
+    Logger.recordOutput("CAN/TxFullCount", canStatus.txFullCount);
+    Logger.recordOutput("CAN/ReceiveErrorCount", canStatus.receiveErrorCount);
+    Logger.recordOutput("CAN/TransmitErrorCount", canStatus.transmitErrorCount);
+
+    m_robotContainer.recordPeriodicOutputs();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
