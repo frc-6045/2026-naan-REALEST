@@ -100,9 +100,11 @@ public class Feeder extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Subsystem: Feeder/Current", m_FeederMotor.getOutputCurrent());
+    double feederCurrent = m_FeederMotor.getOutputCurrent();
+    double blackRollerCurrent = m_IntakeBlackRollerMotor.getOutputCurrent();
+    SmartDashboard.putNumber("Subsystem: Feeder/Current", feederCurrent);
 
-    LoggingUtils.logSpark("Feeder/FeederMotor", m_FeederMotor, m_FeederEncoder);
-    LoggingUtils.logSpark("Feeder/BlackRoller", m_IntakeBlackRollerMotor, m_BlackRollerEncoder);
+    LoggingUtils.logSpark("Feeder/FeederMotor", m_FeederMotor, m_FeederEncoder, feederCurrent);
+    LoggingUtils.logSpark("Feeder/BlackRoller", m_IntakeBlackRollerMotor, m_BlackRollerEncoder, blackRollerCurrent);
   }
 }

@@ -34,10 +34,10 @@ public class Flywheel extends SubsystemBase {
     m_FlywheelMotor2 = new SparkFlex(MotorConstants.kShooterMotor2CanID, MotorType.kBrushless);
 
     updateMotorSettings();
+
     m_config.inverted(false);
     m_FlywheelMotor1.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
-    updateMotorSettings();
     m_config.inverted(true);
     m_FlywheelMotor2.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -71,7 +71,9 @@ public class Flywheel extends SubsystemBase {
     m_config
         .idleMode(IdleMode.kCoast)
         .openLoopRampRate(0.167)
-        .closedLoopRampRate(0.167)
+        // Closed-loop ramp at 0 — let the velocity PID + feedforward drive the wheel up
+        // as fast as the motor allows. The 0.167s ramp added ~150ms to spin-up time.
+        .closedLoopRampRate(0.0)
         .smartCurrentLimit(MotorConstants.kShooterCurrentLimit);
     m_config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -80,9 +82,11 @@ public class Flywheel extends SubsystemBase {
         .d(MotorConstants.kShooterD)
         .velocityFF(MotorConstants.kShooterFF)
         .iZone(MotorConstants.kShooterIZone);
-    // m_config.encoder
-    //     .uvwAverageDepth(2)
-    //     .uvwMeasurementPeriod(10);
+    // Tighter velocity-feedback filter (default is 64-sample average over 100ms — way too
+    // laggy for a flywheel). Brings closed-loop response in line with TopRoller.
+    m_config.encoder
+        .uvwAverageDepth(2)
+        .uvwMeasurementPeriod(10);
   }
 
   public void setSpeed(double speed) {
@@ -129,10 +133,12 @@ public class Flywheel extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Flywheel/Velocity (RPM)", getRPM());
 
-    SmartDashboard.putNumber("Subsystem: Flywheel/Motor 1 Current", m_FlywheelMotor1.getOutputCurrent());
-    SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Current", m_FlywheelMotor2.getOutputCurrent());
+    double current1 = m_FlywheelMotor1.getOutputCurrent();
+    double current2 = m_FlywheelMotor2.getOutputCurrent();
+    SmartDashboard.putNumber("Subsystem: Flywheel/Motor 1 Current", current1);
+    SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Current", current2);
 
-    LoggingUtils.logSpark("Flywheel/Motor1", m_FlywheelMotor1, m_Encoder1);
-    LoggingUtils.logSpark("Flywheel/Motor2", m_FlywheelMotor2, m_Encoder2);
+    LoggingUtils.logSpark("Flywheel/Motor1", m_FlywheelMotor1, m_Encoder1, current1);
+    LoggingUtils.logSpark("Flywheel/Motor2", m_FlywheelMotor2, m_Encoder2, current2);
   }
 }

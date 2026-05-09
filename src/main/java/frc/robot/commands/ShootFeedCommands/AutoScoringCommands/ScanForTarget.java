@@ -57,8 +57,11 @@ public class ScanForTarget extends Command {
         m_setpoint1 = MathUtil.inputModulus(m_initialHeading + kScanAngleDegrees, -180, 180);
         m_setpoint2 = MathUtil.inputModulus(m_initialHeading - kScanAngleDegrees, -180, 180);
 
-        m_scanPhase = 1;
         m_PID.reset();
+
+        // Skip the scan entirely if a tag is already in view — saves at least one cycle of
+        // useless rotation when the driver is already aimed at the hub.
+        m_scanPhase = LimelightTargeting.anyTargetVisible() ? 3 : 1;
     }
 
     @Override
