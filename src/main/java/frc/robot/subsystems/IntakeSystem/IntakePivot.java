@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class IntakePivot extends SubsystemBase {
   private final SparkFlex m_IntakeDeployMotor;
@@ -117,5 +118,17 @@ public double applyLimits(double speed) {
     double position = getAbsoluteEncoderReading();
     SmartDashboard.putNumber("Subsystem: Intake Pivot/Speed", limitedSpeed);
     SmartDashboard.putNumber("Subsystem: Intake Pivot/Position", position);
+
+    Logger.recordOutput("IntakePivot/TargetSpeed", m_TargetSpeed);
+    Logger.recordOutput("IntakePivot/RampedSpeed", limitedSpeed);
+    Logger.recordOutput("IntakePivot/Position", position);
+    Logger.recordOutput("IntakePivot/PositionRadians", encoderToRadians(position));
+    Logger.recordOutput("IntakePivot/PIDSetpoint", m_PID.getSetpoint());
+    Logger.recordOutput("IntakePivot/PIDError", m_PID.getError());
+    Logger.recordOutput("IntakePivot/AtSetpoint", m_PID.atSetpoint());
+    Logger.recordOutput("IntakePivot/AppliedOutput", m_IntakeDeployMotor.getAppliedOutput());
+    Logger.recordOutput("IntakePivot/BusVoltage", m_IntakeDeployMotor.getBusVoltage());
+    Logger.recordOutput("IntakePivot/OutputCurrent", m_IntakeDeployMotor.getOutputCurrent());
+    Logger.recordOutput("IntakePivot/MotorTemperature", m_IntakeDeployMotor.getMotorTemperature());
   }
 }

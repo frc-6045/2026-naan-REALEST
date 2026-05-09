@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooterSystem;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.FeedbackSensor;
@@ -16,11 +17,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
+import frc.robot.util.LoggingUtils;
 
 @SuppressWarnings({"deprecation","removal"})
 public class Flywheel extends SubsystemBase {
   private final SparkFlex m_FlywheelMotor1;
   private final SparkFlex m_FlywheelMotor2;
+  private final RelativeEncoder m_Encoder1;
+  private final RelativeEncoder m_Encoder2;
   private final SparkClosedLoopController m_FlywheelPIDController1;
   private final SparkClosedLoopController m_FlywheelPIDController2;
   private final SparkFlexConfig m_config = new SparkFlexConfig();
@@ -40,6 +44,8 @@ public class Flywheel extends SubsystemBase {
     // Get PID controllers for velocity control
     m_FlywheelPIDController1 = m_FlywheelMotor1.getClosedLoopController();
     m_FlywheelPIDController2 = m_FlywheelMotor2.getClosedLoopController();
+    m_Encoder1 = m_FlywheelMotor1.getEncoder();
+    m_Encoder2 = m_FlywheelMotor2.getEncoder();
 
     // Initialize SmartDashboard values
     SmartDashboard.putNumber("Subsystem: Flywheel/Target RPM Input", MotorConstants.kShooterTargetRPM);
@@ -107,7 +113,7 @@ public class Flywheel extends SubsystemBase {
   }
 
   public double getRPM() {
-    return (m_FlywheelMotor1.getEncoder().getVelocity() + m_FlywheelMotor2.getEncoder().getVelocity()) / 2.0;
+    return (m_Encoder1.getVelocity() + m_Encoder2.getVelocity()) / 2.0;
   }
 
   public boolean isAtTargetSpeed(double targetRPM) {
@@ -125,5 +131,8 @@ public class Flywheel extends SubsystemBase {
 
     SmartDashboard.putNumber("Subsystem: Flywheel/Motor 1 Current", m_FlywheelMotor1.getOutputCurrent());
     SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Current", m_FlywheelMotor2.getOutputCurrent());
+
+    LoggingUtils.logSpark("Flywheel/Motor1", m_FlywheelMotor1, m_Encoder1);
+    LoggingUtils.logSpark("Flywheel/Motor2", m_FlywheelMotor2, m_Encoder2);
   }
 }

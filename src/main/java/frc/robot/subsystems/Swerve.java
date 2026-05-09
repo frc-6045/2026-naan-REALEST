@@ -35,6 +35,7 @@ import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.VisionPoseConstants;
 import frc.robot.util.LimelightHelpers;
+import org.littletonrobotics.junction.Logger;
 import swervelib.SwerveDrive;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveParser;
@@ -275,6 +276,10 @@ public class Swerve extends SubsystemBase {
      */
     public Rotation2d getPitch() {
         return m_swerveDrive.getPitch();
+    }
+
+    public Rotation2d getRoll() {
+        return m_swerveDrive.getRoll();
     }
 
     /**
@@ -578,6 +583,21 @@ public class Swerve extends SubsystemBase {
             String prefix = "Vision/" + LimelightConstants.kAllCameras[i].name + "/";
             SmartDashboard.putBoolean(prefix + "Accepted", m_lastVisionAccepted[i]);
             SmartDashboard.putString(prefix + "Status", m_lastVisionRejectReason[i]);
+            Logger.recordOutput(prefix + "Accepted", m_lastVisionAccepted[i]);
+            Logger.recordOutput(prefix + "Status", m_lastVisionRejectReason[i]);
         }
+
+        // AdvantageKit structured outputs (typed — viewable as a 2D pose / swerve widget
+        // in AdvantageScope, unlike the SmartDashboard scalars).
+        Logger.recordOutput("Swerve/Pose", getPose());
+        Logger.recordOutput("Swerve/Heading", getHeading().getDegrees());
+        Logger.recordOutput("Swerve/Pitch", getPitch().getDegrees());
+        Logger.recordOutput("Swerve/RobotVelocity", getRobotVelocity());
+        Logger.recordOutput("Swerve/FieldVelocity", getFieldVelocity());
+        Logger.recordOutput("Swerve/ModuleStates", m_swerveDrive.getStates());
+        Logger.recordOutput("Swerve/ModulePositions", m_swerveDrive.getModulePositions());
+        Logger.recordOutput("Swerve/MaxChassisVelocity", m_swerveDrive.getMaximumChassisVelocity());
+        Logger.recordOutput("Swerve/MaxAngularVelocity", m_swerveDrive.getMaximumChassisAngularVelocity());
+        Logger.recordOutput("Swerve/HasEverAcceptedVision", m_hasEverAcceptedVision);
     }
 }

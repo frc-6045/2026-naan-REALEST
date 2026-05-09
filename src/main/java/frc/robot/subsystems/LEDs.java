@@ -11,6 +11,7 @@ import frc.robot.Constants.LEDConstants;
 import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.TopRoller;
+import org.littletonrobotics.junction.Logger;
 
 import java.util.Map;
 
@@ -316,6 +317,7 @@ public class LEDs extends SubsystemBase {
             SmartDashboard.putString(kStateKey, label);
             m_lastStateLabel = label;
         }
+        Logger.recordOutput("LEDs/State", label);
     }
 
     /**
