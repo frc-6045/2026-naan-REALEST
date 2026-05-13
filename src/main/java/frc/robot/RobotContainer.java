@@ -116,12 +116,12 @@ public class RobotContainer {
 
   /** Per-tick AdvantageKit outputs that live at the RobotContainer level (PDH + controller inputs). */
   public void recordPeriodicOutputs() {
-    Logger.recordOutput("PDH/TotalCurrent", m_pdh.getTotalCurrent());
-    Logger.recordOutput("PDH/Voltage", m_pdh.getVoltage());
+    //Logger.recordOutput("PDH/TotalCurrent", m_pdh.getTotalCurrent());
+    //Logger.recordOutput("PDH/Voltage", m_pdh.getVoltage());
     Logger.recordOutput("PDH/Temperature", m_pdh.getTemperature());
     Logger.recordOutput("PDH/TotalEnergy", m_pdh.getTotalEnergy());
     Logger.recordOutput("PDH/TotalPower", m_pdh.getTotalPower());
-    Logger.recordOutput("PDH/ChannelCurrents", m_pdh.getAllCurrents());
+    //Logger.recordOutput("PDH/ChannelCurrents", m_pdh.getAllCurrents());
 
     m_driverControllerLogger.record();
     m_operatorControllerLogger.record();
