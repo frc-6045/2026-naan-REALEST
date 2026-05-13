@@ -125,7 +125,7 @@ public final class Constants {
     public static final double kShooterFF = 0.00184; // Feed-forward gain (velocity feed-forward)
     public static final double kShooterIZone = 400.0; // I term only active within this RPM error range
 
-    public static final double kRollerP = 0.0002; // Proportional gain
+    public static final double kRollerP = 0.0003; // Proportional gain
     public static final double kRollerI = 0.0; // Integral gain
     public static final double kRollerD = 0.0; // Derivative gain
     public static final double kRollerFF = 0.00182; // Feed-forward gain (velocity feed-forward)
