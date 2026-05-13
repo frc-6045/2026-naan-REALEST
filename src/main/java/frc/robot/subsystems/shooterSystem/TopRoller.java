@@ -14,6 +14,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
@@ -25,6 +26,16 @@ public class TopRoller extends SubsystemBase {
   private final SparkFlexConfig m_rollerConfig = new SparkFlexConfig();
   private final SparkClosedLoopController m_PIDController;
   private final RelativeEncoder m_Encoder;
+
+  // Spin-up timing
+  private double m_spinUpStartTime = 0;
+  private boolean m_isSpinningUp = false;
+
+  // Average RPM tracking after reaching target
+  private boolean m_trackingAvgRPM = false;
+  private double m_rpmSum = 0;
+  private int m_rpmSampleCount = 0;
+  private boolean m_wasAbove100RPM = false;
 
   public TopRoller() {
     m_Motor = new SparkFlex(MotorConstants.kTopRollerMotorCanID, MotorType.kBrushless);
@@ -42,6 +53,16 @@ public class TopRoller extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Roller/Speed", 0);
     SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", 0);
     SmartDashboard.putNumber("Subsystem: Roller/Current", 0);
+
+    // PID Tuning inputs
+    SmartDashboard.putNumber("TuneTopRoller/P", MotorConstants.kRollerP);
+    SmartDashboard.putNumber("TuneTopRoller/I", MotorConstants.kRollerI);
+    SmartDashboard.putNumber("TuneTopRoller/D", MotorConstants.kRollerD);
+    SmartDashboard.putNumber("TuneTopRoller/FF", MotorConstants.kRollerFF);
+    SmartDashboard.putNumber("TuneTopRoller/IZone", MotorConstants.kRollerIZone);
+    SmartDashboard.putBoolean("TuneTopRoller/Apply", false);
+    SmartDashboard.putNumber("Subsystem: Roller/Spin-Up Time (sec)", 0);
+    SmartDashboard.putNumber("Subsystem: Roller/Avg RPM (at target)", 0);
   }
 
   /**
@@ -114,11 +135,93 @@ public class TopRoller extends SubsystemBase {
     return m_Motor.getOutputCurrent();
   }
 
+  /**
+   * Applies PID gains from SmartDashboard to the top roller motor.
+   * Call this when the "TuneTopRoller/Apply" button is pressed.
+   */
+  public void applyPIDFromDashboard() {
+    double p = SmartDashboard.getNumber("TuneTopRoller/P", MotorConstants.kRollerP);
+    double i = SmartDashboard.getNumber("TuneTopRoller/I", MotorConstants.kRollerI);
+    double d = SmartDashboard.getNumber("TuneTopRoller/D", MotorConstants.kRollerD);
+    double ff = SmartDashboard.getNumber("TuneTopRoller/FF", MotorConstants.kRollerFF);
+    double iZone = SmartDashboard.getNumber("TuneTopRoller/IZone", MotorConstants.kRollerIZone);
+
+    SparkFlexConfig pidConfig = new SparkFlexConfig();
+    pidConfig.closedLoop
+        .p(p)
+        .i(i)
+        .d(d)
+        .velocityFF(ff)
+        .iZone(iZone);
+
+    m_Motor.configure(pidConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+
+    DriverStation.reportWarning(
+        String.format("TopRoller PID updated: P=%.6f I=%.6f D=%.6f FF=%.6f IZone=%.1f", p, i, d, ff, iZone),
+        false);
+  }
+
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", getRPM());
+    double currentRPM = getRPM();
+    double targetRPM = SmartDashboard.getNumber("Subsystem: Roller/Target RPM", 0);
+    double error = targetRPM - currentRPM;
+
+    // Detect spin-up start: actual RPM crosses above 100
+    if (currentRPM > 100 && !m_wasAbove100RPM) {
+      m_spinUpStartTime = Timer.getFPGATimestamp();
+      m_isSpinningUp = true;
+      m_trackingAvgRPM = false;
+      m_rpmSum = 0;
+      m_rpmSampleCount = 0;
+      // Reset displays for new cycle
+      SmartDashboard.putNumber("Subsystem: Roller/Spin-Up Time (sec)", 0);
+      SmartDashboard.putNumber("Subsystem: Roller/Avg RPM (at target)", 0);
+    }
+
+    // Detect spin-down: actual RPM drops below 100 (trigger released)
+    if (currentRPM < 100 && m_wasAbove100RPM) {
+      m_isSpinningUp = false;
+      m_trackingAvgRPM = false;
+      SmartDashboard.putNumber("Subsystem: Roller/Spin-Up Time (sec)", 0);
+      SmartDashboard.putNumber("Subsystem: Roller/Avg RPM (at target)", 0);
+    }
+
+    m_wasAbove100RPM = currentRPM > 100;
+
+    // Spin-up timing: check if we just reached target speed
+    if (m_isSpinningUp && isAtTargetSpeed(targetRPM) && targetRPM > 100) {
+      double spinUpTime = Timer.getFPGATimestamp() - m_spinUpStartTime;
+      m_isSpinningUp = false;
+      m_trackingAvgRPM = true;
+      m_rpmSum = 0;
+      m_rpmSampleCount = 0;
+      SmartDashboard.putNumber("Subsystem: Roller/Spin-Up Time (sec)", spinUpTime);
+      DriverStation.reportWarning(
+          String.format("TopRoller spin-up complete: %.3f sec to reach %.0f RPM", spinUpTime, targetRPM),
+          false);
+    }
+
+    // Track average RPM after reaching target (only while spinning)
+    if (m_trackingAvgRPM && currentRPM > 100) {
+      m_rpmSum += currentRPM;
+      m_rpmSampleCount++;
+      double avgRPM = m_rpmSum / m_rpmSampleCount;
+      SmartDashboard.putNumber("Subsystem: Roller/Avg RPM (at target)", avgRPM);
+    }
+
+    // Telemetry for graphing
+    SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", currentRPM);
+    SmartDashboard.putNumber("Subsystem: Roller/Error (RPM)", error);
+
     double current = m_Motor.getOutputCurrent();
     SmartDashboard.putNumber("Subsystem: Roller/Current", current);
+
+    // Check if user pressed the Apply button
+    if (SmartDashboard.getBoolean("TuneTopRoller/Apply", false)) {
+      applyPIDFromDashboard();
+      SmartDashboard.putBoolean("TuneTopRoller/Apply", false);
+    }
 
     LoggingUtils.logSpark("TopRoller", m_Motor, m_Encoder, current);
   }

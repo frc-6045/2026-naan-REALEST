@@ -14,6 +14,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
@@ -28,6 +29,16 @@ public class Flywheel extends SubsystemBase {
   private final SparkClosedLoopController m_FlywheelPIDController1;
   private final SparkClosedLoopController m_FlywheelPIDController2;
   private final SparkFlexConfig m_config = new SparkFlexConfig();
+
+  // Spin-up timing
+  private double m_spinUpStartTime = 0;
+  private boolean m_isSpinningUp = false;
+
+  // Average RPM tracking after reaching target
+  private boolean m_trackingAvgRPM = false;
+  private double m_rpmSum = 0;
+  private int m_rpmSampleCount = 0;
+  private boolean m_wasAbove100RPM = false;
 
   public Flywheel() {
     m_FlywheelMotor1 = new SparkFlex(MotorConstants.kShooterMotor1CanID, MotorType.kBrushless);
@@ -56,6 +67,16 @@ public class Flywheel extends SubsystemBase {
     SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Velocity", 0);
     SmartDashboard.putNumber("Subsystem: Flywheel/Motor 1 Current", 0);
     SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Current", 0);
+
+    // PID Tuning inputs
+    SmartDashboard.putNumber("TuneFlywheel/P", MotorConstants.kShooterP);
+    SmartDashboard.putNumber("TuneFlywheel/I", MotorConstants.kShooterI);
+    SmartDashboard.putNumber("TuneFlywheel/D", MotorConstants.kShooterD);
+    SmartDashboard.putNumber("TuneFlywheel/FF", MotorConstants.kShooterFF);
+    SmartDashboard.putNumber("TuneFlywheel/IZone", MotorConstants.kShooterIZone);
+    SmartDashboard.putBoolean("TuneFlywheel/Apply", false);
+    SmartDashboard.putNumber("Subsystem: Flywheel/Spin-Up Time (sec)", 0);
+    SmartDashboard.putNumber("Subsystem: Flywheel/Avg RPM (at target)", 0);
   }
 
   /**
@@ -129,14 +150,98 @@ public class Flywheel extends SubsystemBase {
     return (m_FlywheelMotor1.getOutputCurrent()+m_FlywheelMotor2.getOutputCurrent())/2;
   }
 
+  /**
+   * Applies PID gains from SmartDashboard to both flywheel motors.
+   * Call this when the "TuneFlywheel/Apply" button is pressed.
+   */
+  public void applyPIDFromDashboard() {
+    double p = SmartDashboard.getNumber("TuneFlywheel/P", MotorConstants.kShooterP);
+    double i = SmartDashboard.getNumber("TuneFlywheel/I", MotorConstants.kShooterI);
+    double d = SmartDashboard.getNumber("TuneFlywheel/D", MotorConstants.kShooterD);
+    double ff = SmartDashboard.getNumber("TuneFlywheel/FF", MotorConstants.kShooterFF);
+    double iZone = SmartDashboard.getNumber("TuneFlywheel/IZone", MotorConstants.kShooterIZone);
+
+    SparkFlexConfig pidConfig = new SparkFlexConfig();
+    pidConfig.closedLoop
+        .p(p)
+        .i(i)
+        .d(d)
+        .velocityFF(ff)
+        .iZone(iZone);
+
+    m_FlywheelMotor1.configure(pidConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    m_FlywheelMotor2.configure(pidConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+
+    DriverStation.reportWarning(
+        String.format("Flywheel PID updated: P=%.6f I=%.6f D=%.6f FF=%.6f IZone=%.1f", p, i, d, ff, iZone),
+        false);
+  }
+
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Subsystem: Flywheel/Velocity (RPM)", getRPM());
+    double currentRPM = getRPM();
+    double targetRPM = SmartDashboard.getNumber("Subsystem: Flywheel/Target RPM", 0);
+    double error = targetRPM - currentRPM;
+
+    // Detect spin-up start: actual RPM crosses above 100
+    if (currentRPM > 100 && !m_wasAbove100RPM) {
+      m_spinUpStartTime = Timer.getFPGATimestamp();
+      m_isSpinningUp = true;
+      m_trackingAvgRPM = false;
+      m_rpmSum = 0;
+      m_rpmSampleCount = 0;
+      // Reset displays for new cycle
+      SmartDashboard.putNumber("Subsystem: Flywheel/Spin-Up Time (sec)", 0);
+      SmartDashboard.putNumber("Subsystem: Flywheel/Avg RPM (at target)", 0);
+    }
+
+    // Detect spin-down: actual RPM drops below 100 (trigger released)
+    if (currentRPM < 100 && m_wasAbove100RPM) {
+      m_isSpinningUp = false;
+      m_trackingAvgRPM = false;
+      SmartDashboard.putNumber("Subsystem: Flywheel/Spin-Up Time (sec)", 0);
+      SmartDashboard.putNumber("Subsystem: Flywheel/Avg RPM (at target)", 0);
+    }
+
+    m_wasAbove100RPM = currentRPM > 100;
+
+    // Spin-up timing: check if we just reached target speed
+    if (m_isSpinningUp && isAtTargetSpeed(targetRPM) && targetRPM > 100) {
+      double spinUpTime = Timer.getFPGATimestamp() - m_spinUpStartTime;
+      m_isSpinningUp = false;
+      m_trackingAvgRPM = true;
+      m_rpmSum = 0;
+      m_rpmSampleCount = 0;
+      SmartDashboard.putNumber("Subsystem: Flywheel/Spin-Up Time (sec)", spinUpTime);
+      DriverStation.reportWarning(
+          String.format("Flywheel spin-up complete: %.3f sec to reach %.0f RPM", spinUpTime, targetRPM),
+          false);
+    }
+
+    // Track average RPM after reaching target (only while spinning)
+    if (m_trackingAvgRPM && currentRPM > 100) {
+      m_rpmSum += currentRPM;
+      m_rpmSampleCount++;
+      double avgRPM = m_rpmSum / m_rpmSampleCount;
+      SmartDashboard.putNumber("Subsystem: Flywheel/Avg RPM (at target)", avgRPM);
+    }
+
+    // Telemetry for graphing
+    SmartDashboard.putNumber("Subsystem: Flywheel/Velocity (RPM)", currentRPM);
+    SmartDashboard.putNumber("Subsystem: Flywheel/Motor 1 Velocity", m_Encoder1.getVelocity());
+    SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Velocity", m_Encoder2.getVelocity());
+    SmartDashboard.putNumber("Subsystem: Flywheel/Error (RPM)", error);
 
     double current1 = m_FlywheelMotor1.getOutputCurrent();
     double current2 = m_FlywheelMotor2.getOutputCurrent();
     SmartDashboard.putNumber("Subsystem: Flywheel/Motor 1 Current", current1);
     SmartDashboard.putNumber("Subsystem: Flywheel/Motor 2 Current", current2);
+
+    // Check if user pressed the Apply button
+    if (SmartDashboard.getBoolean("TuneFlywheel/Apply", false)) {
+      applyPIDFromDashboard();
+      SmartDashboard.putBoolean("TuneFlywheel/Apply", false);
+    }
 
     LoggingUtils.logSpark("Flywheel/Motor1", m_FlywheelMotor1, m_Encoder1, current1);
     LoggingUtils.logSpark("Flywheel/Motor2", m_FlywheelMotor2, m_Encoder2, current2);
