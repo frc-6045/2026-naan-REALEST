@@ -45,8 +45,10 @@ public final class Constants {
   }
 
   public static class DrivebaseConstants {
-    // Time in seconds to hold motor brakes when disabled before releasing (allows pushing robot)
-    public static final double kWheelLockTime = 10.0;
+    // Time in seconds to hold motor brakes when disabled before releasing. After this
+    // expires brakes drop to coast so officials/pit crew can push the robot. 3s is enough
+    // to keep the robot anchored right after a match ends; longer just delays push-off.
+    public static final double kWheelLockTime = 3.0;
   }
 
   public static class MotorConstants {

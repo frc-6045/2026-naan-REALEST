@@ -53,6 +53,10 @@ public class AutoAimAndShoot extends Command {
 
     private final PIDController m_aimPID;
 
+    // Spin to the safe default until a pose-based pick overrides them. Keeps the flywheel
+    // at speed from the moment the command starts so the first ball isn't fed mid-spin-up.
+    private double m_lastTargetRPM = MotorConstants.kShooterTargetRPM;
+    private double m_lastTargetRollerRPM = MotorConstants.kRollerTargetRPM;
     private boolean m_feeding = false;
     private boolean m_tilted = false;
     private final Timer m_graceTimer = new Timer();
@@ -93,6 +97,23 @@ public class AutoAimAndShoot extends Command {
 
     @Override
     public void execute() {
+        // Fast path: while feeding, the chassis is X-locked and the tag/aim cannot change.
+        // Skip the full aim+RPM recompute and just keep flywheel/roller at last setpoints.
+        // The grace-period logic in updateFeedState() owns the m_feeding state machine.
+        if (m_feeding) {
+            m_swerve.setLockAngles();
+            m_flywheel.setTargetRPM(m_lastTargetRPM);
+            m_topRoller.setRPM(m_lastTargetRollerRPM);
+
+            boolean topRollerReady = m_topRoller.isAtTargetSpeed(m_lastTargetRollerRPM);
+            boolean flywheelReady = m_flywheel.isAtTargetSpeed(m_lastTargetRPM);
+            // While feeding, "aimed" is taken as given (we're locked) — bumps the readyToFire
+            // flag whenever the wheels are still spun up.
+            updateFeedState(topRollerReady && flywheelReady);
+            IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, m_feeding, "AutoAim/");
+            return;
+        }
+
         Pose2d robotPose = m_swerve.getPose();
         Translation2d shooterField = ShooterGeometryConstants.shooterFieldPosition(robotPose);
         Optional<FieldConstants.TagPick> pickOpt = pickTargetTag(shooterField);
@@ -102,10 +123,11 @@ public class AutoAimAndShoot extends Command {
         Translation2d translation = new Translation2d(translationX, translationY);
 
         if (pickOpt.isEmpty()) {
-            // Defensive: alliance unknown or tag layout missing entry. Hold flywheels at default and wait.
+            // Defensive: alliance unknown or tag layout missing entry. Hold flywheels at last setpoint
+            // so we don't drop RPM if the pick momentarily fails, and wait for a valid pick.
             m_swerve.drive(translation, 0.0, true);
-            m_flywheel.setTargetRPM(MotorConstants.kShooterTargetRPM);
-            m_topRoller.setRPM(MotorConstants.kRollerTargetRPM);
+            m_flywheel.setTargetRPM(m_lastTargetRPM);
+            m_topRoller.setRPM(m_lastTargetRollerRPM);
             m_feeder.stopFeederMotor();
             m_spindexer.stopSpindexerMotor();
             m_feeding = false;
@@ -139,6 +161,8 @@ public class AutoAimAndShoot extends Command {
         double tagRpmOffset = TagOverrideConstants.getRpmOffset(targetTag);
         double targetRollerRPM = RPMLookupTable.getShootingRollerRPM(compensatedDistance) + tagRpmOffset;
         double targetRPM = RPMLookupTable.getShootingFlywheelRPM(compensatedDistance) + tagRpmOffset;
+        m_lastTargetRPM = targetRPM;
+        m_lastTargetRollerRPM = targetRollerRPM;
 
         m_topRoller.setRPM(targetRollerRPM);
         m_flywheel.setTargetRPM(targetRPM);

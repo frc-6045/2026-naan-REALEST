@@ -117,8 +117,9 @@ public class TopRoller extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Roller/Velocity (RPM)", getRPM());
-    SmartDashboard.putNumber("Subsystem: Roller/Current", m_Motor.getOutputCurrent());
+    double current = m_Motor.getOutputCurrent();
+    SmartDashboard.putNumber("Subsystem: Roller/Current", current);
 
-    LoggingUtils.logSpark("TopRoller", m_Motor, m_Encoder);
+    LoggingUtils.logSpark("TopRoller", m_Motor, m_Encoder, current);
   }
 }
