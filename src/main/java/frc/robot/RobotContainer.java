@@ -42,6 +42,11 @@ public class RobotContainer {
   // private final CommandXboxController m_testController =
   //     new CommandXboxController(OperatorConstants.kTestControllerPort);
 
+  private final ControllerLogger m_driverControllerLogger =
+      new ControllerLogger("Driver", m_driverController);
+  private final ControllerLogger m_operatorControllerLogger =
+      new ControllerLogger("Operator", m_operatorController);
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     m_pdh.setSwitchableChannel(true);
@@ -118,28 +123,91 @@ public class RobotContainer {
     Logger.recordOutput("PDH/TotalPower", m_pdh.getTotalPower());
     Logger.recordOutput("PDH/ChannelCurrents", m_pdh.getAllCurrents());
 
-    recordController("Driver", m_driverController);
-    recordController("Operator", m_operatorController);
+    m_driverControllerLogger.record();
+    m_operatorControllerLogger.record();
   }
 
-  private static void recordController(String name, CommandXboxController c) {
-    String prefix = "Controllers/" + name + "/";
-    Logger.recordOutput(prefix + "LeftX", c.getLeftX());
-    Logger.recordOutput(prefix + "LeftY", c.getLeftY());
-    Logger.recordOutput(prefix + "RightX", c.getRightX());
-    Logger.recordOutput(prefix + "RightY", c.getRightY());
-    Logger.recordOutput(prefix + "LeftTrigger", c.getLeftTriggerAxis());
-    Logger.recordOutput(prefix + "RightTrigger", c.getRightTriggerAxis());
-    Logger.recordOutput(prefix + "A", c.getHID().getAButton());
-    Logger.recordOutput(prefix + "B", c.getHID().getBButton());
-    Logger.recordOutput(prefix + "X", c.getHID().getXButton());
-    Logger.recordOutput(prefix + "Y", c.getHID().getYButton());
-    Logger.recordOutput(prefix + "LB", c.getHID().getLeftBumperButton());
-    Logger.recordOutput(prefix + "RB", c.getHID().getRightBumperButton());
-    Logger.recordOutput(prefix + "Back", c.getHID().getBackButton());
-    Logger.recordOutput(prefix + "Start", c.getHID().getStartButton());
-    Logger.recordOutput(prefix + "LeftStick", c.getHID().getLeftStickButton());
-    Logger.recordOutput(prefix + "RightStick", c.getHID().getRightStickButton());
-    Logger.recordOutput(prefix + "POV", c.getHID().getPOV());
+  /**
+   * Per-controller telemetry logger. Continuous analog signals (sticks/triggers) publish
+   * every cycle because they actually change every cycle. Booleans and POV publish only
+   * on change — replay value is preserved (AdvantageScope renders unchanged booleans as
+   * step traces) but per-loop NT/log churn drops by ~80% since most buttons are released
+   * most of the match.
+   */
+  private static final class ControllerLogger {
+    private static final String[] BUTTON_NAMES = {
+        "A", "B", "X", "Y", "LB", "RB", "Back", "Start", "LeftStick", "RightStick"
+    };
+
+    private final CommandXboxController controller;
+
+    // Pre-computed full log keys. Concatenating "Controllers/Driver/" + "LeftX" inside
+    // record() would allocate fresh strings every cycle (~600 string allocs/sec across
+    // both controllers); doing it once in the ctor avoids that GC pressure.
+    private final String m_leftXKey;
+    private final String m_leftYKey;
+    private final String m_rightXKey;
+    private final String m_rightYKey;
+    private final String m_leftTriggerKey;
+    private final String m_rightTriggerKey;
+    private final String m_povKey;
+    private final String[] m_buttonKeys = new String[BUTTON_NAMES.length];
+
+    private final boolean[] m_lastButtons = new boolean[BUTTON_NAMES.length];
+    private int m_lastPov = Integer.MIN_VALUE;
+    // Forces one publish for every key on the first cycle so AdvantageScope has a data
+    // point at t=0 regardless of how it renders missing series.
+    private boolean m_firstCycle = true;
+
+    ControllerLogger(String name, CommandXboxController controller) {
+      this.controller = controller;
+      String prefix = "Controllers/" + name + "/";
+      m_leftXKey = prefix + "LeftX";
+      m_leftYKey = prefix + "LeftY";
+      m_rightXKey = prefix + "RightX";
+      m_rightYKey = prefix + "RightY";
+      m_leftTriggerKey = prefix + "LeftTrigger";
+      m_rightTriggerKey = prefix + "RightTrigger";
+      m_povKey = prefix + "POV";
+      for (int i = 0; i < BUTTON_NAMES.length; i++) {
+        m_buttonKeys[i] = prefix + BUTTON_NAMES[i];
+      }
+    }
+
+    void record() {
+      Logger.recordOutput(m_leftXKey, controller.getLeftX());
+      Logger.recordOutput(m_leftYKey, controller.getLeftY());
+      Logger.recordOutput(m_rightXKey, controller.getRightX());
+      Logger.recordOutput(m_rightYKey, controller.getRightY());
+      Logger.recordOutput(m_leftTriggerKey, controller.getLeftTriggerAxis());
+      Logger.recordOutput(m_rightTriggerKey, controller.getRightTriggerAxis());
+
+      var hid = controller.getHID();
+      publishButton(0, hid.getAButton());
+      publishButton(1, hid.getBButton());
+      publishButton(2, hid.getXButton());
+      publishButton(3, hid.getYButton());
+      publishButton(4, hid.getLeftBumperButton());
+      publishButton(5, hid.getRightBumperButton());
+      publishButton(6, hid.getBackButton());
+      publishButton(7, hid.getStartButton());
+      publishButton(8, hid.getLeftStickButton());
+      publishButton(9, hid.getRightStickButton());
+
+      int pov = hid.getPOV();
+      if (m_firstCycle || pov != m_lastPov) {
+        Logger.recordOutput(m_povKey, pov);
+        m_lastPov = pov;
+      }
+
+      m_firstCycle = false;
+    }
+
+    private void publishButton(int idx, boolean state) {
+      if (m_firstCycle || state != m_lastButtons[idx]) {
+        Logger.recordOutput(m_buttonKeys[idx], state);
+        m_lastButtons[idx] = state;
+      }
+    }
   }
 }

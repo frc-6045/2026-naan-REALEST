@@ -53,9 +53,19 @@ public class Swerve extends SubsystemBase {
     // Commands gate shot-firing on this so pose-based aim can't fire off stale odometry.
     private boolean m_hasEverAcceptedVision = false;
 
+    // True while the modules are pointed in the X-pattern via setLockAngles(). Lets us
+    // dedupe per-cycle setLockAngles() calls (callers used to write all 4 module angles
+    // every loop while feeding/locked, which is ~200 module writes/sec for nothing).
+    private boolean m_inLockAngles = false;
+
     public Swerve() {
-        // Set telemetry verbosity before creating swerve drive
-        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+        // YAGSL's HIGH telemetry mirrors a parallel copy of swerve state into NT every loop.
+        // We already publish what AdvantageScope's swerve widgets need via the explicit
+        // Logger.recordOutput calls in periodic() (Pose, ModuleStates, ModulePositions,
+        // RobotVelocity, FieldVelocity), so the YAGSL telemetry was duplicate. LOW keeps
+        // the basic chassis-level telemetry without per-loop module spam. Bump back to
+        // INFO/HIGH temporarily if you ever need to debug per-module setpoint tracking.
+        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.LOW;
 
         try {
             m_swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), "swerve"))
@@ -115,6 +125,7 @@ public class Swerve extends SubsystemBase {
                 this::resetOdometry,
                 this::getRobotVelocity,
                 (speedsRobotRelative, moduleFeedForwards) -> {
+                    m_inLockAngles = false;
                     m_swerveDrive.drive(
                         speedsRobotRelative,
                         m_swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
@@ -199,6 +210,7 @@ public class Swerve extends SubsystemBase {
      * @param fieldRelative Whether to drive field-relative
      */
     public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
+        m_inLockAngles = false;
         m_swerveDrive.drive(translation, rotation, fieldRelative, false);
     }
 
@@ -208,6 +220,7 @@ public class Swerve extends SubsystemBase {
      * @param chassisSpeeds Desired chassis speeds
      */
     public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+        m_inLockAngles = false;
         m_swerveDrive.setChassisSpeeds(chassisSpeeds);
     }
 
@@ -399,19 +412,27 @@ public class Swerve extends SubsystemBase {
      * Locks the swerve modules in an X pattern to prevent movement.
      */
     public void lock() {
+        m_inLockAngles = false;
         m_swerveDrive.lockPose();
     }
 
     /**
      * Points the swerve modules into an X pattern without actively driving them.
      * Relies on brake mode to resist movement, reducing current draw compared to lock().
+     *
+     * Self-dedupes: subsequent calls in the same lock state are no-ops. Any drive() call
+     * resets the lock flag so a follow-up setLockAngles() will write again.
      */
     public void setLockAngles() {
+        if (m_inLockAngles) {
+            return;
+        }
         var modules = m_swerveDrive.getModules();
         modules[0].setAngle(45.0);
         modules[1].setAngle(-45.0);
         modules[2].setAngle(-45.0);
         modules[3].setAngle(45.0);
+        m_inLockAngles = true;
     }
 
     /**

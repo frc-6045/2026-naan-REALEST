@@ -106,6 +106,23 @@ public class AutoAimAndShoot extends Command {
 
     @Override
     public void execute() {
+        // Fast path: while feeding, the chassis is X-locked and the tag/aim cannot change.
+        // Skip the full aim+RPM recompute and just keep flywheel/roller at last setpoints.
+        // The grace-period logic in updateFeedState() owns the m_feeding state machine.
+        if (m_feeding) {
+            m_swerve.setLockAngles();
+            m_flywheel.setTargetRPM(m_lastTargetRPM);
+            m_topRoller.setRPM(m_lastTargetRollerRPM);
+
+            boolean topRollerReady = m_topRoller.isAtTargetSpeed(m_lastTargetRollerRPM);
+            boolean flywheelReady = m_flywheel.isAtTargetSpeed(m_lastTargetRPM);
+            // While feeding, "aimed" is taken as given (we're locked) — bumps the readyToFire
+            // flag whenever the wheels are still spun up.
+            updateFeedState(topRollerReady && flywheelReady);
+            IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, m_feeding, "AutoAim/");
+            return;
+        }
+
         // Limelight still decides which tag we lock; once locked, aim is driven by pose so we
         // keep rotating toward the known field location even if the tag blinks out of sight.
         int lockedTag = LimelightTargeting.acquireTarget(m_tagLock).lockedTagID;

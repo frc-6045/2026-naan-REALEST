@@ -74,8 +74,9 @@ public class Spindexer extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Subsystem: Spindexer/Velocity (RPM)", getRPM());
-    SmartDashboard.putNumber("Subsystem: Spindexer/Current", getCurrent());
+    double current = m_SpindexerMotor.getOutputCurrent();
+    SmartDashboard.putNumber("Subsystem: Spindexer/Current", current);
 
-    LoggingUtils.logSpark("Spindexer", m_SpindexerMotor, m_Encoder);
+    LoggingUtils.logSpark("Spindexer", m_SpindexerMotor, m_Encoder, current);
   }
 }

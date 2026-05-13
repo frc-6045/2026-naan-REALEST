@@ -30,6 +30,11 @@ public class Robot extends LoggedRobot {
   private final RobotContainer m_robotContainer;
   private final Timer m_disabledTimer = new Timer();
 
+  // Cached DS info — only republished on change, not every loop. The DS strings (alliance,
+  // event name, match number, match type) only become available after FMS connects and
+  // never change during a match; logging them every cycle was pure NT overhead.
+  private final java.util.Map<String, Object> m_lastDSValues = new java.util.HashMap<>();
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -95,16 +100,14 @@ public class Robot extends LoggedRobot {
     //SmartDashboard.putData(CommandScheduler.getInstance());
     SmartDashboard.putNumber("ROBOT current draw", m_robotContainer.getRobotCurrentDraw());
 
+    // Per-loop dynamic DS state (these change throughout the match)
     Logger.recordOutput("DS/MatchTime", DriverStation.getMatchTime());
-    Logger.recordOutput("DS/Alliance",
-        DriverStation.getAlliance().map(Enum::name).orElse("Unknown"));
-    Logger.recordOutput("DS/MatchType", DriverStation.getMatchType().name());
-    Logger.recordOutput("DS/MatchNumber", DriverStation.getMatchNumber());
-    Logger.recordOutput("DS/EventName", DriverStation.getEventName());
     Logger.recordOutput("DS/IsAutonomous", DriverStation.isAutonomous());
     Logger.recordOutput("DS/IsTeleop", DriverStation.isTeleop());
     Logger.recordOutput("DS/IsEnabled", DriverStation.isEnabled());
-    Logger.recordOutput("DS/IsFMSAttached", DriverStation.isFMSAttached());
+
+    // Static-ish DS info — only republish on change. Saves ~5 NT publishes per loop.
+    publishStaticDSInfoIfChanged();
 
     Logger.recordOutput("Battery/Voltage", RobotController.getBatteryVoltage());
     var canStatus = RobotController.getCANStatus();
@@ -115,6 +118,36 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("CAN/TransmitErrorCount", canStatus.transmitErrorCount);
 
     m_robotContainer.recordPeriodicOutputs();
+  }
+
+  /** Publish DS-static fields only when they change. Cheap when nothing's changed (5 lookups + equality checks). */
+  private void publishStaticDSInfoIfChanged() {
+    publishIfChanged("DS/Alliance", DriverStation.getAlliance().map(Enum::name).orElse("Unknown"));
+    publishIfChanged("DS/MatchType", DriverStation.getMatchType().name());
+    publishIfChanged("DS/MatchNumber", DriverStation.getMatchNumber());
+    publishIfChanged("DS/EventName", DriverStation.getEventName());
+    publishIfChanged("DS/IsFMSAttached", DriverStation.isFMSAttached());
+  }
+
+  private void publishIfChanged(String key, String value) {
+    if (!java.util.Objects.equals(value, m_lastDSValues.get(key))) {
+      Logger.recordOutput(key, value);
+      m_lastDSValues.put(key, value);
+    }
+  }
+
+  private void publishIfChanged(String key, int value) {
+    if (!Integer.valueOf(value).equals(m_lastDSValues.get(key))) {
+      Logger.recordOutput(key, value);
+      m_lastDSValues.put(key, value);
+    }
+  }
+
+  private void publishIfChanged(String key, boolean value) {
+    if (!Boolean.valueOf(value).equals(m_lastDSValues.get(key))) {
+      Logger.recordOutput(key, value);
+      m_lastDSValues.put(key, value);
+    }
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
