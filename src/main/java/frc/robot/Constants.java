@@ -353,13 +353,13 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
 
   public static class AimConstants {
     // Rotation PID gains for auto-aim
-    public static final double kAimP = 0.2; // Proportional gain
+    public static final double kAimP = 0.35; // Proportional gain
     public static final double kAimI = 0.0; // Integral gain
-    public static final double kAimD = 0.01; // Derivative gain
+    public static final double kAimD = 0.03; // Derivative gain
     public static final double kAimToleranceDegrees = 2; // Acceptable aim error (degrees)
     public static final double kAimMovingToleranceDegrees = 10.0; // Wider tolerance while moving
     public static final double kMovingSpeedThresholdMps = 0.3; // Speed above which wider tolerance applies
-    public static final double kMaxAutoRotationRadPerSec = 3.0; // Max rotation speed during auto-aim (rad/s)
+    public static final double kMaxAutoRotationRadPerSec = 5.0; // Max rotation speed during auto-aim (rad/s)
     // When tilted (e.g. ball stuck under robot), the chassis can't rotate the last few degrees, so widen tolerance to still fire.
     public static final double kTiltThresholdDegrees = 4.0;
     public static final double kTiltDeadbandDegrees = 1.0; // Hysteresis: enter tilted at threshold, exit at threshold - deadband
