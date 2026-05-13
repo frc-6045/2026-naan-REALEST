@@ -1,5 +1,6 @@
 package frc.robot.commands.ShootFeedCommands.AutoScoringCommands;
 
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -10,7 +11,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import java.util.Optional;
 import frc.robot.Constants.AimConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.TagOverrideConstants;
@@ -102,7 +102,6 @@ public class AutoAimAndShoot extends Command {
         Translation2d translation = new Translation2d(translationX, translationY);
 
         if (pickOpt.isEmpty()) {
-            // Defensive: alliance unknown or tag layout missing entry. Hold flywheels at default and wait.
             m_swerve.drive(translation, 0.0, true);
             m_flywheel.setTargetRPM(MotorConstants.kShooterTargetRPM);
             m_topRoller.setRPM(MotorConstants.kRollerTargetRPM);
@@ -115,7 +114,7 @@ public class AutoAimAndShoot extends Command {
 
             SmartDashboard.putBoolean("AutoAim/Aimed", false);
             SmartDashboard.putBoolean("AutoAim/ReadyToFire", false);
-            SmartDashboard.putNumber("AutoAim/LockedTagID", -1);
+            SmartDashboard.putNumber("AutoAim/TargetTagID", -1);
             return;
         }
 
@@ -193,13 +192,12 @@ public class AutoAimAndShoot extends Command {
         SmartDashboard.putNumber("AutoAim/AimTolerance", aimTolerance);
         SmartDashboard.putNumber("AutoAim/TiltMag", tiltMagDeg);
         SmartDashboard.putBoolean("AutoAim/Tilted", m_tilted);
-        SmartDashboard.putNumber("AutoAim/LockedTagID", targetTag);
+        SmartDashboard.putNumber("AutoAim/TargetTagID", targetTag);
         SmartDashboard.putNumber("AutoAim/TagRpmOffset", tagRpmOffset);
     }
 
     @Override
     public void end(boolean interrupted) {
-        LimelightHelpers.setPipelineIndex(LimelightConstants.kFrontCamera.name, LimelightConstants.kAprilTagPipeline);
         m_swerve.drive(new Translation2d(), 0.0, true);
         m_flywheel.stopFlywheelMotor();
         m_topRoller.stopRollerMotor();
@@ -212,7 +210,7 @@ public class AutoAimAndShoot extends Command {
 
     @Override
     public boolean isFinished() {
-        return false; // Runs until interrupted (button release or autonomous deadline)
+        return false;
     }
 
     /**
