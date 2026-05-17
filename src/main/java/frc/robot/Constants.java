@@ -92,7 +92,7 @@ public final class Constants {
     public static final double kIntakePivotCurrentThreshold = 45; // Current threshold to detect game piece contact during autoshoot oscillation
 
     // Motor Current Limits (Amps)
-    public static final int kFeederCurrentLimit = 50;
+    public static final int kFeederCurrentLimit = 70;
     public static final int kIntakeCurrentLimit = 100;
     public static final int kIntakePivotCurrentLimit = 50;
     public static final int kShooterCurrentLimit = 60;
@@ -101,10 +101,10 @@ public final class Constants {
 
     // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
     // TODO: Determine empirically on the robot
-    public static final double kIntakePivotDeploySetpoint = 0.5209500193595886;   // Fully down (deployed)
-    public static final double kIntakePivotOuttakeSetpoint = 0.47702521085739136;  // a bit up for eject balls
-    public static final double kIntakePivotMiddleSetpoint = 0.2731515169143677;   // Halfway — oscillation bottom
-    public static final double kIntakePivotStowSetpoint = 0.12288706749677658;     // Fully up (stowed/raised)
+    public static final double kIntakePivotDeploySetpoint = 0.3648099899291992;   // Fully down (deployed)
+    public static final double kIntakePivotOuttakeSetpoint = 0.29658547043800354;  // a bit up for eject balls
+    public static final double kIntakePivotMiddleSetpoint = 0.06818655133247375;   // Halfway — oscillation bottom
+    public static final double kIntakePivotStowSetpoint = 0.9678359627723694;     // Fully up (stowed/raised)
 
     // Seconds per oscillation direction (up->middle or middle->up)
     public static final double kIntakePivotOscillationPeriodSec = 0.8;
