@@ -424,11 +424,11 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
   /** Classroom basketball-hoop demo. Single AprilTag mounted on a portable hoop. */
   public static class DemoConstants {
     // AprilTag ID mounted on the hoop backboard. Pick an ID not in the HUB lists.
-    public static final int kDemoTagID = 1;
+    public static final int kDemoTagID = 28;
     // Height of the tag's CENTER off the floor (10ft hoop ≈ 3.048m; backboard tag a bit higher)
-    public static final double kDemoTagHeightMeters = 3.10;
-    public static final double kDemoMinDistanceMeters = 1.0;
-    public static final double kDemoMaxDistanceMeters = 5.0;
+    public static final double kDemoTagHeightMeters = 1.29;
+    public static final double kDemoMinDistanceMeters = .25;
+    public static final double kDemoMaxDistanceMeters = 10.0;
   }
 
   public enum Directions {
