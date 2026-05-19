@@ -14,6 +14,8 @@ public class RPMLookupTable {
     private static final InterpolatingDoubleTreeMap m_shootingFlywheelMap = new InterpolatingDoubleTreeMap();
     private static final InterpolatingDoubleTreeMap m_feedingRollerMap = new InterpolatingDoubleTreeMap();
     private static final InterpolatingDoubleTreeMap m_feedingFlywheelMap = new InterpolatingDoubleTreeMap();
+    private static final InterpolatingDoubleTreeMap m_demoRollerMap = new InterpolatingDoubleTreeMap();
+    private static final InterpolatingDoubleTreeMap m_demoFlywheelMap = new InterpolatingDoubleTreeMap();
 
     static {
         final int shortOffset = -50;
@@ -42,6 +44,18 @@ public class RPMLookupTable {
 
         m_feedingFlywheelMap.put(0.0254 * 12 * 30, 4250.0);
         m_feedingFlywheelMap.put(0.0254 * 12 * 45, 5250.0);
+
+        // Demo table (classroom basketball-hoop). Tune at venue with actual hoop + ball.
+        // Higher trajectory than the HUB shot — lifts the ball into a 10ft basket.
+        m_demoFlywheelMap.put(0.0254 * 60,  2400.0);
+        m_demoFlywheelMap.put(0.0254 * 90,  2500.0);
+        m_demoFlywheelMap.put(0.0254 * 120, 2700.0);
+        m_demoFlywheelMap.put(0.0254 * 150, 2900.0);
+
+        m_demoRollerMap.put(0.0254 * 60,  1700.0);
+        m_demoRollerMap.put(0.0254 * 90,  1900.0);
+        m_demoRollerMap.put(0.0254 * 120, 2100.0);
+        m_demoRollerMap.put(0.0254 * 150, 2350.0);
     }
 
     public static double getShootingRollerRPM(double distanceMeters) {
@@ -58,5 +72,13 @@ public class RPMLookupTable {
 
     public static double getFeedingFlywheelRPM(double distanceMeters) {
         return m_feedingFlywheelMap.get(distanceMeters);
+    }
+
+    public static double getDemoRollerRPM(double distanceMeters) {
+        return m_demoRollerMap.get(distanceMeters);
+    }
+
+    public static double getDemoFlywheelRPM(double distanceMeters) {
+        return m_demoFlywheelMap.get(distanceMeters);
     }
 }
