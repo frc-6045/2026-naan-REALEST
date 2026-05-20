@@ -19,9 +19,26 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.util.LoggingUtils;
+import frc.robot.util.RPMLookupTable;
+import org.littletonrobotics.junction.Logger;
 
 @SuppressWarnings({"deprecation","removal"})
 public class Flywheel extends SubsystemBase {
+  /**
+   * Goal-based control. The subsystem decides target RPM and tolerance from the goal;
+   * callers express intent instead of raw RPM.
+   */
+  public enum Goal {
+    IDLE,
+    SHOOT_AT_DISTANCE,
+    FEED_AT_DISTANCE,
+    TOWER_BACK,
+    TOWER_FRONT,
+    FEED_SHOT,
+    MANUAL_RPM,
+    OPEN_LOOP
+  }
+
   private final SparkFlex m_FlywheelMotor1;
   private final SparkFlex m_FlywheelMotor2;
   private final RelativeEncoder m_Encoder1;
@@ -29,6 +46,19 @@ public class Flywheel extends SubsystemBase {
   private final SparkClosedLoopController m_FlywheelPIDController1;
   private final SparkClosedLoopController m_FlywheelPIDController2;
   private final SparkFlexConfig m_config = new SparkFlexConfig();
+
+  // Goal-driven state
+  private Goal m_goal = Goal.IDLE;
+  private double m_shotDistance = 0;
+  private double m_feedDistance = 0;
+  private double m_tagRpmOffset = 0;
+  private double m_manualRpm = 0;
+  private double m_openLoopSpeed = 0;
+  private double m_activeTargetRpm = 0;
+  // The SparkFlex closed-loop holds its setpoint between calls, so re-issuing the same one
+  // at 50 Hz is pure CAN-bus noise. Dedup against these to fire setReference only on change.
+  private Goal m_lastAppliedGoal = null;
+  private double m_lastAppliedValue = Double.NaN;
 
   // Spin-up timing
   private double m_spinUpStartTime = 0;
@@ -110,37 +140,127 @@ public class Flywheel extends SubsystemBase {
         .uvwMeasurementPeriod(10);
   }
 
-  public void setSpeed(double speed) {
-    double requestedSpeed = speed;
-    speed = MathUtil.clamp(speed, -MotorConstants.kShooterMotorMaximumSpeed, MotorConstants.kShooterMotorMaximumSpeed);
+  /** Set the current goal. Motors update on the next periodic() (or immediately on goal change). */
+  public void setGoal(Goal goal) {
+    m_goal = goal;
+    applyGoal();
+  }
 
-    if (Math.abs(requestedSpeed) > Math.abs(speed)) {
-      String warning = String.format("Flywheel speed clamped: requested %.2f, limited to %.2f",
-                                     requestedSpeed, speed);
-      DriverStation.reportWarning(warning, false);
+  public Goal getGoal() { return m_goal; }
+
+  /** Distance input for SHOOT_AT_DISTANCE. */
+  public void setShotDistance(double meters) { m_shotDistance = meters; }
+
+  /** Distance input for FEED_AT_DISTANCE. */
+  public void setFeedDistance(double meters) { m_feedDistance = meters; }
+
+  /** Per-tag RPM bias applied on top of SHOOT_AT_DISTANCE. */
+  public void setTagRpmOffset(double offset) { m_tagRpmOffset = offset; }
+
+  /** Caller-supplied RPM target for MANUAL_RPM (live-tuning, supplier-driven shots). */
+  public void setManualRpm(double rpm) { m_manualRpm = rpm; }
+
+  /** Caller-supplied duty cycle for OPEN_LOOP. */
+  public void setOpenLoopSpeed(double speed) { m_openLoopSpeed = speed; }
+
+  /**
+   * True when the subsystem is at the active goal's setpoint (or always true at IDLE).
+   * Uses goal-appropriate tolerance — looser for FEED_SHOT, tight for everything else.
+   */
+  public boolean atGoal() {
+    if (m_goal == Goal.IDLE || m_goal == Goal.OPEN_LOOP) return true;
+    double tol = (m_goal == Goal.FEED_SHOT)
+        ? MotorConstants.kFeedShotFlywheelRPMTolerance
+        : MotorConstants.kShooterRPMTolerance;
+    return Math.abs(getRPM() - m_activeTargetRpm) < tol;
+  }
+
+  /** Current PID setpoint we're driving toward (0 at IDLE/OPEN_LOOP). */
+  public double getActiveTargetRpm() { return m_activeTargetRpm; }
+
+  private double targetRpmForGoal() {
+    return switch (m_goal) {
+      case IDLE -> 0;
+      case SHOOT_AT_DISTANCE -> RPMLookupTable.getShootingFlywheelRPM(m_shotDistance) + m_tagRpmOffset;
+      case FEED_AT_DISTANCE -> RPMLookupTable.getFeedingFlywheelRPM(m_feedDistance);
+      case TOWER_BACK -> MotorConstants.kTowerShotFlywheelRPM;
+      case TOWER_FRONT -> MotorConstants.kTowerShotFrontFlywheelRPM;
+      case FEED_SHOT -> MotorConstants.kFeederShotFlywheelRPM;
+      case MANUAL_RPM -> m_manualRpm;
+      case OPEN_LOOP -> 0;
+    };
+  }
+
+  private void applyGoal() {
+    if (m_goal == Goal.OPEN_LOOP) {
+      double speed = MathUtil.clamp(m_openLoopSpeed,
+          -MotorConstants.kShooterMotorMaximumSpeed, MotorConstants.kShooterMotorMaximumSpeed);
+      if (m_lastAppliedGoal != Goal.OPEN_LOOP || speed != m_lastAppliedValue) {
+        m_FlywheelMotor1.set(speed);
+        m_FlywheelMotor2.set(speed);
+        m_lastAppliedValue = speed;
+        m_lastAppliedGoal = Goal.OPEN_LOOP;
+        SmartDashboard.putNumber("Subsystem: Flywheel/Speed", speed);
+        SmartDashboard.putNumber("Subsystem: Flywheel/Target RPM", 0);
+      }
+      m_activeTargetRpm = 0;
+      return;
     }
 
-    m_FlywheelMotor1.set(speed);
-    m_FlywheelMotor2.set(speed);
-    SmartDashboard.putNumber("Subsystem: Flywheel/Speed", speed);
+    if (m_goal == Goal.IDLE) {
+      if (m_lastAppliedGoal != Goal.IDLE) {
+        m_FlywheelMotor1.stopMotor();
+        m_FlywheelMotor2.stopMotor();
+        m_lastAppliedGoal = Goal.IDLE;
+        SmartDashboard.putNumber("Subsystem: Flywheel/Speed", 0);
+        SmartDashboard.putNumber("Subsystem: Flywheel/Target RPM", 0);
+      }
+      m_activeTargetRpm = 0;
+      return;
+    }
+
+    double rpm = targetRpmForGoal();
+    m_activeTargetRpm = rpm;
+    if (m_goal != m_lastAppliedGoal || Math.abs(rpm - m_lastAppliedValue) > 0.5) {
+      m_FlywheelPIDController1.setReference(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+      m_FlywheelPIDController2.setReference(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+      m_lastAppliedGoal = m_goal;
+      m_lastAppliedValue = rpm;
+      SmartDashboard.putNumber("Subsystem: Flywheel/Target RPM", rpm);
+    }
   }
 
+  // -------- Back-compat shims --------
+
+  /** @deprecated Use setGoal + setManualRpm, or a named goal. */
+  @Deprecated
+  public void setSpeed(double speed) {
+    m_openLoopSpeed = speed;
+    setGoal(Goal.OPEN_LOOP);
+  }
+
+  /** @deprecated Use setGoal(IDLE). */
+  @Deprecated
   public void stopFlywheelMotor() {
-    m_FlywheelMotor1.stopMotor();
-    m_FlywheelMotor2.stopMotor();
-    SmartDashboard.putNumber("Subsystem: Flywheel/Speed", 0);
+    setGoal(Goal.IDLE);
   }
 
+  /** @deprecated Use setGoal + the appropriate named goal, or setManualRpm. */
+  @Deprecated
   public void setTargetRPM(double targetRPM) {
-    m_FlywheelPIDController1.setReference(targetRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    m_FlywheelPIDController2.setReference(targetRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    SmartDashboard.putNumber("Subsystem: Flywheel/Target RPM", targetRPM);
+    m_manualRpm = targetRPM;
+    setGoal(Goal.MANUAL_RPM);
   }
 
   public double getRPM() {
     return (m_Encoder1.getVelocity() + m_Encoder2.getVelocity()) / 2.0;
   }
 
+  /**
+   * @deprecated Use atGoal(). Kept for callers that still pass an explicit RPM target.
+   * Uses the parameter rather than the active goal's setpoint to preserve old semantics.
+   */
+  @Deprecated
   public boolean isAtTargetSpeed(double targetRPM) {
     double currentVelocity = getRPM();
     return Math.abs(currentVelocity - targetRPM) < MotorConstants.kShooterRPMTolerance;
@@ -179,8 +299,10 @@ public class Flywheel extends SubsystemBase {
 
   @Override
   public void periodic() {
+    applyGoal();
+
     double currentRPM = getRPM();
-    double targetRPM = SmartDashboard.getNumber("Subsystem: Flywheel/Target RPM", 0);
+    double targetRPM = m_activeTargetRpm;
     double error = targetRPM - currentRPM;
 
     // Detect spin-up start: actual RPM crosses above 100
@@ -206,7 +328,7 @@ public class Flywheel extends SubsystemBase {
     m_wasAbove100RPM = currentRPM > 100;
 
     // Spin-up timing: check if we just reached target speed
-    if (m_isSpinningUp && isAtTargetSpeed(targetRPM) && targetRPM > 100) {
+    if (m_isSpinningUp && atGoal() && targetRPM > 100) {
       double spinUpTime = Timer.getFPGATimestamp() - m_spinUpStartTime;
       m_isSpinningUp = false;
       m_trackingAvgRPM = true;
@@ -242,6 +364,10 @@ public class Flywheel extends SubsystemBase {
       applyPIDFromDashboard();
       SmartDashboard.putBoolean("TuneFlywheel/Apply", false);
     }
+
+    Logger.recordOutput("Flywheel/goal", m_goal.name());
+    Logger.recordOutput("Flywheel/targetRpm", m_activeTargetRpm);
+    Logger.recordOutput("Flywheel/atGoal", atGoal());
 
     LoggingUtils.logSpark("Flywheel/Motor1", m_FlywheelMotor1, m_Encoder1, current1);
     LoggingUtils.logSpark("Flywheel/Motor2", m_FlywheelMotor2, m_Encoder2, current2);

@@ -28,17 +28,18 @@ import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.shooterSystem.Feeder;
-import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.LEDs;
+import frc.robot.subsystems.shooterSystem.ShooterSuperstructure;
 import frc.robot.subsystems.shooterSystem.Spindexer;
-import frc.robot.subsystems.shooterSystem.TopRoller;
 import frc.robot.commands.ShootFeedCommands.FeedShot;
 
 public class Bindings {
     public static void configureBindings(
         CommandXboxController m_driverController,
         CommandXboxController m_operatorController,
-        Intake intake, IntakePivot intakePivot, Spindexer spindexer, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Swerve swerve, LEDs leds
+        Intake intake, IntakePivot intakePivot, Spindexer spindexer, Feeder feeder,
+        ShooterSuperstructure superstructure,
+        Swerve swerve, LEDs leds
     ) {
 
         // Initialize SmartDashboard tuning values
@@ -55,8 +56,9 @@ public class Bindings {
         // Back: Lock wheels in X pattern
         m_driverController.back().whileTrue(Commands.run(() -> swerve.lock(), swerve));
 
-        m_driverController.leftTrigger(.1).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake,
-            ()->flywheel.getTargetRPMFromDashboard(), ()-> topRoller.getTargetRPMFromDashboard()));
+        // Live-tunable tower shot (driver LT light touch): reads dashboard target inputs
+        m_driverController.leftTrigger(.1).whileTrue(new TowerShot(superstructure, intakePivot, intake,
+            superstructure::dashboardFlywheelRpm, superstructure::dashboardRollerRpm));
 
 
 
@@ -70,7 +72,7 @@ public class Bindings {
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)),
             new AutoAimAndShoot(
-                swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+                swerve, superstructure, intakePivot, intake,
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
             )
@@ -79,15 +81,16 @@ public class Bindings {
 
         // Auto-aim and auto-feed: pose-based lob into the same-side back corner of our alliance zone
         m_driverController.leftBumper().whileTrue(new AutoAimAndFeed(
-            swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+            swerve, superstructure, intakePivot, intake,
             () -> -MathUtil.applyDeadband(m_driverController.getLeftY(), ControllerConstants.kDeadband),
             () -> -MathUtil.applyDeadband(m_driverController.getLeftX(), ControllerConstants.kDeadband)
         ).andThen(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint)
             .until(() -> intakePivot.atSetpoint())));
 
-        m_driverController.leftTrigger().whileTrue(new FeedShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake, MotorConstants.kFeederShotFlywheelRPM, MotorConstants.kFeederShotTopRollerRPM));
+        m_driverController.leftTrigger().whileTrue(new FeedShot(superstructure, intakePivot, intake));
 
-        m_driverController.x().whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+        // X-button TuneShot: live-tunable RPMs via separate TuneShot/ dashboard keys
+        m_driverController.x().whileTrue(new TowerShot(superstructure, intakePivot, intake,
             () -> SmartDashboard.getNumber("TuneShot/Flywheel RPM", MotorConstants.kTowerShotFlywheelRPM),
             () -> SmartDashboard.getNumber("TuneShot/TopRoller RPM", MotorConstants.kTowerShotTopRollerRPM)));
 
@@ -121,20 +124,22 @@ public class Bindings {
         m_operatorController.start().onTrue(Commands.runOnce(() -> swerve.zeroGyroWithAlliance()));
 
         // Rev shooter
-        m_operatorController.rightTrigger(0.5).whileTrue(new RevShooter(flywheel, topRoller));
+        m_operatorController.rightTrigger(0.5).whileTrue(new RevShooter(superstructure));
         m_operatorController.rightTrigger(0.5).whileTrue(Commands.run(() -> swerve.setLockAngles(), swerve));
 
-        // Feed to shooter
+        // Feed to shooter (operator manual)
         m_operatorController.x().whileTrue(new RunFeeder(feeder, Directions.IN));
 
-        
+
         // Intake pivot deploy/stow (open-loop)
         m_operatorController.b().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotStowSetpoint));
         m_operatorController.a().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotDeploySetpoint));
 
         m_operatorController.rightBumper().onTrue(new IntakePivotSetpoint(intakePivot, MotorConstants.kIntakePivotMiddleSetpoint));
 
-        m_operatorController.pov(0).whileTrue(new TowerShot(flywheel, topRoller, feeder, spindexer, intakePivot, intake, MotorConstants.kTowerShotFrontFlywheelRPM, MotorConstants.kTowerShotFrontTopRollerRPM));
+        // Operator POV up: tower shot using the FRONT-tower goal (named, not manual RPMs)
+        m_operatorController.pov(0).whileTrue(new TowerShot(superstructure, intakePivot, intake,
+            ShooterSuperstructure.Goal.TOWER_FRONT));
 
         // Spindexer CW (normal direction)
         m_operatorController.pov(90).whileTrue(new RunSpindexer(spindexer, MotorConstants.kSpindexerSpeed));
@@ -150,7 +155,7 @@ public class Bindings {
                 () -> -MathUtil.applyDeadband(m_operatorController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_operatorController.getLeftX(), ControllerConstants.kDeadband)),
             new AutoAimAndShoot(
-                swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake,
+                swerve, superstructure, intakePivot, intake,
                 () -> -MathUtil.applyDeadband(m_operatorController.getLeftY(), ControllerConstants.kDeadband),
                 () -> -MathUtil.applyDeadband(m_operatorController.getLeftX(), ControllerConstants.kDeadband)
             )

@@ -19,13 +19,37 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.util.LoggingUtils;
+import frc.robot.util.RPMLookupTable;
+import org.littletonrobotics.junction.Logger;
 
 @SuppressWarnings({"deprecation","removal"})
 public class TopRoller extends SubsystemBase {
+  public enum Goal {
+    IDLE,
+    SHOOT_AT_DISTANCE,
+    FEED_AT_DISTANCE,
+    TOWER_BACK,
+    TOWER_FRONT,
+    FEED_SHOT,
+    MANUAL_RPM,
+    OPEN_LOOP
+  }
+
   private final SparkFlex m_Motor;
   private final SparkFlexConfig m_rollerConfig = new SparkFlexConfig();
   private final SparkClosedLoopController m_PIDController;
   private final RelativeEncoder m_Encoder;
+
+  private Goal m_goal = Goal.IDLE;
+  private double m_shotDistance = 0;
+  private double m_feedDistance = 0;
+  private double m_tagRpmOffset = 0;
+  private double m_manualRpm = 0;
+  private double m_openLoopSpeed = 0;
+  // See Flywheel for dedup rationale — same pattern.
+  private double m_activeTargetRpm = 0;
+  private Goal m_lastAppliedGoal = null;
+  private double m_lastAppliedValue = Double.NaN;
 
   // Spin-up timing
   private double m_spinUpStartTime = 0;
@@ -93,39 +117,106 @@ public class TopRoller extends SubsystemBase {
         .iZone(MotorConstants.kRollerIZone);
   }
 
-  /**
-   * Set the top roller motor speed with clamping and soft limit warnings.
-   * @param speed Desired speed (-1.0 to 1.0)
-   */
-  public void setTopRollerSpeed(double speed) {
-    double requestedSpeed = speed;
-    speed = MathUtil.clamp(speed, -MotorConstants.kTopRollerMotorMaximumSpeed, MotorConstants.kTopRollerMotorMaximumSpeed);
+  public void setGoal(Goal goal) {
+    m_goal = goal;
+    applyGoal();
+  }
 
-    if (Math.abs(requestedSpeed) > Math.abs(speed)) {
-      String warning = String.format("Roller speed clamped: requested %.2f, limited to %.2f",
-                                     requestedSpeed, speed);
-      DriverStation.reportWarning(warning, false);
+  public Goal getGoal() { return m_goal; }
+
+  public void setShotDistance(double meters) { m_shotDistance = meters; }
+  public void setFeedDistance(double meters) { m_feedDistance = meters; }
+  public void setTagRpmOffset(double offset) { m_tagRpmOffset = offset; }
+  public void setManualRpm(double rpm) { m_manualRpm = rpm; }
+  public void setOpenLoopSpeed(double speed) { m_openLoopSpeed = speed; }
+
+  public boolean atGoal() {
+    if (m_goal == Goal.IDLE || m_goal == Goal.OPEN_LOOP) return true;
+    double tol = (m_goal == Goal.FEED_SHOT)
+        ? MotorConstants.kFeedShotRollerRPMTolerance
+        : MotorConstants.kRollerRPMTolerance;
+    return Math.abs(getRPM() - m_activeTargetRpm) < tol;
+  }
+
+  public double getActiveTargetRpm() { return m_activeTargetRpm; }
+
+  private double targetRpmForGoal() {
+    return switch (m_goal) {
+      case IDLE -> 0;
+      case SHOOT_AT_DISTANCE -> RPMLookupTable.getShootingRollerRPM(m_shotDistance) + m_tagRpmOffset;
+      case FEED_AT_DISTANCE -> RPMLookupTable.getFeedingRollerRPM(m_feedDistance);
+      case TOWER_BACK -> MotorConstants.kTowerShotTopRollerRPM;
+      case TOWER_FRONT -> MotorConstants.kTowerShotFrontTopRollerRPM;
+      case FEED_SHOT -> MotorConstants.kFeederShotTopRollerRPM;
+      case MANUAL_RPM -> m_manualRpm;
+      case OPEN_LOOP -> 0;
+    };
+  }
+
+  private void applyGoal() {
+    if (m_goal == Goal.OPEN_LOOP) {
+      double speed = MathUtil.clamp(m_openLoopSpeed,
+          -MotorConstants.kTopRollerMotorMaximumSpeed, MotorConstants.kTopRollerMotorMaximumSpeed);
+      if (m_lastAppliedGoal != Goal.OPEN_LOOP || speed != m_lastAppliedValue) {
+        m_Motor.set(speed);
+        m_lastAppliedValue = speed;
+        m_lastAppliedGoal = Goal.OPEN_LOOP;
+        SmartDashboard.putNumber("Subsystem: Roller/Speed", speed);
+        SmartDashboard.putNumber("Subsystem: Roller/Target RPM", 0);
+      }
+      m_activeTargetRpm = 0;
+      return;
     }
 
-    m_Motor.set(speed);
-    SmartDashboard.putNumber("Subsystem: Roller/Speed", speed);
+    if (m_goal == Goal.IDLE) {
+      if (m_lastAppliedGoal != Goal.IDLE) {
+        m_Motor.stopMotor();
+        m_lastAppliedGoal = Goal.IDLE;
+        SmartDashboard.putNumber("Subsystem: Roller/Speed", 0);
+        SmartDashboard.putNumber("Subsystem: Roller/Target RPM", 0);
+      }
+      m_activeTargetRpm = 0;
+      return;
+    }
+
+    double rpm = targetRpmForGoal();
+    m_activeTargetRpm = rpm;
+    if (m_goal != m_lastAppliedGoal || Math.abs(rpm - m_lastAppliedValue) > 0.5) {
+      m_PIDController.setReference(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+      m_lastAppliedGoal = m_goal;
+      m_lastAppliedValue = rpm;
+      SmartDashboard.putNumber("Subsystem: Roller/Target RPM", rpm);
+    }
   }
 
-  /** Stop the top roller motor and report zero speed to dashboard. */
+  // -------- Back-compat shims --------
+
+  /** @deprecated Use setGoal + setOpenLoopSpeed, or OPEN_LOOP goal. */
+  @Deprecated
+  public void setTopRollerSpeed(double speed) {
+    m_openLoopSpeed = speed;
+    setGoal(Goal.OPEN_LOOP);
+  }
+
+  /** @deprecated Use setGoal(IDLE). */
+  @Deprecated
   public void stopRollerMotor() {
-    m_Motor.stopMotor();
-    SmartDashboard.putNumber("Subsystem: Roller/Speed", 0);
+    setGoal(Goal.IDLE);
   }
 
+  /** @deprecated Use setGoal + named goal, or setManualRpm + MANUAL_RPM. */
+  @Deprecated
   public void setRPM(double targetRPM) {
-    m_PIDController.setReference(targetRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    SmartDashboard.putNumber("Subsystem: Roller/Target RPM", targetRPM);
+    m_manualRpm = targetRPM;
+    setGoal(Goal.MANUAL_RPM);
   }
 
   public double getRPM() {
     return m_Encoder.getVelocity();
   }
 
+  /** @deprecated Use atGoal(). */
+  @Deprecated
   public boolean isAtTargetSpeed(double targetRPM) {
     double currentVelocity = getRPM();
     return Math.abs(currentVelocity - targetRPM) < MotorConstants.kRollerRPMTolerance;
@@ -163,8 +254,10 @@ public class TopRoller extends SubsystemBase {
 
   @Override
   public void periodic() {
+    applyGoal();
+
     double currentRPM = getRPM();
-    double targetRPM = SmartDashboard.getNumber("Subsystem: Roller/Target RPM", 0);
+    double targetRPM = m_activeTargetRpm;
     double error = targetRPM - currentRPM;
 
     // Detect spin-up start: actual RPM crosses above 100
@@ -190,7 +283,7 @@ public class TopRoller extends SubsystemBase {
     m_wasAbove100RPM = currentRPM > 100;
 
     // Spin-up timing: check if we just reached target speed
-    if (m_isSpinningUp && isAtTargetSpeed(targetRPM) && targetRPM > 100) {
+    if (m_isSpinningUp && atGoal() && targetRPM > 100) {
       double spinUpTime = Timer.getFPGATimestamp() - m_spinUpStartTime;
       m_isSpinningUp = false;
       m_trackingAvgRPM = true;
@@ -222,6 +315,10 @@ public class TopRoller extends SubsystemBase {
       applyPIDFromDashboard();
       SmartDashboard.putBoolean("TuneTopRoller/Apply", false);
     }
+
+    Logger.recordOutput("TopRoller/goal", m_goal.name());
+    Logger.recordOutput("TopRoller/targetRpm", m_activeTargetRpm);
+    Logger.recordOutput("TopRoller/atGoal", atGoal());
 
     LoggingUtils.logSpark("TopRoller", m_Motor, m_Encoder, current);
   }

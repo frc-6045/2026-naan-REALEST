@@ -6,10 +6,7 @@ import frc.robot.Constants.SideTagConstants;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.shooterSystem.Feeder;
-import frc.robot.subsystems.shooterSystem.Flywheel;
-import frc.robot.subsystems.shooterSystem.Spindexer;
-import frc.robot.subsystems.shooterSystem.TopRoller;
+import frc.robot.subsystems.shooterSystem.ShooterSuperstructure;
 
 /**
  * Auto-aim and shoot command with side-specific AprilTag prioritization.
@@ -28,12 +25,10 @@ public class AutoAimAndShootSide extends AutoAimAndShoot {
 
     public AutoAimAndShootSide(
             ApproachSide side,
-            Swerve swerve, Flywheel flywheel, TopRoller topRoller,
-            Feeder feeder, Spindexer spindexer,
+            Swerve swerve, ShooterSuperstructure superstructure,
             IntakePivot intakePivot, Intake intake,
             DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier) {
-        super(swerve, flywheel, topRoller, feeder, spindexer,
-              intakePivot, intake, translationXSupplier, translationYSupplier);
+        super(swerve, superstructure, intakePivot, intake, translationXSupplier, translationYSupplier);
         m_side = side;
     }
 

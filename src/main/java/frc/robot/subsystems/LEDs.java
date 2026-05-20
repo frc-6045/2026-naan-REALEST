@@ -8,9 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConstants;
-import frc.robot.subsystems.shooterSystem.Feeder;
-import frc.robot.subsystems.shooterSystem.Flywheel;
-import frc.robot.subsystems.shooterSystem.TopRoller;
+import frc.robot.subsystems.shooterSystem.ShooterSuperstructure;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.Map;
@@ -27,9 +25,7 @@ public class LEDs extends SubsystemBase {
     private final AddressableLED m_led;
     private final AddressableLEDBuffer m_ledBuffer;
     private LEDState m_currentState = LEDState.DISABLED;
-    private final Flywheel m_flywheel;
-    private final TopRoller m_topRoller;
-    private final Feeder m_feeder;
+    private final ShooterSuperstructure m_shooter;
 
     // Last solid color pushed to the strip. Used to skip redundant setData() writes.
     private Color m_lastSolidColor = null;
@@ -50,10 +46,8 @@ public class LEDs extends SubsystemBase {
     private long m_morseLastUpdateMs = 0;
     private boolean m_morseLightOn = false;
 
-    public LEDs(Flywheel flywheel, TopRoller topRoller, Feeder feeder) {
-        m_flywheel = flywheel;
-        m_topRoller = topRoller;
-        m_feeder = feeder;
+    public LEDs(ShooterSuperstructure shooter) {
+        m_shooter = shooter;
         m_led = new AddressableLED(LEDConstants.kLEDPort);
         m_ledBuffer = new AddressableLEDBuffer(LEDConstants.kLEDCount);
         m_led.setLength(m_ledBuffer.getLength());
@@ -92,23 +86,15 @@ public class LEDs extends SubsystemBase {
         m_lastSolidColor = color;
     }
 
-    /**
-     * Checks if the shooter is fully revved up and ready to shoot.
-     * @return true if both flywheel and top roller are at target speed
-     */
+    /** True iff both flywheel and top roller are at their current goal RPM. */
     private boolean isShooterReady() {
-        double targetFlywheelRPM = m_flywheel.getTargetRPMFromDashboard();
-        double targetRollerRPM = m_topRoller.getTargetRPMFromDashboard();
-        return m_flywheel.isAtTargetSpeed(targetFlywheelRPM) &&
-               m_topRoller.isAtTargetSpeed(targetRollerRPM);
+        return m_shooter.getGoal() != ShooterSuperstructure.Goal.IDLE
+            && m_shooter.wheelsReady();
     }
 
-    /**
-     * Checks if the feeder is currently running (actively shooting).
-     * @return true if feeder motor current is above idle threshold
-     */
+    /** True iff the superstructure is currently feeding a ball through the shooter. */
     private boolean isFeeding() {
-        return Math.abs(m_feeder.getCurrent()) > 1.0;  // Threshold of 1 amp to detect active feeding
+        return m_shooter.isFeeding();
     }
 
     /**

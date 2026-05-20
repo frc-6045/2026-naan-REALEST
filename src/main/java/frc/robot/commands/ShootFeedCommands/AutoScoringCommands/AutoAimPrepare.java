@@ -2,39 +2,36 @@ package frc.robot.commands.ShootFeedCommands.AutoScoringCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.LimelightConstants;
-import frc.robot.Constants.MotorConstants;
+import frc.robot.Constants.ShootingConstants;
 import frc.robot.Constants.TagOverrideConstants;
-import frc.robot.subsystems.shooterSystem.Flywheel;
-import frc.robot.subsystems.shooterSystem.TopRoller;
+import frc.robot.subsystems.shooterSystem.ShooterSuperstructure;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightTargeting;
-import frc.robot.util.RPMLookupTable;
 
 /**
  * Lightweight auto-aim prep command for autonomous use.
- * Spins flywheel and sets top roller RPM based on Limelight distance.
- * Does NOT require Swerve, so it can run alongside PathPlanner paths.
+ * Pushes shot distance + tag offset into the superstructure (AUTO_AIM_SHOOT) without ever
+ * arming, so wheels spin to the right RPM while PathPlanner drives the chassis.
+ * Does NOT require Swerve, so it can run alongside path-following.
  */
 public class AutoAimPrepare extends Command {
-    private final Flywheel m_flywheel;
-    private final TopRoller m_topRoller;
-
-    private double m_lastTargetRPM = MotorConstants.kShooterTargetRPM;
-    private double m_lastTargetRollerRPM = MotorConstants.kRollerTargetRPM;
+    private final ShooterSuperstructure m_superstructure;
     private final LimelightTargeting.TagLockState m_tagLock = new LimelightTargeting.TagLockState();
 
-    public AutoAimPrepare(Flywheel flywheel, TopRoller topRoller) {
-        m_flywheel = flywheel;
-        m_topRoller = topRoller;
-        addRequirements(flywheel, topRoller);
+    public AutoAimPrepare(ShooterSuperstructure superstructure) {
+        m_superstructure = superstructure;
+        addRequirements(superstructure);
     }
 
     @Override
     public void initialize() {
-        // Set Limelight to AprilTag pipeline
         LimelightHelpers.setPipelineIndex(LimelightConstants.kFrontCamera.name, LimelightConstants.kAprilTagPipeline);
-
         m_tagLock.reset();
+
+        m_superstructure.setArmed(false);
+        m_superstructure.setShotDistance(ShootingConstants.kMinShootingDistanceMeters);
+        m_superstructure.setTagRpmOffset(0);
+        m_superstructure.setGoal(ShooterSuperstructure.Goal.AUTO_AIM_SHOOT);
     }
 
     @Override
@@ -43,25 +40,16 @@ public class AutoAimPrepare extends Command {
 
         if (target.hasValidTarget) {
             double tagRpmOffset = TagOverrideConstants.getRpmOffset(target.lockedTagID);
-            double targetRollerRPM = RPMLookupTable.getShootingRollerRPM(target.distanceMeters) + tagRpmOffset;
-            double targetRPM = RPMLookupTable.getShootingFlywheelRPM(target.distanceMeters) + tagRpmOffset;
-            m_lastTargetRPM = targetRPM;
-            m_lastTargetRollerRPM = targetRollerRPM;
-
-            m_topRoller.setRPM(targetRollerRPM);
-            m_flywheel.setTargetRPM(targetRPM);
-        } else {
-            // No valid target: keep motors spinning at last known RPM
-            m_flywheel.setTargetRPM(m_lastTargetRPM);
-            m_topRoller.setRPM(m_lastTargetRollerRPM);
+            m_superstructure.setShotDistance(target.distanceMeters);
+            m_superstructure.setTagRpmOffset(tagRpmOffset);
         }
+        // armed stays false — this command never fires
     }
 
     @Override
     public void end(boolean interrupted) {
         m_tagLock.reset();
-        m_flywheel.stopFlywheelMotor();
-        m_topRoller.stopRollerMotor();
+        m_superstructure.setGoal(ShooterSuperstructure.Goal.IDLE);
     }
 
     @Override

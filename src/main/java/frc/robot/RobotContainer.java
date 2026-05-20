@@ -9,6 +9,7 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
+import frc.robot.subsystems.shooterSystem.ShooterSuperstructure;
 import frc.robot.subsystems.shooterSystem.TopRoller;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
@@ -31,8 +32,10 @@ public class RobotContainer {
   private final Flywheel m_Flywheel = new Flywheel();
   private final TopRoller m_TopRoller = new TopRoller();
   private final Feeder m_Feeder = new Feeder();
+  private final ShooterSuperstructure m_ShooterSuperstructure =
+      new ShooterSuperstructure(m_Flywheel, m_TopRoller, m_Feeder, m_Spindexer);
   private final Swerve m_Swerve = new Swerve();
-  private final LEDs m_LEDs = new LEDs(m_Flywheel, m_TopRoller, m_Feeder);
+  private final LEDs m_LEDs = new LEDs(m_ShooterSuperstructure);
   private final PowerDistribution m_pdh = new PowerDistribution(1, ModuleType.kRev);
 
   private final CommandXboxController m_driverController =
@@ -55,8 +58,8 @@ public class RobotContainer {
     // execute() — avoids a one-time mid-match loop overrun.
     FieldConstants.kFieldLayout.getTags().size();
 
-    m_Autos = new Autos(m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve);
-    Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_IntakePivot, m_Spindexer, m_Flywheel, m_TopRoller, m_Feeder, m_Swerve, m_LEDs);
+    m_Autos = new Autos(m_Intake, m_IntakePivot, m_Spindexer, m_Feeder, m_ShooterSuperstructure, m_Swerve);
+    Bindings.configureBindings(m_driverController, m_operatorController, m_Intake, m_IntakePivot, m_Spindexer, m_Feeder, m_ShooterSuperstructure, m_Swerve, m_LEDs);
 
     DriverStation.silenceJoystickConnectionWarning(true);
 

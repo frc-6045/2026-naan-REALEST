@@ -8,24 +8,18 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AimConstants;
 import frc.robot.Constants.FeedingConstants;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShooterGeometryConstants;
 import frc.robot.Constants.ShootingConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.IntakeSystem.Intake;
 import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.shooterSystem.Feeder;
-import frc.robot.subsystems.shooterSystem.Flywheel;
-import frc.robot.subsystems.shooterSystem.Spindexer;
-import frc.robot.subsystems.shooterSystem.TopRoller;
-import frc.robot.util.RPMLookupTable;
+import frc.robot.subsystems.shooterSystem.ShooterSuperstructure;
 import frc.robot.util.IntakePivotOscillator;
 import frc.robot.util.ShotCompensation;
 
@@ -44,10 +38,7 @@ import frc.robot.util.ShotCompensation;
  */
 public class AutoAimAndFeed extends Command {
     private final Swerve m_swerve;
-    private final Flywheel m_flywheel;
-    private final TopRoller m_topRoller;
-    private final Feeder m_feeder;
-    private final Spindexer m_spindexer;
+    private final ShooterSuperstructure m_superstructure;
     private final IntakePivot m_intakePivot;
     private final Intake m_intake;
 
@@ -56,19 +47,14 @@ public class AutoAimAndFeed extends Command {
 
     private final PIDController m_aimPID;
 
-    private boolean m_feeding = false;
-    private final Timer m_graceTimer = new Timer();
     private final IntakePivotOscillator.OscillationState m_pivotState = new IntakePivotOscillator.OscillationState();
 
     public AutoAimAndFeed(
-            Swerve swerve, Flywheel flywheel, TopRoller topRoller, Feeder feeder, Spindexer spindexer,
+            Swerve swerve, ShooterSuperstructure superstructure,
             IntakePivot intakePivot, Intake intake,
             DoubleSupplier translationXSupplier, DoubleSupplier translationYSupplier) {
         m_swerve = swerve;
-        m_flywheel = flywheel;
-        m_topRoller = topRoller;
-        m_feeder = feeder;
-        m_spindexer = spindexer;
+        m_superstructure = superstructure;
         m_intakePivot = intakePivot;
         m_intake = intake;
         m_translationXSupplier = translationXSupplier;
@@ -78,16 +64,17 @@ public class AutoAimAndFeed extends Command {
         m_aimPID.setTolerance(FeedingConstants.kFeedAimToleranceDegrees);
         m_aimPID.enableContinuousInput(-180.0, 180.0);
 
-        addRequirements(swerve, flywheel, topRoller, feeder, spindexer, intakePivot, intake);
+        addRequirements(swerve, superstructure, intakePivot, intake);
     }
 
     @Override
     public void initialize() {
         m_aimPID.reset();
-        m_feeding = false;
-        m_graceTimer.stop();
-        m_graceTimer.reset();
         m_pivotState.reset();
+
+        m_superstructure.setArmed(false);
+        m_superstructure.setFeedDistance(ShootingConstants.kMinFeedingDistanceMeters);
+        m_superstructure.setGoal(ShooterSuperstructure.Goal.AUTO_AIM_FEED);
     }
 
     @Override
@@ -112,11 +99,7 @@ public class AutoAimAndFeed extends Command {
                 ShootingConstants.kMinFeedingDistanceMeters,
                 ShootingConstants.kMaxFeedingDistanceMeters);
 
-        double targetRollerRPM = RPMLookupTable.getFeedingRollerRPM(feedDistance);
-        double targetRPM = RPMLookupTable.getFeedingFlywheelRPM(feedDistance);
-
-        m_topRoller.setRPM(targetRollerRPM);
-        m_flywheel.setTargetRPM(targetRPM);
+        m_superstructure.setFeedDistance(feedDistance);
 
         double desiredHeadingDeg = bearingDeg
                 - ShooterGeometryConstants.kShooterYawDegrees
@@ -130,15 +113,16 @@ public class AutoAimAndFeed extends Command {
         double aimTolerance = Math.max(compensation.getAimToleranceDegrees(),
                 FeedingConstants.kFeedAimToleranceDegrees);
         boolean aimed = Math.abs(headingErr) < aimTolerance;
-        boolean topRollerReady = m_topRoller.isAtTargetSpeed(targetRollerRPM);
-        boolean flywheelReady = m_flywheel.isAtTargetSpeed(targetRPM);
         boolean visionTrusted = m_swerve.hasEverAcceptedVision();
-        boolean readyToFire = aimed && topRollerReady && flywheelReady && visionTrusted;
 
-        updateFeedState(readyToFire);
-        IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake, m_feeding, "AutoFeed/");
+        // Hand the gating decision to the superstructure. We contribute aim + vision-trust;
+        // it adds wheel-readiness + grace period.
+        m_superstructure.setArmed(aimed && visionTrusted);
 
-        if (m_feeding) {
+        IntakePivotOscillator.update(m_pivotState, m_intakePivot, m_intake,
+                m_superstructure.isFeeding(), "AutoFeed/");
+
+        if (m_superstructure.isFeeding()) {
             m_swerve.setLockAngles();
         } else {
             double translationX = m_translationXSupplier.getAsDouble() * SwerveConstants.kMaxSpeedMetersPerSecond;
@@ -147,9 +131,8 @@ public class AutoAimAndFeed extends Command {
         }
 
         SmartDashboard.putBoolean("AutoFeed/Aimed", aimed);
-        SmartDashboard.putBoolean("AutoFeed/TopRollerReady", topRollerReady);
-        SmartDashboard.putBoolean("AutoFeed/FlywheelReady", flywheelReady);
-        SmartDashboard.putBoolean("AutoFeed/ReadyToFire", readyToFire);
+        SmartDashboard.putBoolean("AutoFeed/WheelsReady", m_superstructure.wheelsReady());
+        SmartDashboard.putBoolean("AutoFeed/Feeding", m_superstructure.isFeeding());
         SmartDashboard.putBoolean("AutoFeed/VisionTrusted", visionTrusted);
         SmartDashboard.putBoolean("AutoFeed/LowSide",
                 robotPose.getY() < FieldConstants.kFieldWidthMeters / 2.0);
@@ -165,13 +148,11 @@ public class AutoAimAndFeed extends Command {
     @Override
     public void end(boolean interrupted) {
         m_swerve.drive(new Translation2d(), 0.0, true);
-        m_flywheel.stopFlywheelMotor();
-        m_topRoller.stopRollerMotor();
-        m_feeder.stopFeederMotor();
-        m_spindexer.stopSpindexerMotor();
+        m_superstructure.setArmed(false);
+        m_superstructure.setGoal(ShooterSuperstructure.Goal.IDLE);
         m_intakePivot.stopMotor();
         m_intake.stopIntakeMotor();
-        SmartDashboard.putBoolean("AutoFeed/ReadyToFire", false);
+        SmartDashboard.putBoolean("AutoFeed/Feeding", false);
     }
 
     @Override
@@ -180,7 +161,7 @@ public class AutoAimAndFeed extends Command {
     }
 
     public boolean isFeedingActive() {
-        return m_feeding;
+        return m_superstructure.isFeeding();
     }
 
     /**
@@ -205,31 +186,5 @@ public class AutoAimAndFeed extends Command {
                 + FeedingConstants.kFeedHubLateralMarginMeters;
         double targetY = lowSide ? centerY - lateralOffset : centerY + lateralOffset;
         return new Translation2d(targetX, targetY);
-    }
-
-    private void updateFeedState(boolean readyToFire) {
-        if (readyToFire) {
-            m_feeder.setSpeed(MotorConstants.kFeederSpeed);
-            m_spindexer.setSpeed(MotorConstants.kSpindexerSpeed);
-            m_feeding = true;
-            m_graceTimer.stop();
-            m_graceTimer.reset();
-            return;
-        }
-
-        boolean withinGracePeriod = m_feeding
-                && !m_graceTimer.hasElapsed(ShootingConstants.kFeedingGracePeriodSec);
-
-        if (withinGracePeriod) {
-            if (!m_graceTimer.isRunning()) {
-                m_graceTimer.start();
-            }
-            m_feeder.setSpeed(MotorConstants.kFeederSpeed);
-            m_spindexer.setSpeed(MotorConstants.kSpindexerSpeed);
-        } else {
-            m_feeder.stopFeederMotor();
-            m_spindexer.stopSpindexerMotor();
-            m_feeding = false;
-        }
     }
 }
