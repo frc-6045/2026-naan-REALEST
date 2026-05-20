@@ -47,15 +47,17 @@ public class RPMLookupTable {
 
         // Demo table (classroom basketball-hoop). Tune at venue with actual hoop + ball.
         // Higher trajectory than the HUB shot — lifts the ball into a 10ft basket.
-        m_demoFlywheelMap.put(0.0254 * 60,  2400.0);
-        m_demoFlywheelMap.put(0.0254 * 90,  2500.0);
-        m_demoFlywheelMap.put(0.0254 * 120, 2700.0);
-        m_demoFlywheelMap.put(0.0254 * 150, 2900.0);
+        m_demoFlywheelMap.put(0.0254 * 86,  1750.0);
+        m_demoFlywheelMap.put(0.0254 * 113,  2100.0);
+        m_demoFlywheelMap.put(0.0254 * 67, 1600.0);
+        // m_demoFlywheelMap.put(0.0254 * 150, 2900.0);
+        // m_demoFlywheelMap.put(0.0254 * 150, 2900.0);
 
-        m_demoRollerMap.put(0.0254 * 60,  1700.0);
-        m_demoRollerMap.put(0.0254 * 90,  1900.0);
-        m_demoRollerMap.put(0.0254 * 120, 2100.0);
-        m_demoRollerMap.put(0.0254 * 150, 2350.0);
+         m_demoRollerMap.put(0.0254 * 86,  2000.0);
+        m_demoRollerMap.put(0.0254 * 113,  2100.0);
+        m_demoRollerMap.put(0.0254 * 67, 1900.0);
+        // m_demoRollerMap.put(0.0254 * 150, 2350.0);
+        // m_demoRollerMap.put(0.0254 * 150, 2350.0);
     }
 
     public static double getShootingRollerRPM(double distanceMeters) {

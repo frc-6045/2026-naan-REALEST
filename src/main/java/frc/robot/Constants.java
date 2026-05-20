@@ -67,19 +67,19 @@ public final class Constants {
     public static final int kSpindexerMotorCanID = 17;
 
     // Motor Speed Limits (percentage, -1.0 to 1.0)
-    public static final double kFeederMotorMaximumSpeed = 1;
-    public static final double kIntakeMotorMaximumSpeed = 1;
+    public static final double kFeederMotorMaximumSpeed = .25;
+    public static final double kIntakeMotorMaximumSpeed = .25;
     public static final double kIntakePivotMotorMaximumSpeed = .4;
     public static final double kShooterMotorMaximumSpeed = 1;
     public static final double kTopRollerMotorMaximumSpeed = 1;
-    public static final double kSpindexerMotorMaximumSpeed = 1;
+    public static final double kSpindexerMotorMaximumSpeed = .25;
 
     // Default speeds
     public static final double kIntakeStowSpeed = -.167; // Speed for stowing intake
     public static final double kIntakeDeploySpeed = .167; // Speed for deploying intake
     public static final double kIntakeRollerSpeed = 1; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
-    public static final double kFeederSpeed = 1; // Speed to feed ball into shooter
-    public static final double kSpindexerSpeed = 1; // Speed to index balls from intake to feeder
+    public static final double kFeederSpeed = .25; // Speed to feed ball into shooter
+    public static final double kSpindexerSpeed = .25; // Speed to index balls from intake to feeder
     public static final double kTopRollerSpeed = 1;
 
     public static final double kIntakeRampRate = 3.14; // Max change in motor output per second (units/sec) - prevents harsh stops on chain
