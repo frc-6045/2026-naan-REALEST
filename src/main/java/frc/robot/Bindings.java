@@ -22,6 +22,7 @@ import frc.robot.commands.ShootFeedCommands.RunFeeder;
 import frc.robot.commands.ShootFeedCommands.TowerShot;
 import frc.robot.commands.ShootFeedCommands.AutoFeedingCommands.AutoAimAndFeed;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.AutoAimAndShoot;
+import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.DemoAimAndShoot;
 import frc.robot.commands.ShootFeedCommands.AutoScoringCommands.ScanForTarget;
 import frc.robot.commands.SpindexerCommands.RunSpindexer;
 import frc.robot.subsystems.IntakeSystem.Intake;
@@ -141,6 +142,10 @@ public class Bindings {
 
         // Spindexer CCW (reverse)
         //m_operatorController.y().whileTrue(new RunSpindexer(spindexer, -MotorConstants.kSpindexerSpeed));
+
+        // Classroom basketball-hoop demo: lock onto DemoConstants.kDemoTagID and shoot
+        m_operatorController.pov(180).whileTrue(
+            new DemoAimAndShoot(swerve, flywheel, topRoller, feeder, spindexer));
 
         m_operatorController.pov(270).whileTrue(new DeployIntake(intakePivot));
         m_operatorController.y().whileTrue(new StowIntake(intakePivot));

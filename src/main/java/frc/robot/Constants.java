@@ -67,19 +67,19 @@ public final class Constants {
     public static final int kSpindexerMotorCanID = 17;
 
     // Motor Speed Limits (percentage, -1.0 to 1.0)
-    public static final double kFeederMotorMaximumSpeed = 1;
-    public static final double kIntakeMotorMaximumSpeed = 1;
+    public static final double kFeederMotorMaximumSpeed = .25;
+    public static final double kIntakeMotorMaximumSpeed = .25;
     public static final double kIntakePivotMotorMaximumSpeed = .4;
     public static final double kShooterMotorMaximumSpeed = 1;
     public static final double kTopRollerMotorMaximumSpeed = 1;
-    public static final double kSpindexerMotorMaximumSpeed = 1;
+    public static final double kSpindexerMotorMaximumSpeed = .25;
 
     // Default speeds
     public static final double kIntakeStowSpeed = -.167; // Speed for stowing intake
     public static final double kIntakeDeploySpeed = .167; // Speed for deploying intake
     public static final double kIntakeRollerSpeed = 1; // Speed for intake rollers to pull in game pieces (must be <= kIntakeMotorMaximumSpeed)
-    public static final double kFeederSpeed = 1; // Speed to feed ball into shooter
-    public static final double kSpindexerSpeed = 1; // Speed to index balls from intake to feeder
+    public static final double kFeederSpeed = .25; // Speed to feed ball into shooter
+    public static final double kSpindexerSpeed = .25; // Speed to index balls from intake to feeder
     public static final double kTopRollerSpeed = 1;
 
     public static final double kIntakeRampRate = 3.14; // Max change in motor output per second (units/sec) - prevents harsh stops on chain
@@ -313,7 +313,7 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
 
   public static class VisionPoseConstants {
     // Trench AprilTags are unreliable for pose estimation (they wiggle when robots hit the trench)
-    public static final boolean kFilterTrenchTags = true;
+    public static final boolean kFilterTrenchTags = false;
     public static final int[] kTrenchAprilTagIDs = {7, 12, 23, 28, 15, 16, 13, 14, 29, 30, 31, 32};
 
     public static final double kMaxAngularVelocityDegPerSec = 360.0; // Reject vision if spinning faster
@@ -419,6 +419,16 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static double getRpmOffset(int tagID) {
       return kRpmOffsetByTag.getOrDefault(tagID, 0.0);
     }
+  }
+
+  /** Classroom basketball-hoop demo. Single AprilTag mounted on a portable hoop. */
+  public static class DemoConstants {
+    // AprilTag ID mounted on the hoop backboard. Pick an ID not in the HUB lists.
+    public static final int kDemoTagID = 28;
+    // Height of the tag's CENTER off the floor (10ft hoop ≈ 3.048m; backboard tag a bit higher)
+    public static final double kDemoTagHeightMeters = 1.29;
+    public static final double kDemoMinDistanceMeters = .25;
+    public static final double kDemoMaxDistanceMeters = 10.0;
   }
 
   public enum Directions {

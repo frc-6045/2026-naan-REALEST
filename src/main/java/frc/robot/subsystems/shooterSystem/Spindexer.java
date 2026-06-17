@@ -38,7 +38,7 @@ public class Spindexer extends SubsystemBase {
     m_config
         .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(MotorConstants.kSpindexerCurrentLimit)
-        .openLoopRampRate(0.167)
+        .openLoopRampRate(0.05)
         .closedLoopRampRate(0.167);
     m_config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
