@@ -9,14 +9,18 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.controller.ArmFeedforward;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.filter.SlewRateLimiter;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.system.RobotController;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.command2.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -60,14 +64,14 @@ public class IntakePivot extends SubsystemBase {
 
   public void setSpeed(double speed) {
     double requestedSpeed = speed;
-    speed = MathUtil.clamp(speed, -MotorConstants.kIntakePivotMotorMaximumSpeed, MotorConstants.kIntakePivotMotorMaximumSpeed);
+    speed = Math.clamp(speed, -MotorConstants.kIntakePivotMotorMaximumSpeed, MotorConstants.kIntakePivotMotorMaximumSpeed);
 
     // This message is kinda annoying
     // // Alert if speed was clamped (configuration issue)
     // if (Math.abs(requestedSpeed) > Math.abs(speed)) {
     //   String warning = String.format("Intake pivot speed clamped: requested %.2f, limited to %.2f",
     //                                  requestedSpeed, speed);
-    //   DriverStation.reportWarning(warning, false);
+    //   DriverStationErrors.reportWarning(warning, false);
     // }
 
     // Apply limit enforcement based on current position

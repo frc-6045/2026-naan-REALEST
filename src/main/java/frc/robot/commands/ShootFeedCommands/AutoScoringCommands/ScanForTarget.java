@@ -2,11 +2,11 @@ package frc.robot.commands.ShootFeedCommands.AutoScoringCommands;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.system.Timer;
+import org.wpilib.command2.Command;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.LimelightTargeting;
 

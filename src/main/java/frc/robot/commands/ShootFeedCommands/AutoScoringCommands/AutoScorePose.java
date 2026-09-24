@@ -2,15 +2,15 @@ package frc.robot.commands.ShootFeedCommands.AutoScoringCommands;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.system.Timer;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.command2.Command;
 import frc.robot.Constants.AimConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.MotorConstants;
@@ -145,12 +145,12 @@ public class AutoScorePose extends Command {
 
         if (target.hasValidTarget) {
             // Velocity compensation for shoot-while-moving
-            ChassisSpeeds fieldVelocity = m_swerve.getFieldVelocity();
+            ChassisVelocities fieldVelocity = m_swerve.getFieldVelocity();
             ShotCompensation.CompensationResult compensation =
                     ShotCompensation.calculate(fieldVelocity, currentHeadingDeg, -aimErrorDeg, target.distanceMeters);
 
             // Use Limelight distance for RPM lookup (clamped to valid shooting range)
-            double compensatedDistance = MathUtil.clamp(compensation.adjustedDistanceMeters,
+            double compensatedDistance = Math.clamp(compensation.adjustedDistanceMeters,
                     ShootingConstants.kMinShootingDistanceMeters,
                     ShootingConstants.kMaxShootingDistanceMeters);
 
@@ -185,7 +185,7 @@ public class AutoScorePose extends Command {
 
         // Calculate rotation speed from PID (aiming at field pose, not Limelight tx)
         double aimOutput = m_aimPID.calculate(aimErrorDeg, aimSetpoint);
-        double rotationSpeed = MathUtil.clamp(aimOutput,
+        double rotationSpeed = Math.clamp(aimOutput,
                 -AimConstants.kMaxAutoRotationRadPerSec,
                 AimConstants.kMaxAutoRotationRadPerSec);
 

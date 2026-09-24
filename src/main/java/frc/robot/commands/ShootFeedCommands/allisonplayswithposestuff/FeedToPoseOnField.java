@@ -3,15 +3,15 @@ package frc.robot.commands.ShootFeedCommands.allisonplayswithposestuff;
 import java.util.function.DoubleSupplier;
 import java.util.function.DoubleUnaryOperator;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.system.Timer;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.command2.Command;
 import frc.robot.Constants.AimConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.ShooterGeometryConstants;
@@ -168,12 +168,12 @@ public class FeedToPoseOnField extends Command {
 
         // Velocity compensation for shoot-while-moving
         // Use aim error as "virtual tx" for compensation calculation
-        ChassisSpeeds fieldVelocity = m_swerve.getFieldVelocity();
+        ChassisVelocities fieldVelocity = m_swerve.getFieldVelocity();
         ShotCompensation.CompensationResult compensation =
                 ShotCompensation.calculate(fieldVelocity, currentHeadingDeg, -aimErrorDeg, distanceMeters);
 
         // Use compensated distance for RPM lookups, clamped to valid feeding range
-        double compensatedDistance = MathUtil.clamp(compensation.adjustedDistanceMeters,
+        double compensatedDistance = Math.clamp(compensation.adjustedDistanceMeters,
                 ShootingConstants.kMinFeedingDistanceMeters,
                 ShootingConstants.kMaxFeedingDistanceMeters);
 
@@ -188,7 +188,7 @@ public class FeedToPoseOnField extends Command {
         // Setpoint includes aim lead compensation for moving shots
         double aimSetpoint = compensation.aimLeadDegrees;
         double aimOutput = m_aimPID.calculate(aimErrorDeg, aimSetpoint);
-        double rotationSpeed = MathUtil.clamp(aimOutput,
+        double rotationSpeed = Math.clamp(aimOutput,
                 -AimConstants.kMaxAutoRotationRadPerSec,
                 AimConstants.kMaxAutoRotationRadPerSec);
 

@@ -2,8 +2,8 @@ package frc.robot.commands.ShootFeedCommands;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj2.command.Command;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.command2.Command;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 

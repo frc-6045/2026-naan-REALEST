@@ -2,7 +2,7 @@ package frc.robot;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import frc.robot.Constants.VelocityCompensationConstants;
 import frc.robot.util.ShotCompensation;
 import frc.robot.util.ShotCompensation.CompensationResult;
@@ -15,7 +15,7 @@ class ShotCompensationTest {
 
     @Test
     void stationaryRobotReturnsZeroCompensation() {
-        ChassisSpeeds velocity = new ChassisSpeeds(0.0, 0.0, 0.0);
+        ChassisVelocities velocity = new ChassisVelocities(0.0, 0.0, 0.0);
         CompensationResult result = ShotCompensation.calculate(velocity, 0.0, 0.0, 4.0);
 
         assertFalse(result.compensationActive);
@@ -28,7 +28,7 @@ class ShotCompensationTest {
     void belowDeadbandReturnsZeroCompensation() {
         // Speed just below deadband threshold
         double belowDeadband = VelocityCompensationConstants.kMinCompensationVelocityMps * 0.5;
-        ChassisSpeeds velocity = new ChassisSpeeds(belowDeadband, 0.0, 0.0);
+        ChassisVelocities velocity = new ChassisVelocities(belowDeadband, 0.0, 0.0);
         CompensationResult result = ShotCompensation.calculate(velocity, 0.0, 0.0, 4.0);
 
         assertFalse(result.compensationActive);
@@ -41,7 +41,7 @@ class ShotCompensationTest {
         // Robot heading 0 deg (facing field-forward), target straight ahead (tx=0)
         // Moving laterally (vy = 2 m/s to the left in field frame)
         double distance = 4.0;
-        ChassisSpeeds velocity = new ChassisSpeeds(0.0, 2.0, 0.0);
+        ChassisVelocities velocity = new ChassisVelocities(0.0, 2.0, 0.0);
         CompensationResult result = ShotCompensation.calculate(velocity, 0.0, 0.0, distance);
 
         assertTrue(result.compensationActive);
@@ -59,7 +59,7 @@ class ShotCompensationTest {
         // Robot heading 0 deg, target straight ahead (tx=0)
         // Moving forward (vx = 2 m/s toward target)
         double distance = 4.0;
-        ChassisSpeeds velocity = new ChassisSpeeds(2.0, 0.0, 0.0);
+        ChassisVelocities velocity = new ChassisVelocities(2.0, 0.0, 0.0);
         CompensationResult result = ShotCompensation.calculate(velocity, 0.0, 0.0, distance);
 
         assertTrue(result.compensationActive);
@@ -76,7 +76,7 @@ class ShotCompensationTest {
     void pureRadialVelocityAwayFromTargetIncreasesDistance() {
         // Moving backward (vx = -2 m/s, away from target at heading 0)
         double distance = 4.0;
-        ChassisSpeeds velocity = new ChassisSpeeds(-2.0, 0.0, 0.0);
+        ChassisVelocities velocity = new ChassisVelocities(-2.0, 0.0, 0.0);
         CompensationResult result = ShotCompensation.calculate(velocity, 0.0, 0.0, distance);
 
         assertTrue(result.compensationActive);
@@ -89,7 +89,7 @@ class ShotCompensationTest {
     void highVelocityCloseRangeClampsToMaxValues() {
         // Very high lateral velocity at close range should clamp aim lead
         double distance = 1.0;
-        ChassisSpeeds velocity = new ChassisSpeeds(0.0, 10.0, 0.0);
+        ChassisVelocities velocity = new ChassisVelocities(0.0, 10.0, 0.0);
         CompensationResult result = ShotCompensation.calculate(velocity, 0.0, 0.0, distance);
 
         assertTrue(result.compensationActive);
@@ -101,7 +101,7 @@ class ShotCompensationTest {
     void highRadialVelocityClampsDistanceAdjustment() {
         // Very high radial velocity should clamp distance adjustment
         double distance = 4.0;
-        ChassisSpeeds velocity = new ChassisSpeeds(10.0, 0.0, 0.0);
+        ChassisVelocities velocity = new ChassisVelocities(10.0, 0.0, 0.0);
         CompensationResult result = ShotCompensation.calculate(velocity, 0.0, 0.0, distance);
 
         assertTrue(result.compensationActive);
@@ -114,7 +114,7 @@ class ShotCompensationTest {
     void nonZeroTxOffsetAffectsDecomposition() {
         // Target offset to the right (tx = 30 deg), robot moving forward
         double distance = 4.0;
-        ChassisSpeeds velocity = new ChassisSpeeds(2.0, 0.0, 0.0);
+        ChassisVelocities velocity = new ChassisVelocities(2.0, 0.0, 0.0);
 
         CompensationResult resultCenter = ShotCompensation.calculate(velocity, 0.0, 0.0, distance);
         CompensationResult resultOffset = ShotCompensation.calculate(velocity, 0.0, 30.0, distance);

@@ -1,7 +1,7 @@
 package frc.robot.util;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import frc.robot.Constants.AimConstants;
 import frc.robot.Constants.VelocityCompensationConstants;
 
@@ -65,7 +65,7 @@ public final class ShotCompensation {
      * @param distanceMeters Raw distance to target in meters
      * @return CompensationResult with aim lead and adjusted distance
      */
-    public static CompensationResult calculate(ChassisSpeeds fieldVelocity, double headingDegrees,
+    public static CompensationResult calculate(ChassisVelocities fieldVelocity, double headingDegrees,
             double txDegrees, double distanceMeters) {
         // Early return if disabled
         if (!VelocityCompensationConstants.kEnableVelocityCompensation) {
@@ -73,8 +73,8 @@ public final class ShotCompensation {
         }
 
         // Robot speed magnitude
-        double vx = fieldVelocity.vxMetersPerSecond;
-        double vy = fieldVelocity.vyMetersPerSecond;
+        double vx = fieldVelocity.vx;
+        double vy = fieldVelocity.vy;
         double robotSpeed = Math.hypot(vx, vy);
 
         // Early return if below deadband
@@ -104,14 +104,14 @@ public final class ShotCompensation {
         double lateralDrift = lateralVelocity * flightTime;
         double aimLeadRad = Math.atan2(lateralDrift, distanceMeters);
         double aimLeadDeg = Math.toDegrees(aimLeadRad) * VelocityCompensationConstants.kAimLeadScalar;
-        aimLeadDeg = MathUtil.clamp(aimLeadDeg,
+        aimLeadDeg = Math.clamp(aimLeadDeg,
                 -VelocityCompensationConstants.kMaxAimLeadDegrees,
                 VelocityCompensationConstants.kMaxAimLeadDegrees);
 
         // Distance adjustment: moving toward target = shorter effective distance
         double distanceAdjustment = -radialVelocity * flightTime
                 * VelocityCompensationConstants.kDistanceCompScalar;
-        distanceAdjustment = MathUtil.clamp(distanceAdjustment,
+        distanceAdjustment = Math.clamp(distanceAdjustment,
                 -VelocityCompensationConstants.kMaxDistanceAdjustmentMeters,
                 VelocityCompensationConstants.kMaxDistanceAdjustmentMeters);
         double adjustedDistance = distanceMeters + distanceAdjustment;
@@ -124,7 +124,7 @@ public final class ShotCompensation {
      * Pose-based variant: accepts a field-frame target bearing directly instead of Limelight tx.
      * Converts bearing to the synthetic tx that {@link #calculate} expects (tx = heading - bearing).
      */
-    public static CompensationResult calculateFromBearing(ChassisSpeeds fieldVelocity,
+    public static CompensationResult calculateFromBearing(ChassisVelocities fieldVelocity,
             double headingDegrees, double targetBearingDegrees, double distanceMeters) {
         double syntheticTx = MathUtil.inputModulus(
                 headingDegrees - targetBearingDegrees, -180.0, 180.0);

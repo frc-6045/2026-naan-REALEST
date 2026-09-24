@@ -15,22 +15,26 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.kinematics.SwerveDriveKinematics;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N3;
+import org.wpilib.math.util.Units;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.system.Filesystem;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.CommandScheduler;
+import org.wpilib.command2.SubsystemBase;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.VisionPoseConstants;
@@ -139,13 +143,13 @@ public class Swerve extends SubsystemBase {
                 config,
                 () -> {
                     // Flip path for red alliance
-                    var alliance = DriverStation.getAlliance();
-                    return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+                    var alliance = MatchState.getAlliance();
+                    return alliance.isPresent() && alliance.get() == Alliance.RED;
                 },
                 this
             );
         } catch (Exception e) {
-            DriverStation.reportError("Failed to load PathPlanner config: " + e.getMessage(), e.getStackTrace());
+            DriverStationErrors.reportError("Failed to load PathPlanner config: " + e.getMessage(), e.getStackTrace());
         }
 
         // Warmup pathfinding command
@@ -188,7 +192,7 @@ public class Swerve extends SubsystemBase {
         return AutoBuilder.pathfindToPose(
             pose,
             constraints,
-            edu.wpi.first.units.Units.MetersPerSecond.of(0)
+            org.wpilib.units.Units.MetersPerSecond.of(0)
         );
     }
 
@@ -219,9 +223,9 @@ public class Swerve extends SubsystemBase {
      *
      * @param chassisSpeeds Desired chassis speeds
      */
-    public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+    public void setChassisVelocities(ChassisVelocities chassisSpeeds) {
         m_inLockAngles = false;
-        m_swerveDrive.setChassisSpeeds(chassisSpeeds);
+        m_swerveDrive.setChassisVelocities(chassisSpeeds);
     }
 
     /**
@@ -256,20 +260,20 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Gets the current robot velocity as ChassisSpeeds.
+     * Gets the current robot velocity as ChassisVelocities.
      *
-     * @return The current robot-relative ChassisSpeeds
+     * @return The current robot-relative ChassisVelocities
      */
-    public ChassisSpeeds getRobotVelocity() {
+    public ChassisVelocities getRobotVelocity() {
         return m_swerveDrive.getRobotVelocity();
     }
 
     /**
      * Gets the field-relative velocity of the robot.
      *
-     * @return The field-relative ChassisSpeeds
+     * @return The field-relative ChassisVelocities
      */
-    public ChassisSpeeds getFieldVelocity() {
+    public ChassisVelocities getFieldVelocity() {
         return m_swerveDrive.getFieldVelocity();
     }
 
@@ -308,8 +312,8 @@ public class Swerve extends SubsystemBase {
      * @return true if red alliance, false otherwise
      */
     private boolean isRedAlliance() {
-        var alliance = DriverStation.getAlliance();
-        return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+        var alliance = MatchState.getAlliance();
+        return alliance.isPresent() && alliance.get() == Alliance.RED;
     }
 
     /**
@@ -468,7 +472,7 @@ public class Swerve extends SubsystemBase {
      */
     private void updateVisionPose() {
         double headingDeg = getPose().getRotation().getDegrees();
-        double angularVelDegPerSec = Math.toDegrees(getRobotVelocity().omegaRadiansPerSecond);
+        double angularVelDegPerSec = Math.toDegrees(getRobotVelocity().omega);
 
         for (int i = 0; i < LimelightConstants.kAllCameras.length; i++) {
             updateVisionPoseForCamera(LimelightConstants.kAllCameras[i], headingDeg, angularVelDegPerSec, i);

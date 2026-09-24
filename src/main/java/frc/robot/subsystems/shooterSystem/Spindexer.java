@@ -9,10 +9,14 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.command2.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.util.LoggingUtils;
 
@@ -46,12 +50,12 @@ public class Spindexer extends SubsystemBase {
 
   public void setSpeed(double speed) {
     double requestedSpeed = speed;
-    speed = MathUtil.clamp(speed, -MotorConstants.kSpindexerMotorMaximumSpeed, MotorConstants.kSpindexerMotorMaximumSpeed);
+    speed = Math.clamp(speed, -MotorConstants.kSpindexerMotorMaximumSpeed, MotorConstants.kSpindexerMotorMaximumSpeed);
 
     if (Math.abs(requestedSpeed) > Math.abs(speed)) {
       String warning = String.format("Spindexer speed clamped: requested %.2f, limited to %.2f",
                                      requestedSpeed, speed);
-      DriverStation.reportWarning(warning, false);
+      DriverStationErrors.reportWarning(warning, false);
     }
 
     m_SpindexerMotor.set(speed);

@@ -1,6 +1,6 @@
 package frc.robot.commands.ShootFeedCommands.AutoScoringCommands;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import org.wpilib.command2.Command;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.TagOverrideConstants;

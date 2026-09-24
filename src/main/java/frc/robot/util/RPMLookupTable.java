@@ -1,6 +1,6 @@
 package frc.robot.util;
 
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import org.wpilib.math.interpolation.InterpolatingDoubleTreeMap;
 
 /**
  * Lookup tables for shooter RPM by distance.

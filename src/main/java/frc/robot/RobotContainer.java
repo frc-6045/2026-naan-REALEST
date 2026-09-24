@@ -15,12 +15,16 @@ import frc.robot.subsystems.IntakeSystem.IntakePivot;
 import frc.robot.subsystems.shooterSystem.Spindexer;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.Swerve;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.hardware.power.PowerDistribution;
+import org.wpilib.hardware.power.PowerDistribution.ModuleType;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.button.CommandXboxController;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -63,8 +67,8 @@ public class RobotContainer {
     // Field-relative drive runs in blue-origin coords. Red drivers stand at the opposite end,
     // so their "forward" stick input maps to -X in field. Flip translation (not rotation) on red.
     java.util.function.DoubleSupplier allianceSign = () ->
-        DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
-            == DriverStation.Alliance.Red ? -1.0 : 1.0;
+        MatchState.getAlliance().orElse(Alliance.BLUE)
+            == Alliance.RED ? -1.0 : 1.0;
 
     m_Swerve.setDefaultCommand(
         m_Swerve.driveCommand(

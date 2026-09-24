@@ -1,6 +1,6 @@
 package frc.robot.commands.AutoCommands;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import org.wpilib.command2.InstantCommand;
 import frc.robot.subsystems.shooterSystem.Flywheel;
 import frc.robot.subsystems.shooterSystem.TopRoller;
 

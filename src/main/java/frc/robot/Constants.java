@@ -7,12 +7,16 @@ package frc.robot;
 import java.util.Map;
 import java.util.Optional;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.util.Color;
+import org.wpilib.vision.apriltag.AprilTagFieldLayout;
+import org.wpilib.vision.apriltag.AprilTagFields;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.util.Color;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -212,7 +216,7 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
 
     /** Get the valid target AprilTag IDs for the current alliance. */
     public static int[] getTargetAprilTagIDs() {
-      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
+      return MatchState.getAlliance().orElse(Alliance.BLUE) == Alliance.RED
           ? kRedAprilTagIDs
           : kBlueAprilTagIDs;
     }
@@ -244,14 +248,14 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
 
     /** Get the priority tag ID for LEFT-side approach based on current alliance. */
     public static int getLeftSidePriorityTag() {
-      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
+      return MatchState.getAlliance().orElse(Alliance.BLUE) == Alliance.RED
           ? kRedLeftSideTag
           : kBlueLeftSideTag;
     }
 
     /** Get the priority tag ID for RIGHT-side approach based on current alliance. */
     public static int getRightSidePriorityTag() {
-      return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
+      return MatchState.getAlliance().orElse(Alliance.BLUE) == Alliance.RED
           ? kRedRightSideTag
           : kBlueRightSideTag;
     }
@@ -436,12 +440,12 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     public static final double kGradientPeriodSec = 2.0;  // Time for full green->orange->green cycle
 
     // Colors
-    public static final Color kGreen = Color.kGreen;
-    public static final Color kOrange = Color.kOrange;
-    public static final Color kYellow = Color.kYellow;
-    public static final Color kRed = Color.kRed;
-    public static final Color kBlue = Color.kBlue;
-    public static final Color kPurple = Color.kPurple;
+    public static final Color.GREEN = Color.GREEN;
+    public static final Color.ORANGE = Color.ORANGE;
+    public static final Color.YELLOW = Color.YELLOW;
+    public static final Color.RED = Color.RED;
+    public static final Color.BLUE = Color.BLUE;
+    public static final Color.PURPLE = Color.PURPLE;
 
     // Animation settings
     public static final double kAnimationSpeedMs = 0.005;  // Milliseconds per LED position (super fast!)

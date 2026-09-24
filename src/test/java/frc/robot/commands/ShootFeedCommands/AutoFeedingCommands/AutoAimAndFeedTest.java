@@ -3,9 +3,9 @@ package frc.robot.commands.ShootFeedCommands.AutoFeedingCommands;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
 import frc.robot.Constants.FeedingConstants;
 import frc.robot.Constants.FieldConstants;
 import org.junit.jupiter.api.Test;

@@ -2,7 +2,7 @@ package frc.robot.util;
 
 import java.util.function.IntPredicate;
 
-import edu.wpi.first.math.MathUtil;
+import org.wpilib.math.util.MathUtil;
 import frc.robot.Constants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.ShootingConstants;
@@ -123,7 +123,7 @@ public final class LimelightTargeting {
         double distance = (LimelightConstants.kTargetHeightMeters - cam.mountHeightMeters)
                 / Math.tan(angleToTargetRad);
 
-        distance = MathUtil.clamp(distance,
+        distance = Math.clamp(distance,
                 ShootingConstants.kMinShootingDistanceMeters,
                 ShootingConstants.kMaxShootingDistanceMeters);
 

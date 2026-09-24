@@ -1,12 +1,16 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.hardware.led.AddressableLED;
+import org.wpilib.hardware.led.AddressableLEDBuffer;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.util.Color;
+import org.wpilib.command2.SubsystemBase;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.subsystems.shooterSystem.Feeder;
 import frc.robot.subsystems.shooterSystem.Flywheel;
@@ -116,9 +120,9 @@ public class LEDs extends SubsystemBase {
      * @return Red for Red alliance, Blue for Blue alliance, Orange as fallback
      */
     private Color getAllianceColor() {
-        var alliance = DriverStation.getAlliance();
+        var alliance = MatchState.getAlliance();
         if (alliance.isPresent()) {
-            return alliance.get() == Alliance.Red ? LEDConstants.kRed : LEDConstants.kBlue;
+            return alliance.get() == Alliance.RED ? LEDConstants.kRed : LEDConstants.kBlue;
         }
         return LEDConstants.kOrange;  // Fallback if alliance unknown
     }
@@ -128,7 +132,7 @@ public class LEDs extends SubsystemBase {
      * @return true if connected to FMS and disabled (pre-match state)
      */
     private boolean isOurShift() {
-        return DriverStation.isFMSAttached() && DriverStation.isDisabled();
+        return RobotState.isFMSAttached() && RobotState.isDisabled();
     }
 
     private static final Map<Character, String> kMorseMap = Map.ofEntries(
@@ -231,7 +235,7 @@ public class LEDs extends SubsystemBase {
         m_flashStartTimeMs = 0;
 
         for (int i = 0; i < m_ledBuffer.getLength(); i++) {
-            m_ledBuffer.setLED(i, Color.kBlack);
+            m_ledBuffer.setLED(i, Color.BLACK);
         }
         m_led.setData(m_ledBuffer);
         m_lastSolidColor = null;
@@ -270,7 +274,7 @@ public class LEDs extends SubsystemBase {
                 if (m_animationChasePosition > 0) {
                     int prevPos = m_animationChasePosition - 1;
                     if (prevPos >= m_animationPass) {
-                        m_ledBuffer.setLED(prevPos, Color.kBlack);
+                        m_ledBuffer.setLED(prevPos, Color.BLACK);
                     }
                 }
 
@@ -332,8 +336,8 @@ public class LEDs extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        boolean isAuto = DriverStation.isAutonomous();
-        boolean isTeleop = DriverStation.isTeleop();
+        boolean isAuto = RobotState.isAutonomous();
+        boolean isTeleop = RobotState.isTeleop();
 
         if (isAuto && m_morseCode.isEmpty()) {
             initializeMorseCode();
@@ -361,17 +365,17 @@ public class LEDs extends SubsystemBase {
         }
 
         if (isTeleop) {
-            double timeRemaining = DriverStation.getMatchTime();
+            double timeRemaining = MatchState.getMatchTime();
             long now = System.currentTimeMillis();
 
             if (timeRemaining > 0 && timeRemaining <= LEDConstants.kShootWarningTime) {
-                setSolidColor((now % 200 < 100) ? LEDConstants.kGreen : Color.kBlack);
+                setSolidColor((now % 200 < 100) ? LEDConstants.kGreen : Color.BLACK);
                 publishState("SHOOT_WARNING");
                 return;
             }
 
             if (timeRemaining > 0 && timeRemaining <= LEDConstants.kEndgameWarningTime) {
-                setSolidColor((now % 500 < 250) ? getAllianceColor() : Color.kBlack);
+                setSolidColor((now % 500 < 250) ? getAllianceColor() : Color.BLACK);
                 publishState("ENDGAME_WARNING");
                 return;
             }

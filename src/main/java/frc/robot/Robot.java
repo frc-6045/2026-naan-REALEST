@@ -4,12 +4,16 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.system.RobotController;
+import org.wpilib.system.Timer;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.CommandScheduler;
 import frc.robot.Constants.DrivebaseConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.LEDs.LEDState;
@@ -101,10 +105,10 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putNumber("ROBOT current draw", m_robotContainer.getRobotCurrentDraw());
 
     // Per-loop dynamic DS state (these change throughout the match)
-    Logger.recordOutput("DS/MatchTime", DriverStation.getMatchTime());
-    Logger.recordOutput("DS/IsAutonomous", DriverStation.isAutonomous());
-    Logger.recordOutput("DS/IsTeleop", DriverStation.isTeleop());
-    Logger.recordOutput("DS/IsEnabled", DriverStation.isEnabled());
+    Logger.recordOutput("DS/MatchTime", MatchState.getMatchTime());
+    Logger.recordOutput("DS/IsAutonomous", RobotState.isAutonomous());
+    Logger.recordOutput("DS/IsTeleop", RobotState.isTeleop());
+    Logger.recordOutput("DS/IsEnabled", RobotState.isEnabled());
 
     // Static-ish DS info — only republish on change. Saves ~5 NT publishes per loop.
     publishStaticDSInfoIfChanged();
@@ -122,11 +126,11 @@ public class Robot extends LoggedRobot {
 
   /** Publish DS-static fields only when they change. Cheap when nothing's changed (5 lookups + equality checks). */
   private void publishStaticDSInfoIfChanged() {
-    publishIfChanged("DS/Alliance", DriverStation.getAlliance().map(Enum::name).orElse("Unknown"));
-    publishIfChanged("DS/MatchType", DriverStation.getMatchType().name());
-    publishIfChanged("DS/MatchNumber", DriverStation.getMatchNumber());
-    publishIfChanged("DS/EventName", DriverStation.getEventName());
-    publishIfChanged("DS/IsFMSAttached", DriverStation.isFMSAttached());
+    publishIfChanged("DS/Alliance", MatchState.getAlliance().map(Enum::name).orElse("Unknown"));
+    publishIfChanged("DS/MatchType", MatchState.getMatchType().name());
+    publishIfChanged("DS/MatchNumber", MatchState.getMatchNumber());
+    publishIfChanged("DS/EventName", MatchState.getEventName());
+    publishIfChanged("DS/IsFMSAttached", RobotState.isFMSAttached());
   }
 
   private void publishIfChanged(String key, String value) {
@@ -214,14 +218,14 @@ public class Robot extends LoggedRobot {
   public void teleopPeriodic() {}
 
   @Override
-  public void testInit() {
+  public void utilityInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
   }
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void utilityPeriodic() {}
 
   /** This function is called once when the robot is first started up. */
   @Override

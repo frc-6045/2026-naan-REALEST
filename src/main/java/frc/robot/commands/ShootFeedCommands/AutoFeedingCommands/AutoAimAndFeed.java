@@ -2,15 +2,19 @@ package frc.robot.commands.ShootFeedCommands.AutoFeedingCommands;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.system.Timer;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.command2.Command;
 import frc.robot.Constants.AimConstants;
 import frc.robot.Constants.FeedingConstants;
 import frc.robot.Constants.FieldConstants;
@@ -95,8 +99,8 @@ public class AutoAimAndFeed extends Command {
         Pose2d robotPose = m_swerve.getPose();
         double headingDeg = robotPose.getRotation().getDegrees();
 
-        boolean isRed = DriverStation.getAlliance()
-                .orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
+        boolean isRed = MatchState.getAlliance()
+                .orElse(Alliance.BLUE) == Alliance.RED;
         Translation2d target = computeFeedTarget(robotPose, isRed);
         // Use shooter exit position rather than robot center to avoid parallax misses.
         Translation2d shooterField = ShooterGeometryConstants.shooterFieldPosition(robotPose);
@@ -104,11 +108,11 @@ public class AutoAimAndFeed extends Command {
         double bearingDeg = toTarget.getAngle().getDegrees();
         double poseDistance = toTarget.getNorm();
 
-        ChassisSpeeds fieldVelocity = m_swerve.getFieldVelocity();
+        ChassisVelocities fieldVelocity = m_swerve.getFieldVelocity();
         ShotCompensation.CompensationResult compensation =
                 ShotCompensation.calculateFromBearing(fieldVelocity, headingDeg, bearingDeg, poseDistance);
 
-        double feedDistance = MathUtil.clamp(compensation.adjustedDistanceMeters,
+        double feedDistance = Math.clamp(compensation.adjustedDistanceMeters,
                 ShootingConstants.kMinFeedingDistanceMeters,
                 ShootingConstants.kMaxFeedingDistanceMeters);
 
@@ -122,7 +126,7 @@ public class AutoAimAndFeed extends Command {
                 - ShooterGeometryConstants.kShooterYawDegrees
                 - compensation.aimLeadDegrees;
         double aimOutput = m_aimPID.calculate(headingDeg, desiredHeadingDeg);
-        double rotationSpeed = MathUtil.clamp(aimOutput,
+        double rotationSpeed = Math.clamp(aimOutput,
                 -AimConstants.kMaxAutoRotationRadPerSec,
                 AimConstants.kMaxAutoRotationRadPerSec);
 

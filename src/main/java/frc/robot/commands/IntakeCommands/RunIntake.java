@@ -1,6 +1,6 @@
 package frc.robot.commands.IntakeCommands;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import org.wpilib.command2.Command;
 import frc.robot.subsystems.IntakeSystem.Intake;
 
 import frc.robot.Constants.Directions;

@@ -12,11 +12,15 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.system.Timer;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.command2.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.util.LoggingUtils;
 
@@ -112,12 +116,12 @@ public class Flywheel extends SubsystemBase {
 
   public void setSpeed(double speed) {
     double requestedSpeed = speed;
-    speed = MathUtil.clamp(speed, -MotorConstants.kShooterMotorMaximumSpeed, MotorConstants.kShooterMotorMaximumSpeed);
+    speed = Math.clamp(speed, -MotorConstants.kShooterMotorMaximumSpeed, MotorConstants.kShooterMotorMaximumSpeed);
 
     if (Math.abs(requestedSpeed) > Math.abs(speed)) {
       String warning = String.format("Flywheel speed clamped: requested %.2f, limited to %.2f",
                                      requestedSpeed, speed);
-      DriverStation.reportWarning(warning, false);
+      DriverStationErrors.reportWarning(warning, false);
     }
 
     m_FlywheelMotor1.set(speed);
@@ -172,7 +176,7 @@ public class Flywheel extends SubsystemBase {
     m_FlywheelMotor1.configure(pidConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     m_FlywheelMotor2.configure(pidConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
-    DriverStation.reportWarning(
+    DriverStationErrors.reportWarning(
         String.format("Flywheel PID updated: P=%.6f I=%.6f D=%.6f FF=%.6f IZone=%.1f", p, i, d, ff, iZone),
         false);
   }
@@ -185,7 +189,7 @@ public class Flywheel extends SubsystemBase {
 
     // Detect spin-up start: actual RPM crosses above 100
     if (currentRPM > 100 && !m_wasAbove100RPM) {
-      m_spinUpStartTime = Timer.getFPGATimestamp();
+      m_spinUpStartTime = Timer.getTimestamp();
       m_isSpinningUp = true;
       m_trackingAvgRPM = false;
       m_rpmSum = 0;
@@ -207,13 +211,13 @@ public class Flywheel extends SubsystemBase {
 
     // Spin-up timing: check if we just reached target speed
     if (m_isSpinningUp && isAtTargetSpeed(targetRPM) && targetRPM > 100) {
-      double spinUpTime = Timer.getFPGATimestamp() - m_spinUpStartTime;
+      double spinUpTime = Timer.getTimestamp() - m_spinUpStartTime;
       m_isSpinningUp = false;
       m_trackingAvgRPM = true;
       m_rpmSum = 0;
       m_rpmSampleCount = 0;
       SmartDashboard.putNumber("Subsystem: Flywheel/Spin-Up Time (sec)", spinUpTime);
-      DriverStation.reportWarning(
+      DriverStationErrors.reportWarning(
           String.format("Flywheel spin-up complete: %.3f sec to reach %.0f RPM", spinUpTime, targetRPM),
           false);
     }
