@@ -89,7 +89,7 @@ public final class Constants {
 
     // Current Spike Detection Thresholds (Amps)
     public static final double kIntakeCurrentSpikeThreshold = 40; // Current threshold to detect stow/deploy complete
-    public static final double kIntakePivotCurrentThreshold = 45; // Current threshold to detect game piece contact during autoshoot oscillation
+    public static final double kIntakePivotCurrentThreshold = 60; // Current threshold to detect game piece contact during autoshoot oscillation
 
     // Motor Current Limits (Amps)
     public static final int kFeederCurrentLimit = 100;
