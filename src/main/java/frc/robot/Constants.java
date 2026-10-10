@@ -68,7 +68,7 @@ public final class Constants {
 
     // Motor Speed Limits (percentage, -1.0 to 1.0)
     public static final double kFeederMotorMaximumSpeed = 1;
-    public static final double kIntakeMotorMaximumSpeed = 0.8;
+    public static final double kIntakeMotorMaximumSpeed = 1;
     public static final double kIntakePivotMotorMaximumSpeed = .4;
     public static final double kShooterMotorMaximumSpeed = 1;
     public static final double kTopRollerMotorMaximumSpeed = 1;
