@@ -92,12 +92,12 @@ public final class Constants {
     public static final double kIntakePivotCurrentThreshold = 45; // Current threshold to detect game piece contact during autoshoot oscillation
 
     // Motor Current Limits (Amps)
-    public static final int kFeederCurrentLimit = 70;
+    public static final int kFeederCurrentLimit = 100;
     public static final int kIntakeCurrentLimit = 100;
     public static final int kIntakePivotCurrentLimit = 50;
     public static final int kShooterCurrentLimit = 60;
     public static final int kTopRollerCurrentLimit = 60;
-    public static final int kSpindexerCurrentLimit = 90;
+    public static final int kSpindexerCurrentLimit = 100;
 
     // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
     // TODO: Determine empirically on the robot
