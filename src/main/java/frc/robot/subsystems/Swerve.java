@@ -63,8 +63,15 @@ public class Swerve extends SubsystemBase {
         // We already publish what AdvantageScope's swerve widgets need via the explicit
         // Logger.recordOutput calls in periodic() (Pose, ModuleStates, ModulePositions,
         // RobotVelocity, FieldVelocity), so the YAGSL telemetry was duplicate. LOW keeps
-        // the basic chassis-level telemetry without per-loop module spam. Bump back to
-        // INFO/HIGH temporarily if you ever need to debug per-module setpoint tracking.
+        // the basic chassis-level telemetry without per-loop module spam.
+        //
+        // Caveat: YAGSL only writes the per-module encoder keys on SmartDashboard
+        // (swerve/modules/<name>/Raw Absolute Encoder, Raw Angle Encoder, Raw Drive
+        // Encoder, ...) when verbosity is exactly HIGH. INFO does NOT publish them. The
+        // topics still get created at construction, so at any lower level the dashboard
+        // shows a full set of 0s rather than missing keys. periodic() below calls each
+        // module's updateTelemetry() itself so those keys stay live without re-enabling
+        // the rest of HIGH's duplicated chassis telemetry.
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.LOW;
 
         try {
@@ -608,8 +615,24 @@ public class Swerve extends SubsystemBase {
             Logger.recordOutput(prefix + "Status", m_lastVisionRejectReason[i]);
         }
 
+        // Per-module encoder readouts for the dashboard. YAGSL only does this itself at
+        // TelemetryVerbosity.HIGH (see the constructor), and we run at LOW. Skipped in sim:
+        // the non-HIGH branch of updateTelemetry() reads the real motor/encoder objects,
+        // which YAGSL's own sim path deliberately avoids.
+        var modules = m_swerveDrive.getModules();
+        double[] rawAbsoluteEncoderDegrees = new double[modules.length];
+        if (!SwerveDriveTelemetry.isSimulation) {
+            for (int i = 0; i < modules.length; i++) {
+                modules[i].updateTelemetry();
+                rawAbsoluteEncoderDegrees[i] = modules[i].getRawAbsolutePosition();
+            }
+        }
+
         // AdvantageKit structured outputs (typed — viewable as a 2D pose / swerve widget
         // in AdvantageScope, unlike the SmartDashboard scalars).
+        // Raw (pre-offset) absolute encoder angles are logged too so an encoder that reads
+        // wrong on the dashboard can be diagnosed from a match log, not just live.
+        Logger.recordOutput("Swerve/RawAbsoluteEncoderDegrees", rawAbsoluteEncoderDegrees);
         Logger.recordOutput("Swerve/Pose", getPose());
         Logger.recordOutput("Swerve/Heading", getHeading().getDegrees());
         Logger.recordOutput("Swerve/Pitch", getPitch().getDegrees());
