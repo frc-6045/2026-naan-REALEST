@@ -69,7 +69,7 @@ public final class Constants {
     // Motor Speed Limits (percentage, -1.0 to 1.0)
     public static final double kFeederMotorMaximumSpeed = 1;
     public static final double kIntakeMotorMaximumSpeed = 1;
-    public static final double kIntakePivotMotorMaximumSpeed = .4;
+    public static final double kIntakePivotMotorMaximumSpeed = .5;
     public static final double kShooterMotorMaximumSpeed = 1;
     public static final double kTopRollerMotorMaximumSpeed = 1;
     public static final double kSpindexerMotorMaximumSpeed = 1;
@@ -101,10 +101,10 @@ public final class Constants {
 
     // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
     // TODO: Determine empirically on the robot
-    public static final double kIntakePivotDeploySetpoint = 0.018431739881634712;   // Fully down (deployed)
-    public static final double kIntakePivotOuttakeSetpoint = 0.9649031162261963;  // a bit up for eject balls
-    public static final double kIntakePivotMiddleSetpoint = 0.7336735725402832;   // Halfway — oscillation bottom
-    public static final double kIntakePivotStowSetpoint = 0.6068117618560791;     // Fully up (stowed/raised)
+    public static final double kIntakePivotDeploySetpoint = 0.579471230506897;   // Fully down (deployed)
+    public static final double kIntakePivotOuttakeSetpoint = 0.5385093688964844;  // a bit up for eject balls
+    public static final double kIntakePivotMiddleSetpoint = 0.2838776707649231;   // Halfway — oscillation bottom
+    public static final double kIntakePivotStowSetpoint = 0.18633347749710083;     // Fully up (stowed/raised)
 
     // Seconds per oscillation direction (up->middle or middle->up)
     public static final double kIntakePivotOscillationPeriodSec = 0.8;
