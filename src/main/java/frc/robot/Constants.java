@@ -439,13 +439,13 @@ private static final int[] kRedAprilTagIDs = {8, 9, 10, 11};
     // Animation timing
     public static final double kGradientPeriodSec = 2.0;  // Time for full green->orange->green cycle
 
-    // Colors
-    public static final Color.GREEN = Color.GREEN;
-    public static final Color.ORANGE = Color.ORANGE;
-    public static final Color.YELLOW = Color.YELLOW;
-    public static final Color.RED = Color.RED;
-    public static final Color.BLUE = Color.BLUE;
-    public static final Color.PURPLE = Color.PURPLE;
+    // Colors (causing syntax errors, seems unnecessary -benji)
+    //public static final Color.GREEN = Color.GREEN;
+    //public static final Color.ORANGE = Color.ORANGE;
+    //public static final Color.YELLOW = Color.YELLOW;
+    //public static final Color.RED = Color.RED;
+    //public static final Color.BLUE = Color.BLUE;
+    //public static final Color.PURPLE = Color.PURPLE;
 
     // Animation settings
     public static final double kAnimationSpeedMs = 0.005;  // Milliseconds per LED position (super fast!)
