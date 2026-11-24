@@ -101,10 +101,10 @@ public final class Constants {
 
     // Intake Pivot Setpoints (absolute encoder, 0.0-1.0 range)
     // TODO: Determine empirically on the robot
-    public static final double kIntakePivotDeploySetpoint = 0.579471230506897;   // Fully down (deployed)
-    public static final double kIntakePivotOuttakeSetpoint = 0.5385093688964844;  // a bit up for eject balls
-    public static final double kIntakePivotMiddleSetpoint = 0.2838776707649231;   // Halfway — oscillation bottom
-    public static final double kIntakePivotStowSetpoint = 0.18633347749710083;     // Fully up (stowed/raised)
+    public static final double kIntakePivotDeploySetpoint = 0.7307416200637817;   // Fully down (deployed)
+    public static final double kIntakePivotOuttakeSetpoint = 0.6780878305435181;  // a bit up for eject balls
+    public static final double kIntakePivotMiddleSetpoint = 0.48096850514411926;   // Halfway — oscillation bottom
+    public static final double kIntakePivotStowSetpoint = 0.3179439902305603;     // Fully up (stowed/raised)
 
     // Seconds per oscillation direction (up->middle or middle->up)
     public static final double kIntakePivotOscillationPeriodSec = 0.8;
